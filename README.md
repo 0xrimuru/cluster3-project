@@ -2,44 +2,44 @@
 
 **Student:** Pedro Alvim
 **Student ID:** CTI20260187
-**Course:** ICT50220 Diploma of Information Technology — Cluster 3
-**Started:** 29 July 2026
+**Course:** ICT50220 Diploma of Information Technology — Cluster 3 (Advanced Programming)
+**Study period:** 01/06/2026 – 27/11/2026
 
-## Project overview
+Single Git repository for Cluster 3. This is the repo pushed to GitHub. Work is
+organised into one folder per teaching block (one unit each). The web application
+itself is built from Block 2 onward and evolves across the later blocks.
 
-An online **bookstore** delivered across three front-ends — **webstore**, **desktop app** and **mobile app** — backed by a shared product/catalogue service. This repository holds the code and the project-management artefacts produced across Cluster 3.
+## Project
 
-Cluster 3 covers three units, built in phases:
+One connected project with three faces of the same idea: an e-commerce **webstore**,
+a **desktop** interface, and a **mobile** interface — built as an intermediate
+"pre-alpha" core first, then extended with the advanced features.
 
-| Block | Unit | Focus |
-|-------|------|-------|
-| 1 | ICTPRG530 | Manage projects using software management tools |
-| 2 | ICTPRG556 | Build a REST/CRUD web application |
-| 3 | ICTPRG538 | Integrate/mash up external data sources |
+## Blocks (unit → assessment-doc phase)
 
-## Repository structure
+| Folder   | Unit      | Focus                                            | Assess. Phase |
+|----------|-----------|--------------------------------------------------|---------------|
+| Block 1  | ICTPRG530 | Manage projects using software mgmt tools        | 1             |
+| Block 2  | ICTPRG556 | MVC framework                                    | 7             |
+| Block 3  | ICTPRG538 | Create mashups                                   | 2             |
+| Block 4  | ICTPRG535 | Build advanced user interfaces                   | 4             |
+| Block 5  | ICTPRG546 | Validate application designs                     | TBC*          |
+| Block 6  | ICTWEB514 | Create dynamic web pages                         | 5             |
+| Block 7  | ICTDBS507 | Integrate databases with website                 | 6             |
+| Block 8  | ICTPRG554 | Manage data persistence using NoSQL              | 3             |
+| Block 9  | ICTPRG537 | Implement security for applications              | 8             |
+| Block 10 | ICTPRG549 | Apply intermediate object-oriented language      | 9             |
 
-```
-cluster3-project/
-├── README.md                 # this file
-├── .gitignore
-└── docs/
-    ├── project-plan.md            # scope, schedule, roles (Block 1)
-    ├── milestone-checklist.md     # cluster milestone checklist (Block 1)
-    ├── meeting-agenda-minutes.md  # CTI client-meeting agenda + minutes (Block 1)
-    ├── gantt-cluster3.png         # Gantt chart of the cluster (Block 1)
-    └── phase1-assessment-draft.md # draft text for the assessment document
-```
+\* The assessment doc also references **ICTPRG547 (Apply advanced programming
+skills)** as Phase 10, and the source guide flags a Phase-5/ICTPRG546 mismatch —
+confirm the exact phase list with your trainer.
 
 ## Tools
 
-- **Source control:** Git + GitHub
-- **Project management / board:** GitHub Projects
-- **Diagrams (Gantt):** draw.io
-- **Editor:** Visual Studio Code
+Git + GitHub · GitHub Projects (board) · draw.io (Gantt) · VS Code · Postman ·
+XAMPP / MongoDB (later blocks) — confirm the language/stack with your assessor.
 
-## Status
+## Progress
 
-- [x] Block 1 — planning artefacts drafted
-- [ ] Block 2 — web application
-- [ ] Block 3 — data mash-ups
+- [x] Block 1 — planning artefacts drafted (see `Block 1/`)
+- [ ] Blocks 2–10 — see each folder's README
