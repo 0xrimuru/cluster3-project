@@ -14,10 +14,10 @@ Each block below shows its unit and the **assessment-doc Phase** it maps to.
 - [x] Project plan written (scope, schedule, roles) — done 29/07/2026
 - [x] Milestone checklist created (this document) — done 29/07/2026
 - [x] Gantt chart of the cluster created — done 29/07/2026
-- [ ] GitHub repo created + first commit pushed
-- [ ] Project board set up (To Do / In Progress / Done)
-- [ ] Screenshots captured (board, repo, first commit, Gantt) — name + ID + date on each
-- [ ] Phase 1 + Meeting sections drafted in assessment doc
+- [x] GitHub repo created + first commit pushed — done 29/07/2026
+- [x] Project board set up (To Do / In Progress / Done) — done 29/07/2026
+- [x] Screenshots captured (board, repo, first commit, Gantt) — name + ID + date on each — done 29/07/2026
+- [x] Phase 1 + Meeting sections drafted in assessment doc — done 29/07/2026
 
 ## Block 2 — ICTPRG556: MVC framework (Phase 7) · 15/06–26/06
 - [ ] MVC framework chosen + confirmed with assessor
