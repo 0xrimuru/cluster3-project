@@ -38,7 +38,7 @@ One connected **e-commerce project** presented as three faces of the same idea (
 
 ### Constraints
 - Fixed cluster window 01/06/2026 – 27/11/2026; each unit is a two-week block.
-- Solo developer (the student performs every role).
+- Small team (front-end, two back-end, two graphics) coordinated by the student as project manager.
 - Auditable Git commit history required as authenticity evidence.
 
 ## 3. Deliverables
@@ -74,15 +74,17 @@ Teaching-block order and assessment-doc **Phase** numbers differ — both are sh
 
 ## 5. Roles and responsibilities (who does what)
 
-Solo project — the student wears every "hat"; the table shows which role applies to each activity.
+I act as the project manager for OT Tech and allocate the work across the team, reporting to my supervisor, John. The client is played by the trainer.
 
 | Role | Responsibility | Assigned to |
 |------|----------------|-------------|
 | Client | Provides requirements, signs off minutes | Trainer (role-play) |
-| Project manager | Maintains plan, board, Gantt; tracks progress | Pedro Alvim |
-| Developer | Writes and commits code | Pedro Alvim |
-| Tester | Verifies features, records PASS/FAIL evidence | Pedro Alvim |
-| Documenter | Maintains README and assessment doc | Pedro Alvim |
+| Supervisor | Oversees the project, receives progress reports | John |
+| Project manager | Plan, board, Gantt, scheduling; tracks progress; reports to John | Pedro Alvim |
+| Front-end designer | Builds the web/mobile interfaces | Nona |
+| Back-end developers | Build the API, server logic and database | Ben, Chan |
+| Graphics / UI designers | Produce graphics, UI assets and multimedia | Thomas, Linda |
+| Tester | Verifies features, records PASS/FAIL evidence | Whole team (PM coordinates) |
 
 ## 6. Tools selected
 
