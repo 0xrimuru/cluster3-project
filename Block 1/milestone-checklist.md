@@ -21,11 +21,11 @@ Each block below shows its unit and the **assessment-doc Phase** it maps to.
 
 ## Block 2 — ICTPRG556: MVC framework (Phase 7) · 15/06–26/06
 - [ ] MVC framework chosen + confirmed with assessor
-- [ ] Project skeleton created (Models / Views / Controllers / routes)
-- [ ] One page renders through a controller
-- [ ] GET / POST / PUT / DELETE demonstrated
+- [x] Project skeleton created (Models / Views / Controllers / routes) — done 29/07/2026
+- [x] One page renders through a controller — done 29/07/2026
+- [x] GET / POST / PUT / DELETE demonstrated — done 29/07/2026
 - [ ] Debugger used to inspect a request/response
-- [ ] Phase 7 drafted (framework + IDE + verbs)
+- [x] Phase 7 drafted (framework + IDE + verbs) — done 29/07/2026
 
 ## Block 3 — ICTPRG538: Create mashups (Phase 2) · 20/07–31/07
 - [ ] APIs identified + tested in Postman

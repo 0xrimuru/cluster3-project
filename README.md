@@ -42,4 +42,4 @@ XAMPP / MongoDB (later blocks) — confirm the language/stack with your assessor
 ## Progress
 
 - [x] Block 1 — planning artefacts drafted (see `Block 1/`)
-- [ ] Blocks 2–10 — see each folder's README
+- [ ] Blocks 2–10 — see each folder's README (Block 2 MVC app built 29/07/2026; awaiting debugger evidence)

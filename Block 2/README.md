@@ -51,5 +51,8 @@ A request flows **route → controller → model → view**.
 
 HTML forms only send GET and POST, so **method-override** turns the edit form into a real
 `PUT` and the delete button into a real `DELETE`. API clients (Postman) can call the verbs
-directly and receive JSON. Data is in memory for this block and resets on restart; a real
-database arrives in the database blocks.
+directly: send a JSON body (`Content-Type: application/json`) and the controller answers
+with JSON and proper status codes — `201` on create, `200` on read/update, `204` on delete,
+`400` when title/author are missing, `404` when the book doesn't exist. Browsers keep
+getting HTML pages and redirects. Data is in memory for this block and resets on restart;
+a real database arrives in the database blocks.
