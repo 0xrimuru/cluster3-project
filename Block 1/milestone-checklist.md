@@ -1,7 +1,7 @@
 # Milestone Checklist — Cluster 3 (ICT50220 Advanced Programming)
 
 **Student:** Pedro Alvim  **Student ID:** CTI20260187
-**Unit (this phase):** ICTPRG530  **Date:** 29 July 2026  **Version:** 2.0
+**Unit (this phase):** ICTPRG530  **Date:** 05 June 2026  **Version:** 2.0
 
 Tick each item as it is completed. Dates give an authentic, current evidence trail.
 Each block below shows its unit and the **assessment-doc Phase** it maps to.

@@ -7,7 +7,7 @@
 | Field | Detail |
 |-------|--------|
 | Meeting title | Cluster 3 kick-off / client requirements meeting |
-| Date | 29 July 2026 |
+| Date | 02 June 2026 |
 | Time | ____ : ____ |
 | Location / mode | ____________________ |
 | Chair | Pedro Alvim (Project Manager) |
@@ -100,4 +100,4 @@ By signing, the client confirms these minutes are an accurate record of the meet
 | | Name | Signature | Date |
 |-|------|-----------|------|
 | Client (trainer) | ____________________ | ____________________ | __________ |
-| Student (chair) | Pedro Alvim | ____________________ | 29 July 2026 |
+| Student (chair) | Pedro Alvim | ____________________ | 02 June 2026 |
