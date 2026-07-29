@@ -1,7 +1,7 @@
 # Milestone Checklist — Cluster 3 (ICT50220 Advanced Programming)
 
 **Student:** Pedro Alvim  **Student ID:** CTI20260187
-**Unit (this phase):** ICTPRG530  **Date:** 05 June 2026  **Version:** 2.0
+**Unit (this phase):** ICTPRG530  **Date:** 29 July 2026  **Version:** 2.0
 
 Tick each item as it is completed. Dates give an authentic, current evidence trail.
 Each block below shows its unit and the **assessment-doc Phase** it maps to.
@@ -9,11 +9,11 @@ Each block below shows its unit and the **assessment-doc Phase** it maps to.
 ## Block 1 — ICTPRG530: Manage projects (Phase 1) · 01/06–12/06
 - [ ] Attended role-play client meeting; asked webstore/desktop/mobile questions
 - [ ] Meeting minutes completed **and signed** by client
-- [ ] Project management tool chosen (GitHub Projects)
-- [ ] Source-control tool chosen (Git + GitHub)
-- [ ] Project plan written (scope, schedule, roles)
-- [ ] Milestone checklist created (this document)
-- [ ] Gantt chart of the cluster created
+- [x] Project management tool chosen (GitHub Projects) — done 29/07/2026
+- [x] Source-control tool chosen (Git + GitHub) — done 29/07/2026
+- [x] Project plan written (scope, schedule, roles) — done 29/07/2026
+- [x] Milestone checklist created (this document) — done 29/07/2026
+- [x] Gantt chart of the cluster created — done 29/07/2026
 - [ ] GitHub repo created + first commit pushed
 - [ ] Project board set up (To Do / In Progress / Done)
 - [ ] Screenshots captured (board, repo, first commit, Gantt) — name + ID + date on each
