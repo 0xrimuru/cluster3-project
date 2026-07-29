@@ -1,0 +1,9 @@
+<%- include('../partials/header') %>
+  <h1>Edit book</h1>
+  <!-- HTML forms only send GET/POST, so method-override turns this into a real PUT -->
+  <form method="POST" action="/books/<%= book.id %>?_method=PUT">
+    <%- include('_form', { book: book }) %>
+    <button class="btn" type="submit">Save changes</button>
+    <a href="/books/<%= book.id %>">Cancel</a>
+  </form>
+<%- include('../partials/footer') %>

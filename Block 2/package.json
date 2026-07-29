@@ -1,0 +1,17 @@
+{
+  "name": "cluster3-block2-mvc",
+  "version": "1.0.0",
+  "description": "ICTPRG556 (Block 2) - Express + EJS MVC bookstore for OT Tech / Cluster 3",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "author": "Pedro Alvim (CTI20260187)",
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "method-override": "^3.0.0"
+  }
+}
