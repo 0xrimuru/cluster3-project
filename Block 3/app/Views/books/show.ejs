@@ -1,0 +1,15 @@
+<%- include('../partials/header') %>
+  <article class="book">
+    <h1><%= book.title %></h1>
+    <p class="meta">by <%= book.author %> &middot; $<%= book.price.toFixed(2) %></p>
+    <p><%= book.description %></p>
+    <div class="actions">
+      <a class="btn" href="/books/<%= book.id %>/edit">Edit</a>
+      <form method="POST" action="/books/<%= book.id %>?_method=DELETE"
+            onsubmit="return confirm('Delete this book?');">
+        <button class="btn danger" type="submit">Delete</button>
+      </form>
+      <a href="/books">&larr; Back to catalogue</a>
+    </div>
+  </article>
+<%- include('../partials/footer') %>

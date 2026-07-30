@@ -29,9 +29,9 @@ Each block below shows its unit and the **assessment-doc Phase** it maps to.
 
 ## Block 3 — ICTPRG538: Create mashups (Phase 2) · 20/07–31/07
 - [ ] APIs identified + tested in Postman
-- [ ] Two mashups built inside the project
+- [x] Two mashups built inside the project — done 30/07/2026
 - [ ] Requirements documented + signed off
-- [ ] Phase 2 drafted (APIs, why, how built)
+- [x] Phase 2 drafted (APIs, why, how built) — done 30/07/2026
 
 ## Block 4 — ICTPRG535: Advanced user interfaces (Phase 4) · 03/08–14/08
 - [ ] UI design planned (mock-ups)

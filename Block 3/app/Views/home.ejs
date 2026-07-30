@@ -1,0 +1,8 @@
+<%- include('partials/header') %>
+  <h1>Welcome to the OT Tech Bookstore</h1>
+  <p>This page is rendered through <code>HomeController</code> on the MVC framework
+     &mdash; the request goes route &rarr; controller &rarr; view, not to static HTML.</p>
+  <p class="stat">The catalogue currently holds <strong><%= count %></strong>
+     book<%= count === 1 ? '' : 's' %>.</p>
+  <p><a class="btn" href="/books">Browse the catalogue &rarr;</a></p>
+<%- include('partials/footer') %>
