@@ -14,7 +14,7 @@ one folder per teaching block; a block's folder is added as the class reaches it
 |--------|------|-------|--------|
 | Block 1 | ICTPRG530 | Manage projects using software management tools | Done |
 | Block 2 | ICTPRG556 | Implement and use an MVC framework (Express + EJS app) | Done |
-| Block 3 | ICTPRG538 | Create mashups | Next |
+| Block 3 | ICTPRG538 | Create mashups (store-locator map + live pricing) | Done |
 
 *Units still to come (their folders are added when we reach each block): ICTPRG535, ICTPRG546,
 ICTWEB514, ICTDBS507, ICTPRG554, ICTPRG537, ICTPRG549, ICTPRG547.*
@@ -25,5 +25,5 @@ Git + GitHub · GitHub Projects (board) · draw.io (Gantt) · VS Code · Node.js
 
 ## Running the application
 
-The web application lives in **`Block 2/`** — see `Block 2/README.md` for setup
-(`npm install`, then `npm start`, at http://localhost:3000).
+The MVC web application lives in **`Block 2/`**; **`Block 3/`** extends it with two data
+mashups. See each block's README for setup (`npm install`, then `npm start`).
