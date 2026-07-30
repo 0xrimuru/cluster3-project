@@ -20,7 +20,7 @@ Each block below shows its unit and the **assessment-doc Phase** it maps to.
 - [x] Phase 1 + Meeting sections drafted in assessment doc — done 29/07/2026
 
 ## Block 2 — ICTPRG556: MVC framework (Phase 7) · 15/06–26/06
-- [ ] MVC framework chosen + confirmed with assessor
+- [x] MVC framework chosen + confirmed with assessor (Express + EJS approved) — done 29/07/2026
 - [x] Project skeleton created (Models / Views / Controllers / routes) — done 29/07/2026
 - [x] One page renders through a controller — done 29/07/2026
 - [x] GET / POST / PUT / DELETE demonstrated — done 29/07/2026
