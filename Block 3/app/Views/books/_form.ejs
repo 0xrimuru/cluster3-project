@@ -7,6 +7,9 @@
 <label>Price (AUD)
   <input name="price" type="number" step="0.01" min="0" value="<%= book.price %>" />
 </label>
+<label>Cover image URL <span class="hint">(optional &mdash; e.g. /images/covers/clean-code.png)</span>
+  <input name="cover" value="<%= typeof book.cover !== 'undefined' ? book.cover : '' %>" placeholder="/images/covers/placeholder.png" />
+</label>
 <label>Description
   <textarea name="description" rows="3"><%= book.description %></textarea>
 </label>
