@@ -225,3 +225,8 @@ body.bare{background:linear-gradient(160deg,#1b4332,#2d6a4f);min-height:100vh;pa
 [data-theme="dark"] table.data td{color:var(--ink);border-bottom-color:var(--line)}
 [data-theme="dark"] table.data th{border-bottom-color:var(--line)}
 [data-theme="dark"] .card{border-color:var(--line)}
+
+/* Login dialog is always on a white card — force dark text regardless of theme */
+.login-dialog,.login-body,.login-body label,.login-body input{color:#111827}
+.login-body input{background:#fff}
+.login-note{color:#6b7280}
