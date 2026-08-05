@@ -4,15 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= typeof title !== 'undefined' ? title : 'OT Tech Bookstore' %></title>
+  <script>
+  (function(){try{var p=JSON.parse(localStorage.getItem('otb-prefs')||'{}');var t=p.theme||'system';
+  var dark=t==='dark'||(t==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches);
+  var r=document.documentElement;if(dark)r.setAttribute('data-theme','dark');
+  if(p.brand)r.style.setProperty('--brand',p.brand);if(p.dark)r.style.setProperty('--brand-dark',p.dark);
+  }catch(e){}})();
+  </script>
   <link rel="stylesheet" href="/css/style.css" />
   <script defer src="/js/stock.js"></script>
+  <script defer src="/js/prefs.js"></script>
 </head>
 <% var _bare = (typeof bare !== 'undefined' && bare); %>
 <body class="app<%= _bare ? ' bare' : '' %>">
 <% if (!_bare) { %>
   <header class="app-bar">
-    <a class="app-title" href="/">OT&nbsp;Tech&nbsp;<span>Bookstore</span></a>
-    <span class="app-page"><%= typeof pageName !== 'undefined' ? pageName : '' %></span>
+    <a class="app-title" href="/">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H12v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H12v16h6.5A1.5 1.5 0 0 0 20 18.5z"/></svg>
+      OT&nbsp;Tech&nbsp;<span>Bookstore</span>
+    </a>
+    <div class="app-tools">
+      <button type="button" id="theme-toggle" class="icon-btn" aria-label="Toggle light or dark mode" title="Toggle light/dark">
+        <svg class="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+        <svg class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6 19 19M19 5l-1.4 1.4M6.4 17.6 5 19"/></svg>
+      </button>
+      <a class="icon-btn" href="/settings" aria-label="Preferences" title="Preferences">
+        <svg viewBox="0 0 24 24"><path d="M4 6h8M4 12h2M4 18h12"/><path d="M20 6h-4M20 12h-8M20 18h-2"/><circle cx="14" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+      </a>
+    </div>
   </header>
   <main class="app-main">
 <% } %>

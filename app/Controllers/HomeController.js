@@ -1,4 +1,4 @@
-// HomeController (the "C" of MVC). Renders the home dashboard through a controller.
+// HomeController - home dashboard + preferences page.
 const Book = require('../Models/Book');
 const Invoice = require('../Models/Invoice');
 
@@ -16,3 +16,6 @@ exports.index = (req, res) => {
     },
   });
 };
+
+exports.settings = (req, res) =>
+  res.render('settings', { title: 'Preferences', pageName: 'Settings', nav: '' });

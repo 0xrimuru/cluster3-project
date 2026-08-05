@@ -3,6 +3,13 @@
     <h1>OT Tech Bookstore</h1>
     <p class="lede">Sales, stock and invoicing for the LPA eComms store.</p>
   </section>
+  <section class="card pad featured">
+    <h2>Featured</h2>
+    <video class="promo" controls preload="none" poster="/media/promo-poster.jpg" playsinline>
+      <source src="/media/promo.mp4" type="video/mp4" />
+      Your browser does not support embedded video.
+    </video>
+  </section>
   <section class="stat-grid">
     <div class="stat-tile"><span class="stat-num"><%= stats.items %></span><span class="stat-lbl">Stock items</span></div>
     <div class="stat-tile warn"><span class="stat-num"><%= stats.lowStock %></span><span class="stat-lbl">Low stock</span></div>
@@ -14,6 +21,6 @@
     <a class="q-card" href="/books"><strong>Stock management</strong><span>View &amp; adjust inventory</span></a>
     <a class="q-card" href="/sales"><strong>Sales &amp; invoicing</strong><span>Search invoices &amp; totals</span></a>
     <a class="q-card" href="/clients"><strong>Clients</strong><span>Customer records</span></a>
-    <a class="q-card" href="/mashups"><strong>Mashups</strong><span>Store locator &amp; pricing</span></a>
+    <a class="q-card" href="/settings"><strong>Preferences</strong><span>Theme &amp; accent colour</span></a>
   </section>
 <%- include('partials/footer') %>
