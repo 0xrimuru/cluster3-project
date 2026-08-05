@@ -1,0 +1,8 @@
+<%- include('../partials/header') %>
+  <h1>Add a book</h1>
+  <form id="book-form" method="POST" action="/books">
+    <%- include('_form', { book: { title: '', author: '', price: '', quantity: '', status: 'active', description: '', cover: '' } }) %>
+    <button class="btn" type="submit">Create</button>
+    <a href="/books">Cancel</a>
+  </form>
+<%- include('../partials/footer') %>

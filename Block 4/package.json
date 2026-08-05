@@ -1,0 +1,17 @@
+{
+  "name": "cluster3-block3-mashups",
+  "version": "1.0.0",
+  "description": "ICTPRG538 (Block 3) - OT Tech bookstore with two mashups (store locator + live pricing) for OT Tech / Cluster 3",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "author": "Pedro Alvim (CTI20260187)",
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "method-override": "^3.0.0"
+  }
+}

@@ -1,0 +1,20 @@
+<%- include('../partials/header') %>
+  <article class="book book-detail">
+    <img class="cover-large" src="<%= book.cover || '/images/covers/placeholder.png' %>" alt="Cover of <%= book.title %>" />
+    <div class="book-info">
+      <h1><%= book.title %></h1>
+      <p class="meta">by <%= book.author %> &middot; $<%= book.price.toFixed(2) %></p>
+      <p class="stock-line">On hand: <strong><%= typeof book.quantity !== 'undefined' ? book.quantity : 0 %></strong>
+        &middot; <span class="badge <%= book.status === 'disabled' ? 'badge-off' : 'badge-on' %>"><%= book.status === 'disabled' ? 'Disabled' : 'Active' %></span></p>
+      <p><%= book.description %></p>
+      <div class="actions">
+        <a class="btn" href="/books/<%= book.id %>/edit">Edit</a>
+        <form method="POST" action="/books/<%= book.id %>?_method=DELETE"
+              onsubmit="return confirm('Delete this book?');">
+          <button class="btn danger" type="submit">Delete</button>
+        </form>
+        <a href="/books">&larr; Back to catalogue</a>
+      </div>
+    </div>
+  </article>
+<%- include('../partials/footer') %>

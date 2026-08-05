@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+  <h1>Book Catalogue <span class="subtle">&mdash; stock management</span></h1>
+  <div class="toolbar">
+    <a class="btn" href="/books/new">+ Add book</a>
+    <input id="stock-search" type="search" class="search" placeholder="Search by title or author&hellip;" aria-label="Search stock" />
+  </div>
+  <table id="stock-table">
+    <thead>
+      <tr><th></th><th>Title</th><th>Author</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+    <% books.forEach(function (b) { %>
+      <tr data-name="<%= (b.title + ' ' + b.author).toLowerCase() %>" class="<%= b.status === 'disabled' ? 'row-disabled' : '' %>">
+        <td class="cover-cell">
+          <a href="/books/<%= b.id %>"><img class="cover-thumb" src="<%= b.cover || '/images/covers/placeholder.png' %>" alt="Cover of <%= b.title %>" /></a>
+        </td>
+        <td><a href="/books/<%= b.id %>"><%= b.title %></a></td>
+        <td><%= b.author %></td>
+        <td>$<%= b.price.toFixed(2) %></td>
+        <td class="<%= (typeof b.quantity !== 'undefined' && b.quantity === 0) ? 'stock-out' : '' %>"><%= typeof b.quantity !== 'undefined' ? b.quantity : 0 %></td>
+        <td><span class="badge <%= b.status === 'disabled' ? 'badge-off' : 'badge-on' %>"><%= b.status === 'disabled' ? 'Disabled' : 'Active' %></span></td>
+        <td><a href="/books/<%= b.id %>/edit">Edit</a></td>
+      </tr>
+    <% }); %>
+    </tbody>
+  </table>
+  <p id="stock-empty" class="empty-msg" style="display:none;">No items match your search.</p>
+  <% if (books.length === 0) { %><p class="empty-msg">No books yet &mdash; add one.</p><% } %>
+<%- include('../partials/footer') %>

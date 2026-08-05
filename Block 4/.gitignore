@@ -1,0 +1,14 @@
+# Node dependencies (re-created with `npm install`)
+node_modules/
+
+# Environment / secrets
+.env
+*.local
+
+# Logs
+npm-debug.log*
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
