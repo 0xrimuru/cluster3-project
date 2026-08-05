@@ -283,3 +283,6 @@ body.bare{background:#eaece9}
 [data-theme="dark"] .link,[data-theme="dark"] td a,[data-theme="dark"] .q-card strong,
 [data-theme="dark"] .stat-num{color:var(--ink)}
 [data-theme="dark"] .stat-tile.ok .stat-num{color:var(--ok)}
+
+/* Header uses a darker shade of the accent (deeper tone) */
+.app-bar{background:var(--brand-dark)}
