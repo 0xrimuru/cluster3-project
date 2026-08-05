@@ -230,3 +230,56 @@ body.bare{background:linear-gradient(160deg,#1b4332,#2d6a4f);min-height:100vh;pa
 .login-dialog,.login-body,.login-body label,.login-body input{color:#111827}
 .login-body input{background:#fff}
 .login-note{color:#6b7280}
+
+/* ================= Design re-skin to match approved mockup ================= */
+/* Fonts */
+body{font-family:"Public Sans",system-ui,Arial,sans-serif}
+.sku,.stock-top .sku,.price,.detail-info .price,table.data .num,.stat-num,
+.stock-meta,.ledger .tag,.ledger-sub,td:first-child,.mono{
+  font-family:"Spline Sans Mono","Public Sans",ui-monospace,monospace}
+table.data td:not(.num){font-family:"Public Sans",system-ui,sans-serif}
+
+/* Palette (light) — from the mockup design tokens */
+:root{
+  --brand:#0e8a5f; --brand-dark:#0a6b49; --brand-soft:rgba(14,138,95,.12);
+  --bg:#f5f6f5; --card:#ffffff; --ink:#1b1f1d; --muted:#68716c; --line:#e3e7e4;
+  --danger:#b3362e; --warn:#96690a; --ok:#1e7a46;
+  --ok-bg:rgba(46,158,99,.13); --warn-bg:rgba(196,138,31,.16); --bad-bg:rgba(208,84,76,.13);
+  --chip:#eef1ef;
+}
+/* Palette (dark) */
+[data-theme="dark"]{
+  --bg:#131614; --card:#1d211f; --ink:#edf0ee; --muted:#98a29c; --line:#2b312d;
+  --brand-soft:rgba(14,138,95,.18); --chip:#272c29;
+  --danger:#f0928a; --warn:#e2b55e; --ok:#5fca92;
+  --ok-bg:rgba(95,202,146,.14); --warn-bg:rgba(226,181,94,.14); --bad-bg:rgba(240,146,138,.13);
+}
+
+/* Badges use the token bg + text (both themes) */
+.badge-in,.badge-on{background:var(--ok-bg);color:var(--ok)}
+.badge-low{background:var(--warn-bg);color:var(--warn)}
+.badge-out,.badge-off{background:var(--bad-bg);color:var(--danger)}
+[data-theme="dark"] .badge-in,[data-theme="dark"] .badge-on{background:var(--ok-bg);color:var(--ok)}
+[data-theme="dark"] .badge-low{background:var(--warn-bg);color:var(--warn)}
+[data-theme="dark"] .badge-out,[data-theme="dark"] .badge-off{background:var(--bad-bg);color:var(--danger)}
+
+/* Category chip uses neutral chip token */
+.stock-top .cat{background:var(--chip);color:var(--muted)}
+[data-theme="dark"] .stock-top .cat{background:var(--chip);color:var(--muted)}
+
+/* Stat tiles: coloured numbers per mockup */
+.stat-tile.warn .stat-num{color:var(--warn)} .stat-tile.danger .stat-num{color:var(--danger)} .stat-tile.ok .stat-num{color:var(--ok)}
+[data-theme="dark"] .stat-tile.warn .stat-num{color:var(--warn)}
+[data-theme="dark"] .stat-tile.danger .stat-num{color:var(--danger)}
+[data-theme="dark"] .stat-tile.ok .stat-num{color:var(--ok)}
+
+/* Login sits on a light neutral panel (not a dark gradient), matching the mockup */
+body.bare{background:#eaece9}
+[data-theme="dark"] body.bare{background:#0f1210}
+
+/* keep dark-mode heading/text contrast (light neutral text) */
+[data-theme="dark"] h1,[data-theme="dark"] h2{color:var(--ink)}
+[data-theme="dark"] .stock-top .sku,[data-theme="dark"] .detail-info .price,
+[data-theme="dark"] .link,[data-theme="dark"] td a,[data-theme="dark"] .q-card strong,
+[data-theme="dark"] .stat-num{color:var(--ink)}
+[data-theme="dark"] .stat-tile.ok .stat-num{color:var(--ok)}

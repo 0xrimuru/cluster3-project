@@ -3,11 +3,11 @@
 (function () {
   var KEY = 'otb-prefs';
   var ACCENTS = {
-    green:   { brand: '#2d6a4f', dark: '#1b4332', soft: '#eef6f1' },
-    blue:    { brand: '#2563eb', dark: '#1e40af', soft: '#eaf1fe' },
-    purple:  { brand: '#7c3aed', dark: '#5b21b6', soft: '#f1eafe' },
-    teal:    { brand: '#0d9488', dark: '#0f766e', soft: '#e6f7f4' },
-    crimson: { brand: '#b91c1c', dark: '#7f1d1d', soft: '#fdeaea' },
+    green:   { brand: '#0e8a5f', dark: '#0a6b49' },
+    blue:    { brand: '#2467c9', dark: '#1b4e9c' },
+    purple:  { brand: '#7048b6', dark: '#553690' },
+    teal:    { brand: '#0d8a8a', dark: '#0a6a6a' },
+    crimson: { brand: '#b3324b', dark: '#8a2439' },
   };
   function read()  { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } }
   function write(p){ localStorage.setItem(KEY, JSON.stringify(p)); }
