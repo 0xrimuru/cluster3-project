@@ -286,3 +286,14 @@ body.bare{background:#eaece9}
 
 /* Header uses a darker shade of the accent (deeper tone) */
 .app-bar{background:var(--brand-dark)}
+
+/* ===== Handoff spec alignment: corner radii + title weights ===== */
+/* Radii — inputs & buttons 10px, cards 14px (chips/badges stay 999px) */
+.btn,.btn.ghost,.btn.danger,input.search,.seg label,
+.adjust-grid input,.adjust-grid select,form input,form textarea,form select,
+.flash,.login-body input{border-radius:10px}
+.card,.stat-tile,.q-card,.stock-card{border-radius:14px}
+/* Type weights — screen title 22/800, item title 16/800, card title 13.5/700 */
+h1{font-weight:800}
+h2{font-weight:800}
+.q-card strong,.stock-title,.detail-info h1{font-weight:700}
