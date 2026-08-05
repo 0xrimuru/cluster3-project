@@ -12,6 +12,7 @@ router.get('/settings', HomeController.settings);
 
 router.get('/login', AuthController.loginForm);
 router.post('/login', AuthController.login);
+router.get('/logout', AuthController.logout);
 
 router.get('/stock/ledger', BookController.ledger);
 
