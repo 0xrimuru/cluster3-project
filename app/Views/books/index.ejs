@@ -1,29 +1,28 @@
 <%- include('../partials/header') %>
-  <h1>Book Catalogue <span class="subtle">&mdash; stock management</span></h1>
-  <div class="toolbar">
-    <a class="btn" href="/books/new">+ Add book</a>
-    <input id="stock-search" type="search" class="search" placeholder="Search by title or author&hellip;" aria-label="Search stock" />
+  <div class="page-head">
+    <h1>Stock <span class="subtle">management</span></h1>
+    <a class="btn" href="/books/new">+ Add item</a>
   </div>
-  <table id="stock-table">
-    <thead>
-      <tr><th></th><th>Title</th><th>Author</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr>
-    </thead>
-    <tbody>
-    <% books.forEach(function (b) { %>
-      <tr data-name="<%= (b.title + ' ' + b.author).toLowerCase() %>" class="<%= b.status === 'disabled' ? 'row-disabled' : '' %>">
-        <td class="cover-cell">
-          <a href="/books/<%= b.id %>"><img class="cover-thumb" src="<%= b.cover || '/images/covers/placeholder.png' %>" alt="Cover of <%= b.title %>" /></a>
-        </td>
-        <td><a href="/books/<%= b.id %>"><%= b.title %></a></td>
-        <td><%= b.author %></td>
-        <td>$<%= b.price.toFixed(2) %></td>
-        <td class="<%= (typeof b.quantity !== 'undefined' && b.quantity === 0) ? 'stock-out' : '' %>"><%= typeof b.quantity !== 'undefined' ? b.quantity : 0 %></td>
-        <td><span class="badge <%= b.status === 'disabled' ? 'badge-off' : 'badge-on' %>"><%= b.status === 'disabled' ? 'Disabled' : 'Active' %></span></td>
-        <td><a href="/books/<%= b.id %>/edit">Edit</a></td>
-      </tr>
+  <form class="search-row" method="GET" action="/books" role="search">
+    <input id="stock-search" name="q" type="search" class="search" value="<%= typeof q !== 'undefined' ? q : '' %>" placeholder="Search by title, author or SKU&hellip;" aria-label="Search stock" />
+    <button class="btn ghost" type="submit">Search</button>
+  </form>
+  <p class="row-right"><a class="link" href="/stock/ledger">Audit history &rarr;</a></p>
+  <ul class="stock-list" id="stock-list">
+    <% books.forEach(function (b) { var lv = level(b); %>
+    <li class="stock-card <%= b.status==='disabled' ? 'is-disabled' : '' %>" data-name="<%= (b.title+' '+b.author+' '+b.sku).toLowerCase() %>">
+      <a class="stock-main" href="/books/<%= b.id %>">
+        <img class="cover-thumb" src="<%= b.cover || '/images/covers/placeholder.png' %>" alt="Cover of <%= b.title %>" />
+        <div class="stock-info">
+          <div class="stock-top"><span class="sku"><%= b.sku %></span><span class="cat"><%= b.category %></span></div>
+          <div class="stock-title"><%= b.title %></div>
+          <div class="stock-meta">$<%= b.price.toFixed(2) %> &middot; <span class="qty">Qty <%= b.quantity %></span></div>
+        </div>
+      </a>
+      <span class="badge badge-<%= lv %>"><%= lv==='out' ? 'Out of stock' : (lv==='low' ? 'Low stock' : 'In stock') %></span>
+    </li>
     <% }); %>
-    </tbody>
-  </table>
+  </ul>
   <p id="stock-empty" class="empty-msg" style="display:none;">No items match your search.</p>
-  <% if (books.length === 0) { %><p class="empty-msg">No books yet &mdash; add one.</p><% } %>
+  <% if (books.length === 0) { %><p class="empty-msg">No stock items match.</p><% } %>
 <%- include('../partials/footer') %>

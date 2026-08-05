@@ -1,5 +1,7 @@
 <%- include('partials/header') %>
-  <h1>Something went wrong</h1>
-  <p><%= message %></p>
-  <p><a href="/">&larr; Back to home</a></p>
+  <section class="card pad">
+    <h1>Something went wrong</h1>
+    <p><%= typeof message !== 'undefined' ? message : 'An error occurred.' %></p>
+    <p><a class="btn" href="/">&larr; Back to home</a></p>
+  </section>
 <%- include('partials/footer') %>

@@ -3,26 +3,40 @@ const express = require('express');
 const router = express.Router();
 const HomeController = require('../app/Controllers/HomeController');
 const BookController = require('../app/Controllers/BookController');
+const SalesController = require('../app/Controllers/SalesController');
+const AuthController = require('../app/Controllers/AuthController');
 const MashupController = require('../app/Controllers/MashupController');
 
-// Home page, rendered through a controller
+// Home dashboard
 router.get('/', HomeController.index);
 
-// Mashups (ICTPRG538) - two mashups + their JSON endpoints
+// User login page (interface; real auth in the security block)
+router.get('/login', AuthController.loginForm);
+router.post('/login', AuthController.login);
+
+// Stock audit history (declare before /books/:id)
+router.get('/stock/ledger', BookController.ledger);
+
+// Stock (Book) resource - CRUD (GET/POST/PUT/DELETE) + stock adjustment
+router.get('/books', BookController.index);
+router.get('/books/new', BookController.newForm);
+router.post('/books', BookController.create);
+router.get('/books/:id', BookController.show);
+router.get('/books/:id/edit', BookController.editForm);
+router.put('/books/:id', BookController.update);
+router.delete('/books/:id', BookController.destroy);
+router.post('/books/:id/adjust', BookController.adjust);
+
+// Sales & Invoicing, and Clients
+router.get('/sales', SalesController.invoices);
+router.get('/clients', SalesController.clients);
+
+// Mashups (ICTPRG538)
 router.get('/mashups', MashupController.index);
 router.get('/mashups/store-locator', MashupController.storeLocator);
 router.get('/mashups/pricing', MashupController.pricing);
 router.get('/mashups/api/stores', MashupController.storesJson);
 router.get('/mashups/api/rates', MashupController.ratesJson);
 router.get('/mashups/api/weather', MashupController.weatherJson);
-
-// Book resource - demonstrates all four HTTP verbs
-router.get('/books', BookController.index);            // GET    (read: list)
-router.get('/books/new', BookController.newForm);      // GET    (create form)
-router.post('/books', BookController.create);          // POST   (create)
-router.get('/books/:id', BookController.show);         // GET    (read: one)
-router.get('/books/:id/edit', BookController.editForm);// GET    (edit form)
-router.put('/books/:id', BookController.update);       // PUT    (update)
-router.delete('/books/:id', BookController.destroy);   // DELETE (delete)
 
 module.exports = router;

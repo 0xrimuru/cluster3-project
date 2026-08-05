@@ -1,0 +1,17 @@
+<%- include('../partials/header') %>
+  <h1>Clients</h1>
+  <form class="search-row" method="GET" action="/clients" role="search">
+    <input name="q" type="search" class="search" value="<%= q %>" placeholder="Search clients&hellip;" aria-label="Search clients" />
+    <button class="btn ghost" type="submit">Search</button>
+  </form>
+  <table class="data">
+    <thead><tr><th>Code</th><th>Name</th><th>Phone</th><th>Status</th></tr></thead>
+    <tbody>
+    <% clients.forEach(function(c){ %>
+      <tr><td><%= c.code %></td><td><%= c.firstName %> <%= c.lastName %></td><td><%= c.phone %></td>
+      <td><span class="badge <%= c.status==='disabled'?'badge-off':'badge-on' %>"><%= c.status==='disabled'?'Disabled':'Active' %></span></td></tr>
+    <% }); %>
+    <% if (clients.length===0){ %><tr><td colspan="4" class="empty-msg">No clients match.</td></tr><% } %>
+    </tbody>
+  </table>
+<%- include('../partials/footer') %>

@@ -1,20 +1,69 @@
 <%- include('../partials/header') %>
-  <article class="book book-detail">
-    <img class="cover-large" src="<%= book.cover || '/images/covers/placeholder.png' %>" alt="Cover of <%= book.title %>" />
-    <div class="book-info">
-      <h1><%= book.title %></h1>
-      <p class="meta">by <%= book.author %> &middot; $<%= book.price.toFixed(2) %></p>
-      <p class="stock-line">On hand: <strong><%= typeof book.quantity !== 'undefined' ? book.quantity : 0 %></strong>
-        &middot; <span class="badge <%= book.status === 'disabled' ? 'badge-off' : 'badge-on' %>"><%= book.status === 'disabled' ? 'Disabled' : 'Active' %></span></p>
-      <p><%= book.description %></p>
-      <div class="actions">
-        <a class="btn" href="/books/<%= book.id %>/edit">Edit</a>
-        <form method="POST" action="/books/<%= book.id %>?_method=DELETE"
-              onsubmit="return confirm('Delete this book?');">
-          <button class="btn danger" type="submit">Delete</button>
-        </form>
-        <a href="/books">&larr; Back to catalogue</a>
+  <% if (typeof adjusted !== 'undefined' && adjusted) { %>
+    <div class="flash ok">Success: stock records revised successfully.</div>
+  <% } %>
+  <article class="card pad detail">
+    <div class="detail-head">
+      <img class="cover-large" src="<%= book.cover || '/images/covers/placeholder.png' %>" alt="Cover of <%= book.title %>" />
+      <div class="detail-info">
+        <div class="stock-top"><span class="sku"><%= book.sku %></span><span class="cat"><%= book.category %></span></div>
+        <h1><%= book.title %></h1>
+        <p class="meta">by <%= book.author %></p>
+        <p class="price">$<%= book.price.toFixed(2) %></p>
+        <p class="badges">
+          <span class="badge badge-<%= level %>"><%= level==='out'?'Out of stock':(level==='low'?'Low stock':'In stock') %></span>
+          <span class="onhand">On hand: <strong><%= book.quantity %></strong></span>
+          <span class="badge <%= book.status==='disabled'?'badge-off':'badge-on' %>"><%= book.status==='disabled'?'Disabled':'Active' %></span>
+        </p>
+        <p class="desc"><%= book.description %></p>
+        <div class="actions">
+          <a class="btn" href="/books/<%= book.id %>/edit">Edit</a>
+          <form method="POST" action="/books/<%= book.id %>?_method=DELETE" onsubmit="return confirm('Delete this item?');">
+            <button class="btn danger" type="submit">Delete</button>
+          </form>
+          <a class="btn ghost" href="/books">[Close]</a>
+        </div>
       </div>
     </div>
   </article>
+
+  <section class="card pad" id="adjust">
+    <h2>Perform stock adjustment</h2>
+    <form method="POST" action="/books/<%= book.id %>/adjust" id="adjust-form">
+      <div class="seg" role="group" aria-label="Adjustment operation">
+        <input type="radio" id="op-add" name="operation" value="add" checked />
+        <label for="op-add">+ Add stock</label>
+        <input type="radio" id="op-remove" name="operation" value="remove" />
+        <label for="op-remove">&minus; Remove stock</label>
+        <input type="radio" id="op-reconcile" name="operation" value="reconcile" />
+        <label for="op-reconcile">Reconcile</label>
+      </div>
+      <div class="adjust-grid">
+        <label class="fld"><span id="qty-label">Quantity adjusted</span>
+          <input name="quantity" id="adjust-qty" type="number" min="0" step="1" value="1" required />
+        </label>
+        <label class="fld">Adjustment motive
+          <select name="reason">
+            <% reasons.forEach(function(r){ %><option><%= r %></option><% }); %>
+          </select>
+        </label>
+      </div>
+      <button class="btn btn-block" type="submit">Submit adjustment record</button>
+    </form>
+  </section>
+
+  <section class="card pad">
+    <h2>Recent adjustments</h2>
+    <% if (ledger.length === 0) { %><p class="empty-msg">No adjustments recorded for this item.</p><% } else { %>
+    <ul class="ledger">
+      <% ledger.forEach(function(e){ var d=e.after-e.before; %>
+      <li>
+        <div class="ledger-top"><strong class="op-<%= e.operation %>"><%= e.operation %></strong>
+          <span class="tag <%= d>=0?'up':'down' %>"><%= (d>=0?'+':'')+d %></span></div>
+        <div class="ledger-sub"><%= e.before %> &rarr; <%= e.after %> units &middot; <%= e.reason %> &middot; <%= e.user %><% if (e.at) { %> &middot; <%= e.at %><% } %></div>
+      </li>
+      <% }); %>
+    </ul>
+    <% } %>
+  </section>
 <%- include('../partials/footer') %>

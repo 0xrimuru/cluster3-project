@@ -7,14 +7,12 @@
   <link rel="stylesheet" href="/css/style.css" />
   <script defer src="/js/stock.js"></script>
 </head>
-<body>
-  <header class="site-header">
-    <a class="brand" href="/">OT Tech Bookstore</a>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/books">Catalogue</a>
-      <a href="/books/new">Add book</a>
-      <a href="/mashups">Mashups</a>
-    </nav>
+<% var _bare = (typeof bare !== 'undefined' && bare); %>
+<body class="app<%= _bare ? ' bare' : '' %>">
+<% if (!_bare) { %>
+  <header class="app-bar">
+    <a class="app-title" href="/">OT&nbsp;Tech&nbsp;<span>Bookstore</span></a>
+    <span class="app-page"><%= typeof pageName !== 'undefined' ? pageName : '' %></span>
   </header>
-  <main class="container">
+  <main class="app-main">
+<% } %>

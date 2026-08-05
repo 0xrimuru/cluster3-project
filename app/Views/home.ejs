@@ -1,8 +1,19 @@
 <%- include('partials/header') %>
-  <h1>Welcome to the OT Tech Bookstore</h1>
-  <p>This page is rendered through <code>HomeController</code> on the MVC framework
-     &mdash; the request goes route &rarr; controller &rarr; view, not to static HTML.</p>
-  <p class="stat">The catalogue currently holds <strong><%= count %></strong>
-     book<%= count === 1 ? '' : 's' %>.</p>
-  <p><a class="btn" href="/books">Browse the catalogue &rarr;</a></p>
+  <section class="hero">
+    <h1>OT Tech Bookstore</h1>
+    <p class="lede">Sales, stock and invoicing for the LPA eComms store.</p>
+  </section>
+  <section class="stat-grid">
+    <div class="stat-tile"><span class="stat-num"><%= stats.items %></span><span class="stat-lbl">Stock items</span></div>
+    <div class="stat-tile warn"><span class="stat-num"><%= stats.lowStock %></span><span class="stat-lbl">Low stock</span></div>
+    <div class="stat-tile danger"><span class="stat-num"><%= stats.outStock %></span><span class="stat-lbl">Out of stock</span></div>
+    <div class="stat-tile"><span class="stat-num"><%= stats.invoices %></span><span class="stat-lbl">Invoices</span></div>
+    <div class="stat-tile ok"><span class="stat-num">$<%= stats.sales.toFixed(2) %></span><span class="stat-lbl">Total sales</span></div>
+  </section>
+  <section class="quick-links">
+    <a class="q-card" href="/books"><strong>Stock management</strong><span>View &amp; adjust inventory</span></a>
+    <a class="q-card" href="/sales"><strong>Sales &amp; invoicing</strong><span>Search invoices &amp; totals</span></a>
+    <a class="q-card" href="/clients"><strong>Clients</strong><span>Customer records</span></a>
+    <a class="q-card" href="/mashups"><strong>Mashups</strong><span>Store locator &amp; pricing</span></a>
+  </section>
 <%- include('partials/footer') %>
