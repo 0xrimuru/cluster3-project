@@ -12,3 +12,6 @@ npm-debug.log*
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Local housekeeping (bridge cannot delete)
+_to_delete/

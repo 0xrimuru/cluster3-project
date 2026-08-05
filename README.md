@@ -1,29 +1,36 @@
-# cluster3-project
+# Cluster 3 Project — OT Tech Bookstore (LPA eComms scenario)
 
-**Student:** Pedro Alvim
-**Student ID:** CTI20260187
-**Course:** ICT50220 Diploma of Information Technology — Cluster 3 (Advanced Programming)
+**Student:** Pedro Alvim (CTI20260187) · **Course:** ICT50220 Diploma of IT — Cluster 3 (Advanced Programming) · **Assessor:** Dijo Sasidharan
 
-Single Git repository for the Cluster 3 project — an e-commerce **bookstore** for **OT Tech**,
-delivered as a webstore with matching desktop and mobile interfaces. Work is organised into
-one folder per teaching block; a block's folder is added as the class reaches it.
+A single, connected e-commerce web application built across the Cluster 3 blocks. The theme is the **OT Tech Bookstore**, addressing the LPA eComms scenario requirements (stock management now; sales/invoicing, clients, database, security and desktop/mobile interfaces in later blocks).
 
-## Blocks so far
+## Tech stack
+Node.js · Express · EJS, built on a Model–View–Controller structure. Data is held in memory for now and moves to a database in the database blocks.
 
-| Folder | Unit | Focus | Status |
-|--------|------|-------|--------|
-| Block 1 | ICTPRG530 | Manage projects using software management tools | Done |
-| Block 2 | ICTPRG556 | Implement and use an MVC framework (Express + EJS app) | Done |
-| Block 3 | ICTPRG538 | Create mashups (store-locator map + live pricing) | Done |
+## Run it
+```
+npm install      # first time only
+node server.js   # then open http://localhost:3000
+```
 
-*Units still to come (their folders are added when we reach each block): ICTPRG535, ICTPRG546,
-ICTWEB514, ICTDBS507, ICTPRG554, ICTPRG537, ICTPRG549, ICTPRG547.*
+## Structure
+```
+app/
+  Models/       data (M)  — Book (stock item)
+  Controllers/  logic (C) — Book, Home, Mashup
+  Views/        EJS templates (V)
+routes/         URL -> controller mapping
+public/         css, js, images, vendor (Leaflet)
+docs/           project plan, Gantt, meeting minutes, requirements,
+                and evidence/ (screenshots per block)
+server.js       application entry point
+```
 
-## Tools
+## Progress by block (unit — assessment phase)
+- **Block 1 — ICTPRG530 (Phase 1): Project management.** Plan, Gantt, GitHub repo + board, meeting minutes. See `docs/`.
+- **Block 2 — ICTPRG556 (Phase 2): MVC framework.** Book catalogue with full CRUD and GET/POST/PUT/DELETE.
+- **Block 3 — ICTPRG538 (Phase 3): Mashups.** Store Locator (OpenStreetMap + Open-Meteo weather) and International Pricing (live exchange rates). See `docs/mashup-requirements.md`.
+- **Block 4 — ICTPRG535 (Phase 4): Advanced UI.** Stock-management view — on-hand quantity + active/disabled status, live search, client-side validation. *(in progress)*
+- Blocks 5–11 — dynamic pages, database integration, NoSQL, security, OOP/desktop, advanced programming — to come.
 
-Git + GitHub · GitHub Projects (board) · draw.io (Gantt) · VS Code · Node.js + Express + EJS (app).
-
-## Running the application
-
-The MVC web application lives in **`Block 2/`**; **`Block 3/`** extends it with two data
-mashups. See each block's README for setup (`npm install`, then `npm start`).
+Evidence screenshots are in `docs/evidence/block-N/`; the git commit history documents the work block by block.
