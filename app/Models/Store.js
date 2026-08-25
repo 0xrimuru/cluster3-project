@@ -1,9 +1,9 @@
-// Store model - OT Tech's physical store locations for the store-locator mashup.
-// Same idea as the Book model: in-memory data the controllers talk to.
+// Store model - LPA's physical store/warehouse locations for the store-locator mashup.
+// Same idea as the Product model: in-memory data the controllers talk to.
 const stores = [
   {
     id: 1,
-    name: 'OT Tech Bookstore — Brisbane (HQ)',
+    name: 'LPA — Brisbane (HQ & Warehouse)',
     address: '123 Queen Street, Brisbane City QLD 4000',
     phone: '(07) 3000 1234',
     hours: 'Mon–Sat 9am–5:30pm',
@@ -12,7 +12,7 @@ const stores = [
   },
   {
     id: 2,
-    name: 'OT Tech Bookstore — Sydney',
+    name: 'LPA — Sydney',
     address: '45 George Street, Sydney NSW 2000',
     phone: '(02) 9000 5678',
     hours: 'Mon–Sun 9am–6pm',
@@ -21,7 +21,7 @@ const stores = [
   },
   {
     id: 3,
-    name: 'OT Tech Bookstore — Melbourne',
+    name: 'LPA — Melbourne',
     address: '200 Bourke Street, Melbourne VIC 3000',
     phone: '(03) 8000 9012',
     hours: 'Mon–Sun 10am–6pm',

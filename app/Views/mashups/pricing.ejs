@@ -10,10 +10,10 @@
          Prices are shown in AUD only. Try again in a minute.</p>
     </div>
     <table>
-      <thead><tr><th>Title</th><th>Price (AUD)</th></tr></thead>
+      <thead><tr><th>Product</th><th>Price (AUD)</th></tr></thead>
       <tbody>
-        <% books.forEach(function (b) { %>
-          <tr><td><%= b.title %></td><td>$<%= b.price.toFixed(2) %></td></tr>
+        <% products.forEach(function (p) { %>
+          <tr><td><%= p.title %></td><td>$<%= p.price.toFixed(2) %></td></tr>
         <% }); %>
       </tbody>
     </table>
@@ -36,17 +36,17 @@
     <table>
       <thead>
         <tr>
-          <th>Title</th>
+          <th>Product</th>
           <th>Price (AUD)</th>
           <th>Price (<%= selected %>)</th>
         </tr>
       </thead>
       <tbody>
-        <% books.forEach(function (b) { %>
+        <% products.forEach(function (p) { %>
           <tr>
-            <td><%= b.title %></td>
-            <td>$<%= b.price.toFixed(2) %></td>
-            <td><%= rate ? (b.price * rate).toFixed(2) + ' ' + selected : 'n/a' %></td>
+            <td><%= p.title %></td>
+            <td>$<%= p.price.toFixed(2) %></td>
+            <td><%= rate ? (p.price * rate).toFixed(2) + ' ' + selected : 'n/a' %></td>
           </tr>
         <% }); %>
       </tbody>

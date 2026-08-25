@@ -1,7 +1,7 @@
 // Block 4 (ICTPRG535) - customisation & personalisation.
 // Persists theme (light/dark/system) and accent colour in localStorage.
 (function () {
-  var KEY = 'otb-prefs';
+  var KEY = 'lpa-prefs';
   var ACCENTS = {
     green:   { brand: '#0e8a5f', dark: '#0a6b49' },
     blue:    { brand: '#2467c9', dark: '#1b4e9c' },

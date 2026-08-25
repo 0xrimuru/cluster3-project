@@ -1,0 +1,11 @@
+<%- include('../partials/header') %>
+  <h1>Stock management <span class="subtle">&mdash; edit item</span></h1>
+  <form id="product-form" class="card pad" method="POST" action="/products/<%= product.id %>?_method=PUT">
+    <%- include('_form', { product: product }) %>
+    <div class="form-actions">
+      <button class="btn" type="submit">Save</button>
+      <a class="btn ghost" href="/products">Search</a>
+      <a class="btn ghost" href="/products/<%= product.id %>">Close</a>
+    </div>
+  </form>
+<%- include('../partials/footer') %>

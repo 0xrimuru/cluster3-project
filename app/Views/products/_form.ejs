@@ -1,0 +1,30 @@
+<label>Stock ID (SKU)
+  <input name="sku" value="<%= typeof product.sku !== 'undefined' ? product.sku : '' %>" placeholder="LPA-000" />
+</label>
+<label>Product name
+  <input name="title" value="<%= product.title %>" required maxlength="250" />
+</label>
+<label>Brand
+  <input name="brand" value="<%= product.brand %>" required />
+</label>
+<label>Category
+  <input name="category" value="<%= typeof product.category !== 'undefined' ? product.category : '' %>" list="cat-list" />
+  <datalist id="cat-list"><option>Keyboards</option><option>Mice</option><option>Monitors</option><option>Docks &amp; Hubs</option><option>Webcams</option><option>Audio</option><option>Cables &amp; Adapters</option><option>General</option></datalist>
+</label>
+<label>Price (AUD)
+  <input name="price" type="number" step="0.01" min="0" value="<%= product.price %>" required />
+</label>
+<label>On-hand quantity
+  <input name="quantity" type="number" min="0" step="1" value="<%= typeof product.quantity !== 'undefined' ? product.quantity : 0 %>" required />
+</label>
+<fieldset class="status-field">
+  <legend>Status</legend>
+  <label class="radio-inline"><input type="radio" name="status" value="active" <%= (typeof product.status==='undefined'||product.status==='active')?'checked':'' %> /> Active</label>
+  <label class="radio-inline"><input type="radio" name="status" value="disabled" <%= product.status==='disabled'?'checked':'' %> /> Disabled</label>
+</fieldset>
+<label>Product image URL <span class="hint">(optional)</span>
+  <input name="image" value="<%= typeof product.image !== 'undefined' ? product.image : '' %>" placeholder="/images/products/placeholder.png" />
+</label>
+<label>Description
+  <textarea name="description" rows="3"><%= product.description %></textarea>
+</label>

@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // 2) Add/Edit form - custom client-side validation messages for quantity
-  var qty = document.querySelector('#book-form input[name="quantity"]');
+  var qty = document.querySelector('#product-form input[name="quantity"]');
   if (qty) {
     qty.addEventListener('invalid', function () {
       if (qty.validity.valueMissing)        qty.setCustomValidity('Please enter the on-hand quantity.');

@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const HomeController = require('../app/Controllers/HomeController');
-const BookController = require('../app/Controllers/BookController');
+const ProductController = require('../app/Controllers/ProductController');
 const SalesController = require('../app/Controllers/SalesController');
 const AuthController = require('../app/Controllers/AuthController');
 const MashupController = require('../app/Controllers/MashupController');
@@ -14,16 +14,16 @@ router.get('/login', AuthController.loginForm);
 router.post('/login', AuthController.login);
 router.get('/logout', AuthController.logout);
 
-router.get('/stock/ledger', BookController.ledger);
+router.get('/stock/ledger', ProductController.ledger);
 
-router.get('/books', BookController.index);
-router.get('/books/new', BookController.newForm);
-router.post('/books', BookController.create);
-router.get('/books/:id', BookController.show);
-router.get('/books/:id/edit', BookController.editForm);
-router.put('/books/:id', BookController.update);
-router.delete('/books/:id', BookController.destroy);
-router.post('/books/:id/adjust', BookController.adjust);
+router.get('/products', ProductController.index);
+router.get('/products/new', ProductController.newForm);
+router.post('/products', ProductController.create);
+router.get('/products/:id', ProductController.show);
+router.get('/products/:id/edit', ProductController.editForm);
+router.put('/products/:id', ProductController.update);
+router.delete('/products/:id', ProductController.destroy);
+router.post('/products/:id/adjust', ProductController.adjust);
 
 router.get('/sales', SalesController.invoices);
 router.get('/clients', SalesController.clients);

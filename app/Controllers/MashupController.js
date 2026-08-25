@@ -5,11 +5,11 @@
 //              weather for each store from the Open-Meteo API + our own
 //              store data. Combined in the browser (client-side fetch).
 //
-//   Mashup 2 - Live international pricing: our book catalogue + exchange
+//   Mashup 2 - Live international pricing: our product catalogue + exchange
 //              rates from the Frankfurter API, cross-checked against a
 //              second provider (open.er-api.com). Combined on the server,
 //              with a one-hour cache so we don't hammer the free APIs.
-const Book = require('../Models/Book');
+const Product = require('../Models/Product');
 const Store = require('../Models/Store');
 
 const CURRENCIES = {
@@ -100,7 +100,7 @@ exports.pricing = async (req, res) => {
   const rates = await getRates();
   res.render('mashups/pricing', {
     title: 'International pricing',
-    books: Book.all(),
+    products: Product.all(),
     rates,
     selected: (req.query.currency || 'USD').toUpperCase(),
   });

@@ -29,6 +29,6 @@ app.use('/', routes);
 
 app.use((req, res) => res.status(404).render('error', { title: 'Not found', message: 'Page not found.' }));
 
-app.listen(PORT, () => console.log(`Bookstore MVC app running at http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`LPA eComms MVC app running at http://localhost:${PORT}`));
 
 module.exports = app;

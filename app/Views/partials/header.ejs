@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><%= typeof title !== 'undefined' ? title : 'OT Tech Bookstore' %></title>
+  <title><%= typeof title !== 'undefined' ? title : 'LPA — Sales, Stock & Invoicing' %></title>
   <script>
-  (function(){try{var p=JSON.parse(localStorage.getItem('otb-prefs')||'{}');var t=p.theme||'system';
+  (function(){try{var p=JSON.parse(localStorage.getItem('lpa-prefs')||'{}');var t=p.theme||'system';
   var dark=t==='dark'||(t==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches);
   var r=document.documentElement;if(dark)r.setAttribute('data-theme','dark');
   if(p.brand)r.style.setProperty('--brand',p.brand);if(p.dark)r.style.setProperty('--brand-dark',p.dark);
@@ -23,8 +23,8 @@
 <% if (!_bare) { %>
   <header class="app-bar">
     <a class="app-title" href="/">
-      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H12v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H12v16h6.5A1.5 1.5 0 0 0 20 18.5z"/></svg>
-      OT&nbsp;Tech&nbsp;<span>Bookstore</span>
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16v4"/></svg>
+      LPA&nbsp;<span>Sales&nbsp;&amp;&nbsp;Stock</span>
     </a>
     <div class="app-tools">
       <button type="button" id="theme-toggle" class="icon-btn" aria-label="Toggle light or dark mode" title="Toggle light/dark">

@@ -1,0 +1,11 @@
+<%- include('../partials/header') %>
+  <h1>Stock management <span class="subtle">&mdash; add item</span></h1>
+  <form id="product-form" class="card pad" method="POST" action="/products">
+    <%- include('_form', { product: { sku:'', title:'', brand:'', category:'', price:'', quantity:'', status:'active', description:'', image:'' } }) %>
+    <div class="form-actions">
+      <button class="btn" type="submit">Save</button>
+      <a class="btn ghost" href="/products">Search</a>
+      <a class="btn ghost" href="/products">Close</a>
+    </div>
+  </form>
+<%- include('../partials/footer') %>
