@@ -2,10 +2,10 @@
 // (who, what item, operation, reason, before -> after, when).
 let nextId = 5;
 let entries = [
-  { id: 1, sku: 'LPA-BK-007', title: "You Don't Know JS", user: 'Michael Chang', operation: 'add',       reason: 'Restocked from primary shipment', before: 5,  after: 15, at: '10:25 AM' },
-  { id: 2, sku: 'LPA-BK-005', title: 'Refactoring',        user: 'Pedro Alvim',   operation: 'add',       reason: 'Restocked from primary shipment', before: 12, after: 20, at: '10:40 AM' },
-  { id: 3, sku: 'LPA-BK-003', title: 'Eloquent JavaScript',user: 'Pedro Alvim',   operation: 'remove',    reason: 'Damaged / write-off',             before: 2,  after: 0,  at: '11:15 AM' },
-  { id: 4, sku: 'LPA-BK-006', title: 'Design Patterns',    user: 'Michael Chang', operation: 'reconcile', reason: 'Physical inventory count',         before: 5,  after: 3,  at: '11:54 AM' },
+  { id: 1, sku: 'LPA-007', title: 'Mechanical Numpad NP-22',   user: 'Michael Chang', operation: 'add',       reason: 'Restocked from primary shipment', before: 5,  after: 15, at: '10:25 AM' },
+  { id: 2, sku: 'LPA-005', title: '1080p HD Webcam CV-10',     user: 'Pedro Alvim',   operation: 'add',       reason: 'Restocked from primary shipment', before: 12, after: 20, at: '10:40 AM' },
+  { id: 3, sku: 'LPA-003', title: '27" 4K UHD Monitor UM-27',  user: 'Pedro Alvim',   operation: 'remove',    reason: 'Damaged / write-off',             before: 2,  after: 0,  at: '11:15 AM' },
+  { id: 4, sku: 'LPA-004', title: 'USB-C Docking Station DS-11',user: 'Michael Chang', operation: 'reconcile', reason: 'Physical inventory count',         before: 5,  after: 4,  at: '11:54 AM' },
 ];
 
 class StockLedger {
