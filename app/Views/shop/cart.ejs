@@ -1,0 +1,40 @@
+<%- include('../partials/header') %>
+  <h1>Your <span class="subtle">cart</span></h1>
+  <% if (error) { %><div class="flash err" role="alert"><%= error %></div><% } %>
+  <div class="flash err" id="cart-msg" role="alert" hidden></div>
+  <% if (!lines.length) { %>
+    <section class="card pad empty-state"><p>Your cart is empty.</p><a class="btn" href="/shop">Browse the shop</a></section>
+  <% } else { %>
+  <table class="data cart-table" id="cart-table">
+    <thead><tr><th>Item</th><th class="num">Price</th><th class="num">Qty</th><th class="num">Amount</th><th></th></tr></thead>
+    <tbody>
+    <% lines.forEach(function(l){ %>
+      <tr data-sku="<%= l.sku %>" data-price="<%= l.price %>">
+        <td><span class="sku"><%= l.sku %></span> <%= l.title %><% if (l.short) { %><span class="cell-sub err">Only <%= l.onHand %> left</span><% } %></td>
+        <td class="num">$<%= l.price.toFixed(2) %></td>
+        <td class="num">
+          <form method="POST" action="/cart/<%= l.sku %>" class="qty-form">
+            <label class="sr-only" for="cq-<%= l.sku %>">Quantity of <%= l.title %></label>
+            <input class="qty" id="cq-<%= l.sku %>" name="qty" type="number" min="0" max="<%= l.onHand %>" step="1" value="<%= l.qty %>" />
+            <noscript><button class="btn ghost" type="submit">Update</button></noscript>
+          </form>
+        </td>
+        <td class="num line-amount">$<%= l.amount.toFixed(2) %></td>
+        <td class="num">
+          <form method="POST" action="/cart/<%= l.sku %>?_method=DELETE" class="remove-form"><button class="link-btn" type="submit">Remove</button></form>
+        </td>
+      </tr>
+    <% }); %>
+    </tbody>
+    <tfoot>
+      <tr><th colspan="3">Total (incl. GST)</th><th class="num" id="cart-total">$<%= total.toFixed(2) %></th><th></th></tr>
+      <tr class="gst-row"><td colspan="3">GST included</td><td class="num" id="cart-gst">$<%= gst.toFixed(2) %></td><td></td></tr>
+    </tfoot>
+  </table>
+  <div class="form-actions">
+    <a class="btn" href="/checkout" id="to-checkout">Proceed to checkout</a>
+    <a class="btn ghost" href="/shop">Continue shopping</a>
+  </div>
+  <% } %>
+  <script defer src="/js/cart.js"></script>
+<%- include('../partials/footer') %>

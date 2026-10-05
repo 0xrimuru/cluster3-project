@@ -1,0 +1,32 @@
+<%- include('../partials/header') %>
+  <h1>Checkout</h1>
+  <% if (errors.length) { %><ul class="form-errors" role="alert"><% errors.forEach(function(e){ %><li><%= e %></li><% }); %></ul><% } %>
+  <form class="card pad stack" method="POST" action="/checkout" id="checkout-form" data-total="<%= total.toFixed(2) %>" data-confirm="Place your order for $<%= total.toFixed(2) %> (incl. GST)? Stock is reserved for you when you confirm.">
+    <h2>Customer details</h2>
+    <div class="kv"><span>Name</span><strong><%= user.firstName %> <%= user.lastName %></strong></div>
+    <div class="kv"><span>Client ID</span><strong><%= customer.code %></strong></div>
+    <label>Delivery address<input name="address" value="<%= form.address %>" required maxlength="250" autocomplete="street-address" /></label>
+    <label>Phone<input name="phone" value="<%= form.phone %>" required pattern="[0-9 \(\)\+\-]{8,20}" autocomplete="tel" title="8-20 digits, spaces, brackets, + or -" /></label>
+
+    <h2>Payment option</h2>
+    <fieldset class="pay-options">
+      <legend class="sr-only">Payment option</legend>
+      <% payments.forEach(function(p, i){ %>
+      <label class="pay-opt"><input type="radio" name="payment" value="<%= p %>" <%= form.payment===p?'checked':'' %> required /> <span><%= p %></span></label>
+      <% }); %>
+    </fieldset>
+    <p class="muted-note">Prototype: no card details are collected here. Payment is taken by the payment provider on confirmation (to be connected in a later phase).</p>
+
+    <h2>Order summary</h2>
+    <table class="data">
+      <thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Amount</th></tr></thead>
+      <tbody><% lines.forEach(function(l){ %><tr><td><%= l.title %> <span class="cell-sub">$<%= l.price.toFixed(2) %> each</span></td><td class="num"><%= l.qty %></td><td class="num">$<%= l.amount.toFixed(2) %></td></tr><% }); %></tbody>
+      <tfoot><tr><th colspan="2">Total (incl. GST $<%= gst.toFixed(2) %>)</th><th class="num">$<%= total.toFixed(2) %></th></tr></tfoot>
+    </table>
+    <input type="hidden" name="expectedTotal" value="<%= total.toFixed(2) %>" />
+    <div class="form-actions">
+      <button class="btn" type="submit">Place order &middot; $<%= total.toFixed(2) %></button>
+      <a class="btn ghost" href="/cart">Back to cart</a>
+    </div>
+  </form>
+<%- include('../partials/footer') %>

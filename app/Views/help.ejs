@@ -1,0 +1,47 @@
+<%- include('partials/header') %>
+  <h1>Help <span class="subtle">guide</span></h1>
+  <section class="card pad">
+    <p>LPA eComms is the sales, stock and invoicing system of <strong>Logic Peripherals Australia</strong>, with a web store for customers.
+       What you can see depends on your user group &mdash; you are signed in as <span class="role-chip role-<%= role %>"><%= roleLabel %></span>.</p>
+  </section>
+
+  <section class="card pad help-block <%= role==='customer' ? 'is-you' : '' %>">
+    <h2>Customers</h2>
+    <ul>
+      <li><strong>Home</strong> &mdash; featured products and your latest orders.</li>
+      <li><strong>Shop</strong> &mdash; search the catalogue, filter by category, sort by price, and add items to your cart (you can only add what is in stock; the price is confirmed before it is added).</li>
+      <li><strong>Cart</strong> &mdash; change quantities or remove items; the total and GST update as you type. Then <em>Proceed to checkout</em>, confirm your details, choose a payment option and place the order.</li>
+      <li><strong>Orders</strong> &mdash; every order you placed, with its items and total.</li>
+      <li>New customers create an account with <em>Create an account</em> on the login page.</li>
+    </ul>
+  </section>
+
+  <section class="card pad help-block <%= role==='user' ? 'is-you' : '' %>">
+    <h2>Staff (user)</h2>
+    <ul>
+      <li><strong>Home</strong> &mdash; stock counts, low / out-of-stock items, number of invoices and total sales.</li>
+      <li><strong>Stock</strong> &mdash; search stock by name, brand, SKU or category; open an item to see it and record a stock adjustment (add, remove or reconcile, with a reason). Every adjustment is kept in the <em>Audit history</em>.</li>
+      <li><strong>Sales</strong> &mdash; search invoices by number, client, date or address and see the total; open an invoice to see its items.</li>
+      <li><strong>Clients</strong> &mdash; search client records (ID, name, address, phone, status).</li>
+    </ul>
+  </section>
+
+  <section class="card pad help-block <%= role==='administrator' ? 'is-you' : '' %>">
+    <h2>Administrators</h2>
+    <p>Everything staff can do, plus:</p>
+    <ul>
+      <li><strong>Stock</strong> &mdash; add, edit, disable and delete stock items.</li>
+      <li><strong>Sales</strong> &mdash; <em>Add</em> a new invoice (search the client by ID, search each stock item by ID, enter the quantity, Save) and delete invoices (the stock is returned).</li>
+      <li><strong>Users</strong> (More &rarr; Users) &mdash; search, add, edit and delete users; set the user group and active / inactive status.</li>
+    </ul>
+  </section>
+
+  <section class="card pad">
+    <h2>Everyone</h2>
+    <ul>
+      <li><strong>More</strong> &mdash; About LPA, the store locator and international pricing mashups, Preferences, Help and Logout.</li>
+      <li><strong>Preferences</strong> &mdash; light / dark theme and accent colour, remembered on this device. The moon button in the top bar switches theme quickly.</li>
+      <li><strong>Logout</strong> &mdash; the door button in the top bar, or More &rarr; Logout.</li>
+    </ul>
+  </section>
+<%- include('partials/footer') %>

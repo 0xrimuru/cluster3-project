@@ -2,13 +2,15 @@
   <div class="login-backdrop">
     <div class="login-dialog" role="dialog" aria-modal="true" aria-labelledby="login-title">
       <div class="login-titlebar"><span id="login-title">User Login</span></div>
-      <form class="login-body" method="POST" action="/login">
-        <% if (typeof error !== 'undefined' && error) { %><p style="color:#b3362e;font-size:.85rem;margin:0 0 .4rem">Please enter a username and password.</p><% } %>
+      <form class="login-body" method="POST" action="/login" novalidate data-validate>
+        <% if (notice) { %><p class="form-msg ok" role="status"><%= notice %></p><% } %>
+        <% if (error) { %><p class="form-msg err" role="alert"><%= error %></p><% } %>
         <label for="username">User name</label>
-        <input id="username" name="username" type="text" autocomplete="username" required />
+        <input id="username" name="username" type="text" autocomplete="username" value="<%= username %>" required />
         <label for="password">Password</label>
         <input id="password" name="password" type="password" autocomplete="current-password" required />
         <button class="btn btn-block" type="submit">Login</button>
+        <p class="login-alt">New customer? <a href="/register">Create an account</a></p>
         <p class="login-note">LPA eComms &mdash; Sales, Stock &amp; Invoicing</p>
       </form>
     </div>

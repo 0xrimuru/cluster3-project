@@ -1,14 +1,18 @@
 <%- include('../partials/header') %>
-  <h1>Sales &amp; <span class="subtle">invoicing</span></h1>
+  <div class="page-head">
+    <h1>Sales &amp; <span class="subtle">invoicing</span></h1>
+    <% if (role === 'administrator') { %><a class="btn" href="/sales/new">+ Add</a><% } %>
+  </div>
+  <% if (notice) { %><div class="flash ok"><%= notice %></div><% } %>
   <form class="search-row" method="GET" action="/sales" role="search">
-    <input name="q" type="search" class="search" value="<%= q %>" placeholder="Search invoices by client or number&hellip;" aria-label="Search invoices" />
+    <input name="q" type="search" class="search" value="<%= q %>" placeholder="Search by number, client, date or address&hellip;" aria-label="Search invoices" />
     <button class="btn ghost" type="submit">Search</button>
   </form>
   <table class="data">
     <thead><tr><th>Invoice</th><th>Date</th><th>Client</th><th class="num">Amount</th></tr></thead>
     <tbody>
     <% invoices.forEach(function(i){ %>
-      <tr><td><%= i.number %></td><td><%= i.date %></td><td><%= i.client %></td><td class="num">$<%= i.amount.toFixed(2) %></td></tr>
+      <tr><td><a href="/sales/<%= i.number %>"><%= i.number %></a></td><td><%= i.date %></td><td><%= i.client %></td><td class="num">$<%= i.amount.toFixed(2) %></td></tr>
     <% }); %>
     <% if (invoices.length===0){ %><tr><td colspan="4" class="empty-msg">No invoices match your search.</td></tr><% } %>
     </tbody>

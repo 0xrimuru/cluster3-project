@@ -77,14 +77,14 @@ async function getRates() {
 
 // GET /mashups -> landing page listing the two mashups
 exports.index = (req, res) => {
-  res.render('mashups/index', { title: 'Mashups' });
+  res.render('mashups/index', { nav: 'more', title: 'About LPA' });
 };
 
 // ---------- Mashup 1: store locator (map + weather) ----------
 
 // GET /mashups/store-locator -> page with the Leaflet map
 exports.storeLocator = (req, res) => {
-  res.render('mashups/store-locator', { title: 'Store locator', stores: Store.all() });
+  res.render('mashups/store-locator', { nav: 'more', title: 'Store locator', stores: Store.all() });
 };
 
 // GET /mashups/api/stores -> our store data as JSON (fetched by the map page,
@@ -98,7 +98,7 @@ exports.storesJson = (req, res) => {
 // GET /mashups/pricing -> catalogue priced in foreign currencies
 exports.pricing = async (req, res) => {
   const rates = await getRates();
-  res.render('mashups/pricing', {
+  res.render('mashups/pricing', { nav: 'more',
     title: 'International pricing',
     products: Product.all(),
     rates,

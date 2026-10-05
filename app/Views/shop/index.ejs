@@ -1,0 +1,51 @@
+<%- include('../partials/header') %>
+  <div class="page-head">
+    <h1>Shop <span class="subtle">peripherals</span></h1>
+    <% if (canBuy) { %><a class="btn ghost" href="/cart">Cart (<span class="js-cart-count"><%= cartCount %></span>)</a><% } %>
+  </div>
+  <% if (!canBuy) { %><p class="flash info">Customer view of the web store. Staff create orders with <a href="/sales/new">New invoice</a>.</p><% } %>
+  <% if (added) { %><div class="flash ok" role="status">Added to your cart.</div><% } %>
+  <div class="flash ok" id="shop-msg" role="status" hidden></div>
+
+  <form class="shop-filters" method="GET" action="/shop" role="search" id="shop-filters">
+    <input id="shop-search" name="q" type="search" class="search" value="<%= q %>" placeholder="Search products&hellip;" aria-label="Search products" />
+    <select name="category" aria-label="Category">
+      <option value="">All categories</option>
+      <% categories.forEach(function(c){ %><option value="<%= c %>" <%= c===category?'selected':'' %>><%= c %></option><% }); %>
+    </select>
+    <select name="sort" aria-label="Sort by">
+      <option value="featured" <%= sort==='featured'?'selected':'' %>>Featured</option>
+      <option value="price-asc" <%= sort==='price-asc'?'selected':'' %>>Price: low to high</option>
+      <option value="price-desc" <%= sort==='price-desc'?'selected':'' %>>Price: high to low</option>
+      <option value="name" <%= sort==='name'?'selected':'' %>>Name A&ndash;Z</option>
+    </select>
+    <button class="btn ghost" type="submit">Apply</button>
+  </form>
+  <p class="result-count"><span id="shop-count"><%= products.length %></span> product<%= products.length===1?'':'s' %></p>
+
+  <ul class="product-grid" id="product-grid">
+    <% products.forEach(function(p){ var lv = level(p); var have = inCart[p.sku] || 0; var left = Math.max(0, p.quantity - have); %>
+    <li class="product-card" data-name="<%= (p.title+' '+p.brand+' '+p.category).toLowerCase() %>">
+      <img src="<%= p.image %>" alt="<%= p.title %>" loading="lazy" />
+      <div class="product-body">
+        <div class="stock-top"><span class="cat"><%= p.category %></span><span class="badge badge-<%= lv %>"><%= lv==='out'?'Out of stock':(lv==='low'?'Only '+p.quantity+' left':'In stock') %></span></div>
+        <h2 class="product-title"><%= p.title %></h2>
+        <p class="product-desc"><%= p.description %></p>
+        <div class="product-buy">
+          <span class="price">$<%= p.price.toFixed(2) %></span>
+          <% if (canBuy) { %>
+          <form class="add-form" method="POST" action="/cart" data-sku="<%= p.sku %>" data-title="<%= p.title %>" data-price="<%= p.price %>" data-left="<%= left %>">
+            <input type="hidden" name="sku" value="<%= p.sku %>" />
+            <label class="sr-only" for="qty-<%= p.sku %>">Quantity</label>
+            <input class="qty" id="qty-<%= p.sku %>" name="qty" type="number" min="1" max="<%= left %>" step="1" value="<%= left ? 1 : 0 %>" <%= left ? '' : 'disabled' %> />
+            <button class="btn" type="submit" <%= left ? '' : 'disabled' %>><%= p.quantity === 0 ? 'Sold out' : (left ? 'Add to cart' : 'All in cart') %></button>
+          </form>
+          <% } %>
+        </div>
+      </div>
+    </li>
+    <% }); %>
+  </ul>
+  <p id="shop-empty" class="empty-msg" <%= products.length ? 'hidden' : '' %>>No products match your search.</p>
+  <script defer src="/js/shop.js"></script>
+<%- include('../partials/footer') %>

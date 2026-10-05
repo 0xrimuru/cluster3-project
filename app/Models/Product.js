@@ -22,14 +22,21 @@ function normStatus(v){ return v === 'disabled' ? 'disabled' : 'active'; }
 function stockLevel(q) { return q <= 0 ? 'out' : (q <= 5 ? 'low' : 'in'); }
 
 class Product {
-  static all() { return products; }
-  static find(id) { return products.find(p => p.id === Number(id)); }
+  // Deleted items are kept (invoices and the audit history still refer to them) but hidden.
+  static all() { return products.filter(p => !p.deleted); }
+  static find(id) { return Product.all().find(p => p.id === Number(id)); }
+  static findBySku(sku) {
+    const s = String(sku || '').trim().toUpperCase();
+    return Product.all().find(p => p.sku.toUpperCase() === s);
+  }
+  // What customers can buy in the web store: active (enabled) items only.
+  static forSale() { return Product.all().filter(p => p.status === 'active'); }
   static level(product) { return stockLevel(product.quantity); }
 
   static create({ title, brand, price, description, image, quantity, status, sku, category }) {
     const product = {
       id: nextId++,
-      sku: (sku && sku.trim()) ? sku.trim() : ('LPA-' + String(nextId - 1).padStart(3, '0')),
+      sku: (sku && sku.trim()) ? sku.trim().toUpperCase() : ('LPA-' + String(nextId - 1).padStart(3, '0')),
       title, brand,
       category: category || 'General',
       price: parseFloat(price) || 0,
@@ -47,7 +54,7 @@ class Product {
     if (!product) return null;
     if (data.title !== undefined) product.title = data.title;
     if (data.brand !== undefined) product.brand = data.brand;
-    if (data.sku !== undefined && data.sku.trim()) product.sku = data.sku.trim();
+    if (data.sku !== undefined && data.sku.trim()) product.sku = data.sku.trim().toUpperCase();
     if (data.category !== undefined) product.category = data.category;
     if (data.price !== undefined) product.price = parseFloat(data.price) || 0;
     if (data.quantity !== undefined) product.quantity = normQty(data.quantity);
@@ -71,10 +78,20 @@ class Product {
     return { before, after, delta: after - before };
   }
 
+  // Sell / return stock (used by checkout and invoices). Never goes below zero.
+  static changeQty(sku, delta) {
+    const p = Product.findBySku(sku);
+    if (!p) return null;
+    const before = p.quantity;
+    p.quantity = Math.max(0, before + delta);
+    return { product: p, before, after: p.quantity };
+  }
+
+  // Soft delete, like the LPA reference app (status 'D'): kept for history, hidden everywhere.
   static remove(id) {
-    const i = products.findIndex(p => p.id === Number(id));
-    if (i === -1) return false;
-    products.splice(i, 1);
+    const p = Product.find(id);
+    if (!p) return false;
+    p.deleted = true;
     return true;
   }
 }

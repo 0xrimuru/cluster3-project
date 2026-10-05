@@ -1,0 +1,30 @@
+<%- include('partials/header') %>
+  <section class="hero">
+    <h1>Logic Peripherals <span class="subtle">Australia</span></h1>
+    <p class="lede"><span id="greeting">Hello</span>, <%= user.firstName %>. Quality computer peripherals, delivered across Australia.</p>
+    <a class="btn" href="/shop">Shop now</a>
+  </section>
+  <section class="card pad featured">
+    <h2>Featured</h2>
+    <video class="promo" controls preload="none" poster="/media/promo-poster.jpg" playsinline>
+      <source src="/media/promo.mp4" type="video/mp4" />
+      Your browser does not support embedded video.
+    </video>
+  </section>
+  <section>
+    <h2>Popular right now</h2>
+    <ul class="product-mini">
+      <% featured.forEach(function(p){ %>
+      <li><a href="/shop?q=<%= encodeURIComponent(p.title) %>"><img src="<%= p.image %>" alt="" /><span><%= p.title %></span><strong>$<%= p.price.toFixed(2) %></strong></a></li>
+      <% }); %>
+    </ul>
+  </section>
+  <section class="card pad">
+    <h2>Your recent orders</h2>
+    <% if (!recent.length) { %><p class="muted-note">No orders yet &mdash; your orders will appear here.</p><% } else { %>
+    <ul class="attention-list">
+      <% recent.forEach(function(o){ %><li><a href="/orders/<%= o.number %>"><%= o.number %> &middot; <%= o.date %></a><strong>$<%= o.amount.toFixed(2) %></strong></li><% }); %>
+    </ul>
+    <% } %>
+  </section>
+<%- include('partials/footer') %>

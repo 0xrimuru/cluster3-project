@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="/css/style.css" />
   <script defer src="/js/stock.js"></script>
   <script defer src="/js/prefs.js"></script>
+  <script defer src="/js/app.js"></script>
 </head>
 <% var _bare = (typeof bare !== 'undefined' && bare); %>
 <body class="app<%= _bare ? ' bare' : '' %>">
@@ -39,5 +40,11 @@
       </a>
     </div>
   </header>
+  <% if (typeof user !== 'undefined' && user) { %>
+  <div class="welcome-strip">
+    <span>Welcome, <strong><%= user.firstName %> <%= user.lastName %></strong></span>
+    <span class="role-chip role-<%= role %>"><%= roleLabel %></span>
+  </div>
+  <% } %>
   <main class="app-main">
 <% } %>

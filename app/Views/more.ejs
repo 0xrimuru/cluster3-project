@@ -1,0 +1,16 @@
+<%- include('partials/header') %>
+  <h1>More</h1>
+  <nav class="menu-list" aria-label="More">
+    <% if (role === 'administrator') { %>
+    <a href="/users"><strong>Users</strong><span>Search, add, edit and delete users</span></a>
+    <% } %>
+    <% if (role !== 'customer') { %>
+    <a href="/stock/ledger"><strong>Stock audit history</strong><span>Every stock adjustment: who, when, why</span></a>
+    <a href="/shop"><strong>Web store</strong><span>The shop as customers see it</span></a>
+    <% } %>
+    <a href="/mashups"><strong>About LPA</strong><span>Our mission, store locator and international pricing</span></a>
+    <a href="/settings"><strong>Preferences</strong><span>Theme and accent colour</span></a>
+    <a href="/help"><strong>Help</strong><span>What each menu does for your user group</span></a>
+    <a href="/logout"><strong>Logout</strong><span>End your session</span></a>
+  </nav>
+<%- include('partials/footer') %>

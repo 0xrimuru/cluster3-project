@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+  <h1>User record <span class="subtle">(<%= mode %>)</span></h1>
+  <% if (errors.length) { %><ul class="form-errors" role="alert"><% errors.forEach(function(e){ %><li><%= e %></li><% }); %></ul><% } %>
+  <form class="card pad stack" method="POST" action="<%= mode==='Add' ? '/users' : '/users/' + form.id + '?_method=PUT' %>" data-validate>
+    <% if (mode==='Edit') { %><div class="kv"><span>User ID</span><strong><%= form.id %></strong></div><% } %>
+    <label>User name<input name="username" value="<%= form.username || '' %>" required pattern="[a-z0-9._\-]{3,30}" title="3-30 lower-case letters, numbers, dot, dash or underscore" autocomplete="off" /></label>
+    <div class="two-col">
+      <label>First name<input name="firstName" value="<%= form.firstName || '' %>" required maxlength="50" /></label>
+      <label>Last name<input name="lastName" value="<%= form.lastName || '' %>" required maxlength="50" /></label>
+    </div>
+    <label>User group
+      <select name="group" required>
+        <% groups.forEach(function(g){ %><option value="<%= g %>" <%= form.group===g?'selected':'' %>><%= label(g) %></option><% }); %>
+      </select>
+    </label>
+    <label>Password <span class="subtle"><%= mode==='Edit' ? '(leave blank to keep the current password)' : '' %></span>
+      <input name="password" type="password" autocomplete="new-password" minlength="8" <%= mode==='Add' ? 'required' : '' %> /></label>
+    <fieldset class="status-field">
+      <legend>User status</legend>
+      <label class="radio-inline"><input type="radio" name="status" value="active" <%= form.status!=='inactive'?'checked':'' %> /> Active</label>
+      <label class="radio-inline"><input type="radio" name="status" value="inactive" <%= form.status==='inactive'?'checked':'' %> /> Inactive</label>
+    </fieldset>
+    <div class="form-actions">
+      <button class="btn" type="submit">Save</button>
+      <a class="btn ghost" href="/users">Close</a>
+    </div>
+  </form>
+<%- include('../partials/footer') %>

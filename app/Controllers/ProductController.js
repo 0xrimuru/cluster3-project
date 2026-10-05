@@ -9,6 +9,17 @@ function wantsJson(req) {
 }
 const base = { pageName: 'Stock', nav: 'stock' };
 
+// Server-side checks (the form also checks in the browser, but the server must not trust it).
+function checkItem(body, selfId) {
+  if (body.sku !== undefined && String(body.sku).trim()) {
+    const clash = Product.findBySku(body.sku);
+    if (clash && clash.id !== Number(selfId)) return `Stock ID ${String(body.sku).trim().toUpperCase()} already exists.`;
+  }
+  if (body.price !== undefined && (isNaN(parseFloat(body.price)) || parseFloat(body.price) < 0)) return 'Price must be a number of 0 or more.';
+  if (body.quantity !== undefined && String(body.quantity) !== '' && (isNaN(parseInt(body.quantity, 10)) || parseInt(body.quantity, 10) < 0)) return 'On-hand quantity must be 0 or more.';
+  return null;
+}
+
 // GET /products -> stock list
 exports.index = (req, res) => {
   const q = (req.query.q || '').trim().toLowerCase();
@@ -27,6 +38,11 @@ exports.create = (req, res) => {
   if (!req.body.title || !req.body.brand) {
     if (wantsJson(req)) return res.status(400).json({ error: 'title and brand are required' });
     return res.status(400).render('error', { title: 'Invalid item', message: 'A stock item needs at least a product name and a brand.', nav: 'stock' });
+  }
+  const problem = checkItem(req.body);
+  if (problem) {
+    if (wantsJson(req)) return res.status(400).json({ error: problem });
+    return res.status(400).render('error', { title: 'Invalid item', message: problem, nav: 'stock' });
   }
   const product = Product.create(req.body);
   if (wantsJson(req)) return res.status(201).json(product);
@@ -57,6 +73,11 @@ exports.editForm = (req, res) => {
 
 // PUT /products/:id
 exports.update = (req, res) => {
+  const problem = checkItem(req.body, req.params.id);
+  if (problem) {
+    if (wantsJson(req)) return res.status(400).json({ error: problem });
+    return res.status(400).render('error', { title: 'Invalid item', message: problem, nav: 'stock' });
+  }
   const product = Product.update(req.params.id, req.body);
   if (!product) {
     if (wantsJson(req)) return res.status(404).json({ error: 'Product not found' });

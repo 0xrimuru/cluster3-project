@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+  <div class="login-backdrop">
+    <div class="login-dialog wide" role="dialog" aria-modal="true" aria-labelledby="reg-title">
+      <div class="login-titlebar"><span id="reg-title">New Customer Registration</span></div>
+      <form class="login-body" method="POST" action="/register" data-validate id="register-form">
+        <% if (errors.length) { %><ul class="form-errors" role="alert"><% errors.forEach(function(e){ %><li><%= e %></li><% }); %></ul><% } %>
+        <div class="two-col">
+          <label>First name<input name="firstName" value="<%= form.firstName || '' %>" required maxlength="50" autocomplete="given-name" /></label>
+          <label>Last name<input name="lastName" value="<%= form.lastName || '' %>" required maxlength="50" autocomplete="family-name" /></label>
+        </div>
+        <label>Address<input name="address" value="<%= form.address || '' %>" required maxlength="250" autocomplete="street-address" /></label>
+        <label>Phone<input name="phone" value="<%= form.phone || '' %>" required pattern="[0-9 \(\)\+\-]{8,20}" title="8-20 digits, spaces, brackets, + or -" autocomplete="tel" /></label>
+        <label>User name<input name="username" value="<%= form.username || '' %>" required pattern="[a-z0-9._\-]{3,30}" title="3-30 lower-case letters, numbers, dot, dash or underscore" autocomplete="username" /></label>
+        <label>Password<input id="reg-pass" name="password" type="password" required minlength="8" autocomplete="new-password" aria-describedby="pass-rule" /></label>
+        <p class="hint" id="pass-rule">At least 8 characters, with a letter and a number.</p>
+        <label>Confirm password<input id="reg-pass2" name="confirmPassword" type="password" required minlength="8" autocomplete="new-password" /></label>
+        <p class="hint" id="pass-match" aria-live="polite"></p>
+        <button class="btn btn-block" type="submit">Register</button>
+        <p class="login-alt"><a href="/login">Back to login</a></p>
+      </form>
+    </div>
+  </div>
+<%- include('partials/footer') %>

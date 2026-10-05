@@ -1,7 +1,7 @@
 <%- include('partials/header') %>
   <section class="hero">
     <h1>LPA eComms</h1>
-    <p class="lede">Sales, stock and invoicing for Logic Peripherals Australia.</p>
+    <p class="lede"><span id="greeting">Hello</span>, <%= user.firstName %>. Sales, stock and invoicing for Logic Peripherals Australia.</p>
   </section>
   <section class="card pad featured">
     <h2>Featured</h2>
@@ -17,7 +17,21 @@
     <div class="stat-tile"><span class="stat-num"><%= stats.invoices %></span><span class="stat-lbl">Invoices</span></div>
     <div class="stat-tile ok"><span class="stat-num">$<%= stats.sales.toFixed(2) %></span><span class="stat-lbl">Total sales</span></div>
   </section>
+  <% if (attention.length) { %>
+  <section class="card pad">
+    <h2>Needs attention</h2>
+    <ul class="attention-list">
+      <% attention.forEach(function(p){ var lv = p.quantity <= 0 ? 'out' : 'low'; %>
+      <li><a href="/products/<%= p.id %>"><span class="sku"><%= p.sku %></span> <%= p.title %></a><span class="badge badge-<%= lv %>"><%= lv==='out' ? 'Out of stock' : p.quantity + ' left' %></span></li>
+      <% }); %>
+    </ul>
+  </section>
+  <% } %>
   <section class="quick-links">
+    <% if (role === 'administrator') { %>
+    <a class="q-card" href="/sales/new"><strong>New invoice</strong><span>Client + items, stock updates automatically</span></a>
+    <a class="q-card" href="/users"><strong>Users</strong><span>Accounts, groups &amp; status</span></a>
+    <% } %>
     <a class="q-card" href="/products"><strong>Stock management</strong><span>View &amp; adjust inventory</span></a>
     <a class="q-card" href="/sales"><strong>Sales &amp; invoicing</strong><span>Search invoices &amp; totals</span></a>
     <a class="q-card" href="/clients"><strong>Clients</strong><span>Customer records</span></a>

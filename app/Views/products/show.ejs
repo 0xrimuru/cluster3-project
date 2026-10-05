@@ -17,11 +17,13 @@
         </p>
         <p class="desc"><%= product.description %></p>
         <div class="actions">
+          <% if (role === 'administrator') { %>
           <a class="btn" href="/products/<%= product.id %>/edit">Edit</a>
-          <form method="POST" action="/products/<%= product.id %>?_method=DELETE" onsubmit="return confirm('Delete this item?');">
+          <form method="POST" action="/products/<%= product.id %>?_method=DELETE" data-confirm="Delete <%= product.title %>? It will be hidden from stock and the shop (history is kept).">
             <button class="btn danger" type="submit">Delete</button>
           </form>
-          <a class="btn ghost" href="/products">[Close]</a>
+          <% } %>
+          <a class="btn ghost" href="/products">Close</a>
         </div>
       </div>
     </div>

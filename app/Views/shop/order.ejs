@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+  <% if (placed) { %><div class="flash ok" role="status"><strong>Order completed!</strong> Thank you &mdash; your order <%= inv.number %> has been placed.</div><% } %>
+  <% if (typeof created !== 'undefined' && created) { %><div class="flash ok" role="status">Invoice <%= inv.number %> saved.</div><% } %>
+  <article class="card pad invoice">
+    <div class="inv-head">
+      <div><span class="lbl"><%= typeof staffView !== 'undefined' && staffView ? 'Invoice' : 'Order' %></span><h1><%= inv.number %></h1></div>
+      <div class="inv-date-box"><span class="lbl">Date</span><strong><%= inv.date %></strong></div>
+    </div>
+    <dl class="client-card">
+      <div><dt>Client</dt><dd><%= inv.client %> (<%= inv.clientId %>)</dd></div>
+      <div><dt>Address</dt><dd><%= inv.clientAddress %></dd></div>
+      <div><dt>Payment</dt><dd><%= inv.payment %></dd></div>
+    </dl>
+    <table class="data">
+      <thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Amount</th></tr></thead>
+      <tbody><% inv.items.forEach(function(i){ %><tr><td><span class="sku"><%= i.sku %></span> <%= i.name %></td><td class="num"><%= i.qty %></td><td class="num">$<%= i.price.toFixed(2) %></td><td class="num">$<%= i.amount.toFixed(2) %></td></tr><% }); %></tbody>
+      <tfoot><tr><th colspan="3">Total (incl. GST)</th><th class="num">$<%= inv.amount.toFixed(2) %></th></tr></tfoot>
+    </table>
+    <div class="form-actions">
+      <% if (typeof staffView !== 'undefined' && staffView && role === 'administrator') { %>
+      <form method="POST" action="/sales/<%= inv.number %>?_method=DELETE" data-confirm="Delete invoice <%= inv.number %>? Its items will be returned to stock.">
+        <button class="btn danger" type="submit">Delete</button>
+      </form>
+      <% } %>
+      <a class="btn ghost" href="<%= backHref %>">Close</a>
+      <% if (placed) { %><a class="btn" href="/shop">Continue shopping</a><% } %>
+    </div>
+  </article>
+<%- include('../partials/footer') %>

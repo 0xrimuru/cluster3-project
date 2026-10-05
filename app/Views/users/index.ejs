@@ -1,0 +1,31 @@
+<%- include('../partials/header') %>
+  <div class="page-head">
+    <h1>Users <span class="subtle">management</span></h1>
+    <a class="btn" href="/users/new">+ Add</a>
+  </div>
+  <% if (notice) { %><div class="flash ok" role="status"><%= notice %></div><% } %>
+  <% if (error) { %><div class="flash err" role="alert"><%= error %></div><% } %>
+  <form class="search-row" method="GET" action="/users" role="search">
+    <input name="q" type="search" class="search" value="<%= q %>" placeholder="Search by ID, user name, name or group&hellip;" aria-label="Search users" />
+    <button class="btn ghost" type="submit">Search</button>
+  </form>
+  <table class="data">
+    <thead><tr><th>User</th><th>Name</th><th>Group</th><th></th></tr></thead>
+    <tbody>
+    <% users.forEach(function(u){ %>
+      <tr>
+        <td><span class="sku"><%= u.id %></span><span class="cell-sub"><%= u.username %></span></td>
+        <td><%= u.firstName %> <%= u.lastName %><% if (u.status==='inactive') { %> <span class="badge badge-off">Inactive</span><% } %></td>
+        <td><span class="role-chip role-<%= u.group %>"><%= label(u.group) %></span></td>
+        <td class="num row-actions">
+          <a class="link-btn" href="/users/<%= u.id %>/edit">Edit</a>
+          <% if (u.id !== user.id) { %>
+          <form method="POST" action="/users/<%= u.id %>?_method=DELETE" data-confirm="Delete user <%= u.username %>? They will no longer be able to sign in."><button class="link-btn danger" type="submit">Delete</button></form>
+          <% } %>
+        </td>
+      </tr>
+    <% }); %>
+    <% if (!users.length) { %><tr><td colspan="4" class="empty-msg">No users match.</td></tr><% } %>
+    </tbody>
+  </table>
+<%- include('../partials/footer') %>

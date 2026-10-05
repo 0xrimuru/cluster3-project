@@ -1,7 +1,7 @@
 <%- include('../partials/header') %>
   <div class="page-head">
     <h1>Stock <span class="subtle">management</span></h1>
-    <a class="btn" href="/products/new">+ Add item</a>
+    <% if (role === 'administrator') { %><a class="btn" href="/products/new">+ Add item</a><% } %>
   </div>
   <form class="search-row" method="GET" action="/products" role="search">
     <input id="stock-search" name="q" type="search" class="search" value="<%= typeof q !== 'undefined' ? q : '' %>" placeholder="Search by product, brand or SKU&hellip;" aria-label="Search stock" />

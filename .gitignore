@@ -15,3 +15,6 @@ Thumbs.db
 
 # Local housekeeping (bridge cannot delete)
 _to_delete/
+
+# activity log written at runtime
+logs/

@@ -1,0 +1,51 @@
+<%- include('../partials/header') %>
+  <h1>New <span class="subtle">invoice</span></h1>
+  <form id="invoice-form" class="card pad stack" method="POST" action="/sales" novalidate>
+    <div class="inv-meta">
+      <div><span class="lbl">Invoice number</span><strong id="inv-no"><%= nextNumber %></strong></div>
+      <label class="inv-date">Date<input type="date" id="inv-date" name="date" value="<%= today %>" max="<%= today %>" required /></label>
+    </div>
+
+    <fieldset class="lookup">
+      <legend>Search client</legend>
+      <div class="search-row">
+        <input id="client-id" class="search" placeholder="Client ID, e.g. CL-002" autocomplete="off" aria-label="Client ID" />
+        <button type="button" class="btn ghost" id="client-search">Search client</button>
+      </div>
+      <p class="lookup-msg" id="client-msg" role="status"></p>
+      <dl class="client-card" id="client-card" hidden>
+        <div><dt>Client ID</dt><dd id="c-code"></dd></div>
+        <div><dt>Name</dt><dd id="c-name"></dd></div>
+        <div><dt>Address</dt><dd id="c-address"></dd></div>
+        <div><dt>Phone</dt><dd id="c-phone"></dd></div>
+      </dl>
+    </fieldset>
+
+    <fieldset class="lookup">
+      <legend>Search stock</legend>
+      <div class="search-row">
+        <input id="item-id" class="search" placeholder="Item ID, e.g. LPA-005" autocomplete="off" aria-label="Item ID" />
+        <button type="button" class="btn ghost" id="item-search">Search item</button>
+      </div>
+      <p class="lookup-msg" id="item-msg" role="status"></p>
+      <div class="item-pick" id="item-pick" hidden>
+        <div class="item-pick-info"><strong id="i-name"></strong><span id="i-meta"></span></div>
+        <label class="qty-field">Quantity<input type="number" id="item-qty" min="1" step="1" value="1" /></label>
+        <button type="button" class="btn" id="item-add">Add item</button>
+      </div>
+    </fieldset>
+
+    <table class="data lines" id="lines">
+      <thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Amount</th><th></th></tr></thead>
+      <tbody id="lines-body"><tr class="empty-row"><td colspan="5" class="empty-msg">No items yet &mdash; search an item and press Add item.</td></tr></tbody>
+      <tfoot><tr><th colspan="3">Total</th><th class="num" id="inv-total">$0.00</th><th></th></tr></tfoot>
+    </table>
+
+    <ul class="form-errors" id="form-errors" hidden></ul>
+    <div class="form-actions">
+      <button type="submit" class="btn" id="inv-save">Save</button>
+      <a class="btn ghost" href="/sales">Close</a>
+    </div>
+  </form>
+  <script defer src="/js/invoice.js"></script>
+<%- include('../partials/footer') %>
