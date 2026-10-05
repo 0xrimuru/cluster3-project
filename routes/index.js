@@ -14,6 +14,15 @@ const ShopController = require('../app/Controllers/ShopController');
 const UserController = require('../app/Controllers/UserController');
 const { requireRole, STAFF } = require('../app/Middleware/auth');
 
+// Controller actions are async (they wait for MySQL). Express 4 does not catch errors from
+// async functions by itself, so every handler is wrapped: a rejected promise goes to next(err)
+// and reaches the error handler in server.js (e.g. "database not available" page).
+const wrap = fn => (fn.length >= 4 ? fn : (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next));
+['get', 'post', 'put', 'delete'].forEach(m => {
+  const original = router[m].bind(router);
+  router[m] = (path, ...handlers) => original(path, ...handlers.map(wrap));
+});
+
 const admin = requireRole('administrator');
 const staff = requireRole(...STAFF);
 const customer = requireRole('customer');

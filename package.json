@@ -1,17 +1,21 @@
 {
-  "name": "cluster3-block3-mashups",
-  "version": "1.0.0",
-  "description": "ICTPRG538 (Block 3) - OT Tech bookstore with two mashups (store locator + live pricing) for OT Tech / Cluster 3",
+  "name": "lpa-ecomms",
+  "version": "1.7.0",
+  "description": "LPA eComms - stock, sales & invoicing, users and web store (Node.js + Express + EJS MVC + MySQL) - ICT50220 Cluster 3",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "db:setup": "node db/setup.js",
+    "db:export": "node db/export.js"
   },
   "author": "Pedro Alvim (CTI20260187)",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.6.1",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
-    "method-override": "^3.0.0"
+    "method-override": "^3.0.0",
+    "mysql2": "^3.24.5"
   }
 }

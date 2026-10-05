@@ -27,10 +27,16 @@ function endSession(req, res) {
 }
 
 // Loads the session (if any) and exposes the user to controllers and views.
-function loadUser(req, res, next) {
+// The user is read from lpa_users on every request, so a deactivated account is stopped at once.
+async function loadUser(req, res, next) {
   const token = readCookie(req, COOKIE);
   const s = token && sessions.get(token);
-  const user = s && User.find(s.userId);
+  let user = null;
+  try {
+    user = s ? await User.find(s.userId) : null;
+  } catch (err) {
+    return next(err); // database not available -> error handler
+  }
   if (s && user && user.status === 'active') {
     req.session = s;
     req.user = user;

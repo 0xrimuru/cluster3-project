@@ -1,82 +1,87 @@
-// Invoice model - sales invoices with their line items (moves to the database in the DB block).
-// Fields mirror the LPA spec (lpa_ecomms.sql):
-//   lpa_invoices      -> number, date, clientId, client (name), clientAddress, amount, status
-//   lpa_invoice_items -> items[]: sku, name, qty, price (price charged at the time of sale), amount
-// The client name/address are copied from the Client record when the invoice is created,
-// exactly like lpa_inv_client_name / lpa_inv_client_address.
-const Client = require('./Client');
+// Invoice model - sales invoices (lpa_invoices) and their line items (lpa_invoice_items).
+// The client name / address are copied onto the invoice when it is created (they are what
+// was printed on the day), and each line keeps the price charged at the time of sale.
+// Line amounts and the invoice amount are always calculated here, never typed in.
+const { query, nowLocal } = require('../../config/database');
 
 const round2 = n => Math.round(n * 100) / 100;
+const like = s => '%' + String(s).replace(/[\\%_]/g, c => '\\' + c) + '%';
 
-// Seed invoices. Line prices are the prices charged on the day (some older/promo prices).
-let invoices = [
-  { number: 'INV-1001', date: '2026-07-28', clientId: 'CL-001', payment: 'Account', items: [
-      { sku: 'LPA-001', name: 'Mechanical Keyboard MK-87', qty: 1, price: 89.00 },
-      { sku: 'LPA-008', name: 'USB-C to HDMI Cable 2m',    qty: 5, price: 19.00 } ] },
-  { number: 'INV-1002', date: '2026-07-29', clientId: 'CL-002', payment: 'Account', items: [
-      { sku: 'LPA-002', name: 'Wireless Optical Mouse WM-200', qty: 2, price: 39.50 },
-      { sku: 'LPA-008', name: 'USB-C to HDMI Cable 2m',        qty: 1, price: 18.00 } ] },
-  { number: 'INV-1003', date: '2026-07-30', clientId: 'CL-003', payment: 'Account', items: [
-      { sku: 'LPA-006', name: 'Noise-Cancelling Headset HS-90', qty: 1, price: 119.00 },
-      { sku: 'LPA-005', name: '1080p HD Webcam CV-10',         qty: 1, price: 69.00 },
-      { sku: 'LPA-002', name: 'Wireless Optical Mouse WM-200', qty: 1, price: 39.50 },
-      { sku: 'LPA-008', name: 'USB-C to HDMI Cable 2m',        qty: 2, price: 19.00 } ] },
-  { number: 'INV-1004', date: '2026-08-01', clientId: 'CL-004', payment: 'Account', items: [
-      { sku: 'LPA-007', name: 'Mechanical Numpad NP-22', qty: 1, price: 26.00 },
-      { sku: 'LPA-008', name: 'USB-C to HDMI Cable 2m',  qty: 1, price: 19.00 } ] },
-  { number: 'INV-1005', date: '2026-08-03', clientId: 'CL-002', payment: 'Account', items: [
-      { sku: 'LPA-001', name: 'Mechanical Keyboard MK-87', qty: 1, price: 89.00 },
-      { sku: 'LPA-007', name: 'Mechanical Numpad NP-22',   qty: 1, price: 34.00 } ] },
-  { number: 'INV-1006', date: '2026-08-04', clientId: 'CL-005', payment: 'Account', items: [
-      { sku: 'LPA-001', name: 'Mechanical Keyboard MK-87', qty: 1, price: 89.00 } ] },
-].map(inv => finalise(Object.assign({ status: 'active' }, inv)));
-let nextNo = 1007;
-
-// Line amounts and the invoice amount are always calculated from the items, never typed in.
-function finalise(inv) {
-  inv.items.forEach(i => { i.amount = round2(i.qty * i.price); });
-  inv.amount = round2(inv.items.reduce((s, i) => s + i.amount, 0));
-  const c = Client.findByCode(inv.clientId);
-  inv.client = inv.client || Client.fullName(c);
-  inv.clientAddress = inv.clientAddress || (c ? c.address : '');
-  return inv;
-}
+// List columns + the number of units on each invoice (sub-query on the items table).
+const LIST = `SELECT i.lpa_inv_no AS number, DATE_FORMAT(i.lpa_inv_date, '%Y-%m-%d') AS date,
+    i.lpa_inv_client_ID AS clientId, i.lpa_inv_client_name AS client, i.lpa_inv_client_address AS clientAddress,
+    i.lpa_inv_amount AS amount, i.lpa_inv_payment AS payment, 'active' AS status,
+    (SELECT COALESCE(SUM(t.lpa_invitem_qty), 0) FROM lpa_invoice_items t WHERE t.lpa_invitem_inv_no = i.lpa_inv_no) AS units
+  FROM lpa_invoices i WHERE i.lpa_inv_status = 'a'`;
+const fixUnits = rows => rows.map(r => Object.assign(r, { units: Number(r.units) }));
 
 class Invoice {
-  static all() { return invoices.filter(i => i.status !== 'deleted'); }
-  static find(number) { return Invoice.all().find(i => i.number === String(number || '').toUpperCase()); }
-  static forClient(clientId) { return Invoice.all().filter(i => i.clientId === clientId).slice().reverse(); }
-  static nextNumber() { return 'INV-' + nextNo; }
+  static async all() { return fixUnits(await query(`${LIST} ORDER BY i.lpa_inv_no`)); }
 
-  // Search by invoice number, client name, client ID, client address or date.
-  static search(q) {
-    const list = Invoice.all();
-    if (!q) return list;
-    const s = q.trim().toLowerCase();
-    return list.filter(i => [i.number, i.client, i.clientId, i.clientAddress, i.date].join(' ').toLowerCase().includes(s));
-  }
-  static total(list) { return round2((list || Invoice.all()).reduce((sum, i) => sum + i.amount, 0)); }
-
-  // items: [{ sku, name, qty, price }] - already validated by the caller (client + stock checks)
-  static create({ clientId, items, payment, date }) {
-    const c = Client.findByCode(clientId);
-    const inv = finalise({
-      number: 'INV-' + nextNo++,
-      date: date || new Date().toLocaleDateString('en-CA', { timeZone: 'Australia/Brisbane' }), // YYYY-MM-DD
-      clientId: c.code, client: Client.fullName(c), clientAddress: c.address,
-      payment: payment || 'Account', status: 'active',
-      items: items.map(i => ({ sku: i.sku, name: i.name, qty: i.qty, price: i.price })),
-    });
-    invoices.push(inv);
+  // One invoice with its line items (two queries), or null.
+  static async find(number, conn) {
+    const no = String(number || '').trim().toUpperCase();
+    const rows = await query(`${LIST} AND i.lpa_inv_no = ?`, [no], conn);
+    if (!rows.length) return null;
+    const inv = fixUnits(rows)[0];
+    inv.items = await query(`SELECT lpa_invitem_stock_ID AS sku, lpa_invitem_stock_name AS name, lpa_invitem_qty AS qty,
+        lpa_invitem_stock_price AS price, lpa_invitem_stock_amount AS amount
+      FROM lpa_invoice_items WHERE lpa_invitem_inv_no = ? ORDER BY lpa_invitem_no`, [no], conn);
     return inv;
   }
 
-  // Soft delete (keeps the record for the audit trail). Returns the removed invoice.
-  static remove(number) {
-    const inv = Invoice.find(number);
+  // A customer's own orders, newest first.
+  static async forClient(clientId, limit) {
+    let sql = `${LIST} AND i.lpa_inv_client_ID = ? ORDER BY i.lpa_inv_date DESC, i.lpa_inv_no DESC`;
+    if (limit) sql += ' LIMIT ' + Math.max(1, parseInt(limit, 10) || 1);
+    return fixUnits(await query(sql, [clientId]));
+  }
+
+  static async nextNumber(conn) {
+    const rows = await query("SELECT COALESCE(MAX(CAST(SUBSTRING(lpa_inv_no, 5) AS UNSIGNED)), 1000) + 1 AS n FROM lpa_invoices WHERE lpa_inv_no REGEXP '^INV-[0-9]+$'", [], conn);
+    return 'INV-' + rows[0].n;
+  }
+
+  // Search by invoice number, client name, client ID, client address or date (YYYY-MM-DD).
+  static async search(q) {
+    if (!q || !q.trim()) return Invoice.all();
+    return fixUnits(await query(`${LIST} AND CONCAT_WS(' ', i.lpa_inv_no, i.lpa_inv_client_name, i.lpa_inv_client_ID,
+        i.lpa_inv_client_address, DATE_FORMAT(i.lpa_inv_date, '%Y-%m-%d')) LIKE ? ORDER BY i.lpa_inv_no`, [like(q.trim())]));
+  }
+
+  static total(list) { return round2((list || []).reduce((sum, i) => sum + i.amount, 0)); }
+
+  // Total sales, worked out by the database (dashboard).
+  static async stats() {
+    const rows = await query("SELECT COUNT(*) AS invoices, COALESCE(SUM(lpa_inv_amount), 0) AS sales FROM lpa_invoices WHERE lpa_inv_status = 'a'");
+    return { invoices: Number(rows[0].invoices), sales: round2(Number(rows[0].sales)) };
+  }
+
+  // INSERT the invoice and its items. Must run inside a transaction (conn) together with the
+  // stock changes. client = the Client record; items = [{ sku, name, qty, price }] (validated).
+  static async create({ client, items, payment, date }, conn) {
+    const number = await Invoice.nextNumber(conn);
+    const lines = items.map(i => Object.assign({}, i, { amount: round2(i.qty * i.price) }));
+    const amount = round2(lines.reduce((s, l) => s + l.amount, 0));
+    const when = date ? `${date} ${nowLocal().slice(11)}` : nowLocal();
+    await query(`INSERT INTO lpa_invoices (lpa_inv_no, lpa_inv_date, lpa_inv_client_ID, lpa_inv_client_name,
+        lpa_inv_client_address, lpa_inv_amount, lpa_inv_payment, lpa_inv_status) VALUES (?, ?, ?, ?, ?, ?, ?, 'a')`,
+      [number, when, client.code, `${client.firstName} ${client.lastName}`, client.address, amount, payment || 'Account'], conn);
+    for (const l of lines) {
+      await query(`INSERT INTO lpa_invoice_items (lpa_invitem_inv_no, lpa_invitem_stock_ID, lpa_invitem_stock_name,
+          lpa_invitem_qty, lpa_invitem_stock_price, lpa_invitem_stock_amount) VALUES (?, ?, ?, ?, ?, ?)`,
+        [number, l.sku, l.name, l.qty, l.price, l.amount], conn);
+    }
+    return { number, amount, items: lines };
+  }
+
+  // Soft delete (status x) - the record stays for the audit trail. Returns the invoice, or null.
+  static async remove(number, conn) {
+    const inv = await Invoice.find(number, conn);
     if (!inv) return null;
-    inv.status = 'deleted';
-    return inv;
+    // "AND status = 'a'" + affectedRows: if two people delete at the same moment, only one wins
+    const r = await query("UPDATE lpa_invoices SET lpa_inv_status = 'x' WHERE lpa_inv_no = ? AND lpa_inv_status = 'a'", [inv.number], conn);
+    return r.affectedRows === 1 ? inv : null;
   }
 }
 module.exports = Invoice;

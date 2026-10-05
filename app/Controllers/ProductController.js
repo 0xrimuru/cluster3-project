@@ -1,115 +1,133 @@
 // ProductController - the Product (stock item) resource: CRUD + stock adjustment.
-// Returns HTML views to the browser and JSON to API clients (Postman).
+// Reads and writes the lpa_stock table through the Product model. Returns HTML views to the
+// browser and JSON to API clients (Postman). Input is validated here before any SQL runs.
 const Product = require('../Models/Product');
 const StockLedger = require('../Models/StockLedger');
-const { currentUser } = require('./AuthController');
+const { transaction } = require('../../config/database');
 
 function wantsJson(req) {
   return req.is('application/json') || (req.get('accept') || '').includes('application/json');
 }
 const base = { pageName: 'Stock', nav: 'stock' };
+const LIMITS = { sku: 20, title: 250, brand: 100, category: 50, image: 250 }; // column sizes in lpa_stock
+const MAX_PRICE = 99999.99;   // DECIMAL(7,2)
+const MAX_QTY = 1000000;
 
 // Server-side checks (the form also checks in the browser, but the server must not trust it).
-function checkItem(body, selfId) {
-  if (body.sku !== undefined && String(body.sku).trim()) {
-    const clash = Product.findBySku(body.sku);
-    if (clash && clash.id !== Number(selfId)) return `Stock ID ${String(body.sku).trim().toUpperCase()} already exists.`;
+async function checkItem(body, selfSku) {
+  for (const [field, max] of Object.entries(LIMITS)) {
+    if (body[field] !== undefined && String(body[field]).trim().length > max) return `${field === 'title' ? 'Product name' : field[0].toUpperCase() + field.slice(1)} must be ${max} characters or fewer.`;
   }
-  if (body.price !== undefined && (isNaN(parseFloat(body.price)) || parseFloat(body.price) < 0)) return 'Price must be a number of 0 or more.';
-  if (body.quantity !== undefined && String(body.quantity) !== '' && (isNaN(parseInt(body.quantity, 10)) || parseInt(body.quantity, 10) < 0)) return 'On-hand quantity must be 0 or more.';
+  if (body.sku !== undefined && String(body.sku).trim()) {
+    const sku = String(body.sku).trim().toUpperCase();
+    if (!/^[A-Z0-9-]{3,20}$/.test(sku)) return 'Stock ID may only use letters, numbers and dashes (3-20 characters).';
+    const clash = await Product.findBySku(sku);
+    if (clash && clash.sku !== String(selfSku || '').toUpperCase()) return `Stock ID ${sku} already exists.`;
+  }
+  if (body.price !== undefined) {
+    const price = parseFloat(body.price);
+    if (isNaN(price) || price < 0 || price > MAX_PRICE) return `Price must be a number from 0 to ${MAX_PRICE}.`;
+  }
+  if (body.quantity !== undefined && String(body.quantity) !== '') {
+    const q = Number(body.quantity);
+    if (!Number.isInteger(q) || q < 0 || q > MAX_QTY) return 'On-hand quantity must be a whole number of 0 or more.';
+  }
   return null;
 }
 
-// GET /products -> stock list
-exports.index = (req, res) => {
-  const q = (req.query.q || '').trim().toLowerCase();
-  let products = Product.all();
-  if (q) products = products.filter(p => (p.title + ' ' + p.brand + ' ' + p.sku + ' ' + p.category).toLowerCase().includes(q));
+function fail(req, res, status, message) {
+  if (wantsJson(req)) return res.status(status).json({ error: message });
+  const title = status === 404 ? 'Not found' : 'Invalid item';
+  return res.status(status).render('error', { title, message, nav: 'stock' });
+}
+
+// GET /products -> stock list (search done in SQL)
+exports.index = async (req, res) => {
+  const q = String(req.query.q || '').trim();
+  const products = await Product.all({ q });
   if (wantsJson(req)) return res.json(products);
-  res.render('products/index', Object.assign({ title: 'Stock', products, q, level: Product.level }, base));
+  res.render('products/index', Object.assign({ title: 'Stock', products, q: q.toLowerCase(), level: Product.level }, base));
 };
 
 // GET /products/new
 exports.newForm = (req, res) =>
   res.render('products/new', Object.assign({ title: 'Add stock item' }, base));
 
-// POST /products
-exports.create = (req, res) => {
-  if (!req.body.title || !req.body.brand) {
-    if (wantsJson(req)) return res.status(400).json({ error: 'title and brand are required' });
-    return res.status(400).render('error', { title: 'Invalid item', message: 'A stock item needs at least a product name and a brand.', nav: 'stock' });
-  }
-  const problem = checkItem(req.body);
-  if (problem) {
-    if (wantsJson(req)) return res.status(400).json({ error: problem });
-    return res.status(400).render('error', { title: 'Invalid item', message: problem, nav: 'stock' });
-  }
-  const product = Product.create(req.body);
+// POST /products -> INSERT
+exports.create = async (req, res) => {
+  if (!String(req.body.title || '').trim() || !String(req.body.brand || '').trim()) return fail(req, res, 400, 'A stock item needs at least a product name and a brand.');
+  const problem = await checkItem(req.body);
+  if (problem) return fail(req, res, 400, problem);
+  const product = await Product.create(req.body);
   if (wantsJson(req)) return res.status(201).json(product);
-  res.redirect(`/products/${product.id}`);
+  res.redirect(`/products/${encodeURIComponent(product.sku)}`);
 };
 
-// GET /products/:id -> stock item detail
-exports.show = (req, res) => {
-  const product = Product.find(req.params.id);
-  if (!product) {
-    if (wantsJson(req)) return res.status(404).json({ error: 'Product not found' });
-    return res.status(404).render('error', { title: 'Not found', message: 'Stock item not found.', nav: 'stock' });
-  }
+// GET /products/:id -> stock item detail + its audit history
+exports.show = async (req, res) => {
+  const product = await Product.find(req.params.id);
+  if (!product) return fail(req, res, 404, 'Stock item not found.');
   if (wantsJson(req)) return res.json(product);
   res.render('products/show', Object.assign({
     title: product.title, product, level: Product.level(product),
-    ledger: StockLedger.forSku(product.sku),
+    ledger: await StockLedger.forSku(product.sku),
     reasons: REASONS, adjusted: req.query.adjusted === '1',
   }, base));
 };
 
 // GET /products/:id/edit
-exports.editForm = (req, res) => {
-  const product = Product.find(req.params.id);
-  if (!product) return res.status(404).render('error', { title: 'Not found', message: 'Stock item not found.', nav: 'stock' });
+exports.editForm = async (req, res) => {
+  const product = await Product.find(req.params.id);
+  if (!product) return fail(req, res, 404, 'Stock item not found.');
   res.render('products/edit', Object.assign({ title: `Edit ${product.title}`, product }, base));
 };
 
-// PUT /products/:id
-exports.update = (req, res) => {
-  const problem = checkItem(req.body, req.params.id);
-  if (problem) {
-    if (wantsJson(req)) return res.status(400).json({ error: problem });
-    return res.status(400).render('error', { title: 'Invalid item', message: problem, nav: 'stock' });
+// PUT /products/:id -> UPDATE
+exports.update = async (req, res) => {
+  const problem = await checkItem(req.body, req.params.id);
+  if (problem) return fail(req, res, 400, problem);
+  let product;
+  try {
+    product = await Product.update(req.params.id, req.body);
+  } catch (err) {
+    // The foreign keys stop a Stock ID change while invoices / the audit history refer to it.
+    if (/^ER_ROW_IS_REFERENCED/.test(err.code)) return fail(req, res, 409, 'This Stock ID is used on invoices or in the audit history, so it cannot be changed.');
+    if (err.code === 'ER_DUP_ENTRY') return fail(req, res, 409, 'That Stock ID already exists.');
+    throw err;
   }
-  const product = Product.update(req.params.id, req.body);
-  if (!product) {
-    if (wantsJson(req)) return res.status(404).json({ error: 'Product not found' });
-    return res.status(404).render('error', { title: 'Not found', message: 'Stock item not found.', nav: 'stock' });
-  }
+  if (!product) return fail(req, res, 404, 'Stock item not found.');
   if (wantsJson(req)) return res.json(product);
-  res.redirect(`/products/${product.id}`);
+  res.redirect(`/products/${encodeURIComponent(product.sku)}`);
 };
 
-// DELETE /products/:id
-exports.destroy = (req, res) => {
-  const ok = Product.remove(req.params.id);
-  if (!ok) {
-    if (wantsJson(req)) return res.status(404).json({ error: 'Product not found' });
-    return res.status(404).render('error', { title: 'Not found', message: 'Stock item not found.', nav: 'stock' });
-  }
+// DELETE /products/:id -> soft delete (status x)
+exports.destroy = async (req, res) => {
+  const ok = await Product.remove(req.params.id);
+  if (!ok) return fail(req, res, 404, 'Stock item not found.');
   if (wantsJson(req)) return res.status(204).end();
   res.redirect('/products');
 };
 
-// POST /products/:id/adjust -> stock adjustment (add / remove / reconcile)
+// POST /products/:id/adjust -> stock adjustment (add / remove / reconcile).
+// The new quantity and the audit entry are saved in ONE transaction.
 const REASONS = ['Physical inventory count', 'Restocked from primary shipment', 'Damaged / write-off', 'Correction', 'Customer return'];
-exports.adjust = (req, res) => {
-  const product = Product.find(req.params.id);
-  if (!product) return res.status(404).render('error', { title: 'Not found', message: 'Stock item not found.', nav: 'stock' });
-  const result = Product.adjust(req.params.id, { operation: req.body.operation, quantity: req.body.quantity });
-  if (result && (result.delta !== 0 || req.body.operation === 'reconcile')) {
-    StockLedger.record({ sku: product.sku, title: product.title, user: currentUser(req), operation: req.body.operation, reason: req.body.reason, before: result.before, after: result.after });
-  }
-  res.redirect(`/products/${product.id}?adjusted=1`);
+const OPERATIONS = ['add', 'remove', 'reconcile'];
+exports.adjust = async (req, res) => {
+  const { operation, reason } = req.body;
+  const qty = Number(req.body.quantity);
+  if (!OPERATIONS.includes(operation)) return fail(req, res, 400, 'Choose add, remove or reconcile.');
+  if (!Number.isInteger(qty) || qty < 0 || qty > MAX_QTY) return fail(req, res, 400, 'Quantity must be a whole number of 0 or more.');
+  const result = await transaction(async conn => {
+    const r = await Product.adjust(req.params.id, { operation, quantity: qty }, conn);
+    if (r && (r.delta !== 0 || operation === 'reconcile')) {
+      await StockLedger.record({ sku: r.product.sku, userId: req.user.id, operation, reason: REASONS.includes(reason) ? reason : 'Correction', before: r.before, after: r.after }, conn);
+    }
+    return r;
+  });
+  if (!result) return fail(req, res, 404, 'Stock item not found.');
+  res.redirect(`/products/${encodeURIComponent(result.product.sku)}?adjusted=1`);
 };
 
 // GET /stock/ledger -> full audit history
-exports.ledger = (req, res) =>
-  res.render('stock/ledger', Object.assign({ title: 'Stock audit history', entries: StockLedger.all() }, base));
+exports.ledger = async (req, res) =>
+  res.render('stock/ledger', Object.assign({ title: 'Stock audit history', entries: await StockLedger.all() }, base));

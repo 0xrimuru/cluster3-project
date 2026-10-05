@@ -100,7 +100,7 @@ exports.pricing = async (req, res) => {
   const rates = await getRates();
   res.render('mashups/pricing', { nav: 'more',
     title: 'International pricing',
-    products: Product.all(),
+    products: await Product.forSale(),
     rates,
     selected: (req.query.currency || 'USD').toUpperCase(),
   });

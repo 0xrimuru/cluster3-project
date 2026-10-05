@@ -5,6 +5,7 @@ const methodOverride = require('method-override');
 const routes = require('./routes');
 const { loadUser, requireLogin } = require('./app/Middleware/auth');
 const security = require('./app/Middleware/security');
+const db = require('./config/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -31,14 +32,29 @@ app.use((req, res) => res.status(404).render('error', { title: 'Not found', mess
 
 // Errors: log the details on the server, show the user a plain message (no stack trace,
 // file paths or code are ever sent to the browser).
+// Database errors are logged with their code (e.g. ECONNREFUSED, ER_DUP_ENTRY) but the user only
+// sees "temporarily unavailable" (503) when MySQL cannot be reached, or the general message.
 app.use((err, req, res, next) => {
-  console.error(new Date().toISOString(), req.method, req.originalUrl, err);
+  console.error(new Date().toISOString(), req.method, req.originalUrl, err.code || '', err.sqlMessage || err.message);
   if (res.headersSent) return next(err);
-  const status = err.status || err.statusCode || 500;
-  if ((req.get('accept') || '').includes('application/json')) return res.status(status).json({ error: status === 400 ? 'Bad request' : 'Something went wrong' });
-  res.status(status).render('error', { title: 'Error', message: status === 400 ? 'The request could not be read.' : 'Sorry, something went wrong. Please try again.' });
+  const dbDown = db.isDown(err);
+  const status = dbDown ? 503 : (err.status || err.statusCode || 500);
+  const message = dbDown ? 'The LPA database is not available at the moment. Please try again in a few minutes.'
+    : (status === 400 ? 'The request could not be read.' : 'Sorry, something went wrong. Please try again.');
+  if ((req.get('accept') || '').includes('application/json')) return res.status(status).json({ error: dbDown ? 'Database unavailable' : (status === 400 ? 'Bad request' : 'Something went wrong') });
+  Object.assign(res.locals, { user: res.locals.user || null, role: res.locals.role || '', roleLabel: res.locals.roleLabel || '', cartCount: res.locals.cartCount || 0, csrfToken: res.locals.csrfToken || '' });
+  res.status(status).render('error', { title: dbDown ? 'Service unavailable' : 'Error', message, bare: dbDown, hideNav: dbDown });
 });
 
-app.listen(PORT, () => console.log(`LPA eComms MVC app running at http://localhost:${PORT}`));
+app.listen(PORT, async () => {
+  console.log(`LPA eComms MVC app running at http://localhost:${PORT}`);
+  try {
+    const info = await db.check();
+    console.log(`Database connected: ${info.db} on ${db.settings.host}:${db.settings.port} as ${info.who} (server ${info.version})`);
+  } catch (err) {
+    console.error(`\n*** Database NOT connected (${err.code || err.message}) - pages will show "Service unavailable".`);
+    console.error('    Start MySQL/MariaDB (XAMPP -> MySQL -> Start) and run: npm run db:setup\n');
+  }
+});
 
 module.exports = app;

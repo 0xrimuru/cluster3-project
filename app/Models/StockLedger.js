@@ -1,21 +1,27 @@
-// StockLedger model - an in-memory audit trail of every stock adjustment
-// (who, what item, operation, reason, before -> after, when).
-let nextId = 5;
-let entries = [
-  { id: 1, sku: 'LPA-007', title: 'Mechanical Numpad NP-22',   user: 'Michael Chang', operation: 'add',       reason: 'Restocked from primary shipment', before: 5,  after: 15, at: '10:25 AM' },
-  { id: 2, sku: 'LPA-005', title: '1080p HD Webcam CV-10',     user: 'Pedro Alvim',   operation: 'add',       reason: 'Restocked from primary shipment', before: 12, after: 20, at: '10:40 AM' },
-  { id: 3, sku: 'LPA-003', title: '27" 4K UHD Monitor UM-27',  user: 'Pedro Alvim',   operation: 'remove',    reason: 'Damaged / write-off',             before: 2,  after: 0,  at: '11:15 AM' },
-  { id: 4, sku: 'LPA-004', title: 'USB-C Docking Station DS-11',user: 'Michael Chang', operation: 'reconcile', reason: 'Physical inventory count',         before: 5,  after: 4,  at: '11:54 AM' },
-];
+// StockLedger model - the audit trail of every stock change, stored in lpa_stock_ledger.
+// Each row: which item, who (user ID -> lpa_users), operation, reason, before -> after, when.
+// The page shows names, so the queries JOIN the stock and user tables.
+const { query, nowLocal } = require('../../config/database');
+
+const SELECT = `SELECT l.lpa_ledger_ID AS id, l.lpa_ledger_stock_ID AS sku, s.lpa_stock_name AS title,
+    CONCAT(u.lpa_user_firstname, ' ', u.lpa_user_lastname, IF(u.lpa_user_group = 'customer', ' (web order)', '')) AS user,
+    l.lpa_ledger_operation AS operation, l.lpa_ledger_reason AS reason,
+    l.lpa_ledger_before AS \`before\`, l.lpa_ledger_after AS \`after\`,
+    DATE_FORMAT(l.lpa_ledger_at, '%d/%m/%Y %l:%i %p') AS at
+  FROM lpa_stock_ledger l
+  JOIN lpa_stock s ON s.lpa_stock_ID = l.lpa_ledger_stock_ID
+  JOIN lpa_users u ON u.lpa_user_ID = l.lpa_ledger_user_ID`;
 
 class StockLedger {
-  static all() { return entries.slice().reverse(); } // most recent first
-  static forSku(sku) { return entries.filter(e => e.sku === sku).reverse(); }
-  static record({ sku, title, user, operation, reason, before, after }) {
-    const at = new Date().toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase();
-    const e = { id: nextId++, sku, title, user: user || 'Unknown user', operation, reason: reason || '', before, after, at };
-    entries.push(e);
-    return e;
+  static async all() { return query(`${SELECT} ORDER BY l.lpa_ledger_at DESC, l.lpa_ledger_ID DESC`); }
+  static async forSku(sku) { return query(`${SELECT} WHERE l.lpa_ledger_stock_ID = ? ORDER BY l.lpa_ledger_at DESC, l.lpa_ledger_ID DESC`, [sku]); }
+
+  // INSERT one entry (inside the same transaction as the stock change).
+  static async record({ sku, userId, operation, reason, before, after }, conn) {
+    const r = await query(`INSERT INTO lpa_stock_ledger (lpa_ledger_stock_ID, lpa_ledger_user_ID, lpa_ledger_operation,
+        lpa_ledger_reason, lpa_ledger_before, lpa_ledger_after, lpa_ledger_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [sku, userId, operation, String(reason || '').slice(0, 100), before, after, nowLocal()], conn);
+    return r.insertId;
   }
 }
 module.exports = StockLedger;

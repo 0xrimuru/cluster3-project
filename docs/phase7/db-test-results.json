@@ -1,0 +1,137 @@
+[
+  {
+    "id": "DB-01",
+    "title": "App connects with a limited account",
+    "steps": "config/database.js opens a pool with the .env settings; try a DROP TABLE as the app",
+    "sql": "SELECT CURRENT_USER(); SHOW GRANTS; DROP TABLE lpa_stock_ledger",
+    "expected": "Connected as lpa_app with SELECT/INSERT/UPDATE/DELETE only; DROP refused",
+    "actual": "lpa_app@localhost on lpa_ecomms (10.11.14-MariaDB-0ubuntu0.24.04.1); grants: SELECT, INSERT, UPDATE, DELETE; DROP -> ER_TABLEACCESS_DENIED_ERROR",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-02",
+    "title": "Database password is not in the code or in Git",
+    "steps": "Check .gitignore, config/database.js and .env.example",
+    "sql": "n/a",
+    "expected": ".env ignored; no password in the code; example file has a placeholder only",
+    "actual": ".env in .gitignore = true; git: .env not checked (no git here); password in config = false; example placeholder = true",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-03",
+    "title": "Read: the Stock page shows the rows in lpa_stock",
+    "steps": "Open Stock; compare with a SELECT",
+    "sql": "SELECT COUNT(*) FROM lpa_stock WHERE lpa_stock_status <> 'x'",
+    "expected": "Same number of items; item detail shows the price and on-hand from the table",
+    "actual": "table 8 rows, page 8 cards; LPA-001 $89.00 / 12 on hand shown = true",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-04",
+    "title": "Create: Add stock item inserts a row",
+    "steps": "Stock > Add item (LPA-020 Laptop Stand, $45.00, 9)",
+    "sql": "INSERT INTO lpa_stock (...) VALUES (?, ?, ...)",
+    "expected": "Redirect to the new item; the row is in lpa_stock",
+    "actual": "302 -> /products/LPA-020; row = Laptop Stand LS-3, $45, 9, status a",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-05",
+    "title": "Update: Edit item changes the row",
+    "steps": "Edit LPA-020: price 45.00 -> 39.95, quantity 9 -> 12, Save",
+    "sql": "UPDATE lpa_stock SET ... WHERE lpa_stock_ID = ?",
+    "expected": "Row has the new price and quantity",
+    "actual": "price 39.95, on hand 12",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-06",
+    "title": "Delete: item is soft-deleted",
+    "steps": "Open LPA-020 > Delete > confirm",
+    "sql": "UPDATE lpa_stock SET lpa_stock_status = 'x' WHERE ...",
+    "expected": "Row kept with status x (history keeps working); item no longer listed",
+    "actual": "302; status = x; hidden = true",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-07",
+    "title": "Validation stops bad data before it reaches the table",
+    "steps": "Save items with a 260-character name, price -5, Stock ID \"LPA 0;1\", price 1,000,000",
+    "sql": "none run (rejected first)",
+    "expected": "All refused (400) with a message; no rows added",
+    "actual": "400/400/400/400; messages: true, true, true, true; rows 9 -> 9",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-08",
+    "title": "SQL injection attempts do nothing",
+    "steps": "Search stock for ' OR '1'='1; search sales for x'; DROP TABLE lpa_invoices; --; log in as palvim' --",
+    "sql": "All values sent as ? parameters (prepared statements)",
+    "expected": "0 results, tables untouched, login refused",
+    "actual": "stock results 0; sales results 0; tables 6; login -> /login?error=2&u=palvim'%20--",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-09",
+    "title": "Transaction: a failed invoice saves nothing",
+    "steps": "New invoice: webcam x2 (in stock) + dock x999 (only 4)",
+    "sql": "START TRANSACTION ... SELECT ... FOR UPDATE ... ROLLBACK",
+    "expected": "Refused (400); webcam stock, invoices and ledger unchanged",
+    "actual": "400 \"Only 4 of USB-C Docking Station DS-11 on hand (asked for 999).\"; webcam 20 -> 20; invoices 6 -> 6; ledger 4 -> 4",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-10",
+    "title": "Two sales at once cannot oversell",
+    "steps": "Send two invoices at the same moment, each for all 4 docks",
+    "sql": "SELECT ... FOR UPDATE locks the stock row until COMMIT",
+    "expected": "Exactly one is saved; the other is refused; stock ends at 0 (never negative)",
+    "actual": "statuses 201 + 400; stock 4 -> 0",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-11",
+    "title": "Foreign keys protect the history",
+    "steps": "Change the Stock ID of LPA-001 (on invoices); insert an invoice for client CL-999 (does not exist)",
+    "sql": "FOREIGN KEY fk_item_stock / fk_inv_client",
+    "expected": "Both refused; LPA-001 unchanged",
+    "actual": "rename -> 409 \"used on invoices...\"; LPA-001 kept = true; bad invoice -> ER_NO_REFERENCED_ROW_2",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-12",
+    "title": "Checkout writes invoice, items, stock and ledger",
+    "steps": "Customer adds numpad x2, checks out with PayPal",
+    "sql": "INSERT lpa_invoices + lpa_invoice_items; UPDATE lpa_stock; INSERT lpa_stock_ledger (one transaction)",
+    "expected": "Invoice for CL-006 $68.00 PayPal, 1 line, stock 15 -> 13, ledger by aturner",
+    "actual": "INV-1008: CL-006 $68.00 PayPal; lines 1; ledger aturner 15 -> 13",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-13",
+    "title": "Data is still there after the app restarts",
+    "steps": "Start a NEW app process; open the order made in DB-12 and the deleted item",
+    "sql": "SELECT on start-up of a new process",
+    "expected": "Order found with the same amount; deleted item still deleted",
+    "actual": "new process: connected; INV-1008 -> 200 $68.00; LPA-020 -> 404",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-14",
+    "title": "Clear message when the database is not available",
+    "steps": "Start the app with a wrong DB password, then try to log in",
+    "sql": "connection refused (ER_ACCESS_DENIED_ERROR)",
+    "expected": "Start-up warning in the console; user sees 503 \"database is not available\"; no technical details",
+    "actual": "console warning = true; status 503; message = true; leaks = false",
+    "result": "PASS"
+  },
+  {
+    "id": "DB-15",
+    "title": "Database exported to db/export.sql",
+    "steps": "npm run db:export",
+    "sql": "SHOW CREATE TABLE ?? + SELECT * FROM ??",
+    "expected": "6 tables with their data; hashes only, no plain passwords",
+    "actual": "6 tables; 6 INSERT blocks; 11.7 KB; plain password = false",
+    "result": "PASS"
+  }
+]

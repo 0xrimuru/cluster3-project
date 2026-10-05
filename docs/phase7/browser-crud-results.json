@@ -1,0 +1,66 @@
+[
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "step": "Create",
+    "page": "/products/LPA-031 shows \"Ergonomic Wrist Rest WR-1\"",
+    "database": "row LPA-031: Ergonomic Wrist Rest WR-1, $24, 6, a",
+    "result": "PASS",
+    "shot": "chromium-1-create.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "step": "Read",
+    "page": "search \"wrist\" -> 1 card(s)",
+    "database": "1 matching row(s)",
+    "result": "PASS",
+    "shot": "chromium-2-read.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "step": "Update",
+    "page": "detail shows $19.95 = true",
+    "database": "price now 19.95",
+    "result": "PASS",
+    "shot": "chromium-3-update.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "step": "Delete",
+    "page": "back on Stock list; LPA-031 listed = false",
+    "database": "status x (row kept for history)",
+    "result": "PASS",
+    "shot": "chromium-4-delete.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "step": "Create",
+    "page": "/products/LPA-032 shows \"Ergonomic Wrist Rest WR-1\"",
+    "database": "row LPA-032: Ergonomic Wrist Rest WR-1, $24, 6, a",
+    "result": "PASS",
+    "shot": "firefox-1-create.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "step": "Read",
+    "page": "search \"wrist\" -> 1 card(s)",
+    "database": "1 matching row(s)",
+    "result": "PASS",
+    "shot": "firefox-2-read.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "step": "Update",
+    "page": "detail shows $19.95 = true",
+    "database": "price now 19.95",
+    "result": "PASS",
+    "shot": "firefox-3-update.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "step": "Delete",
+    "page": "back on Stock list; LPA-032 listed = false",
+    "database": "status x (row kept for history)",
+    "result": "PASS",
+    "shot": "firefox-4-delete.png"
+  }
+]

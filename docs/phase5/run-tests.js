@@ -1,7 +1,7 @@
 // LPA eComms - use-case tests (Phase 5 validation, re-run after the requirements revision).
 // Each test records: id, use case, steps, test data, expected, actual, PASS/FAIL.
-// Run against a FRESH server (tests change the in-memory data):
-//   npm start   then   BASE=http://localhost:3000 node docs/phase5/run-tests.js
+// Run against a FRESH database (the tests change the data):
+//   npm run db:setup   then   npm start   then   BASE=http://localhost:3000 node docs/phase5/run-tests.js
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -99,7 +99,7 @@ const logText = () => { try { return fs.readFileSync(path.join(APP, 'logs', 'lpa
   r = await post('admin', '/products', { form: { sku: 'LPA-009', title: 'Wireless Presenter WP-5', brand: 'Orbit', category: 'Accessories', price: '29.90', quantity: '10', status: 'active', description: 'Laser presenter with USB receiver.' } });
   const newId = (r.loc || '').split('/').pop();
   x = await get('admin', r.loc || '/');
-  rec('UC-08', 'Add a new stock item (administrator)', 'Stock > Add item, fill the form, Save', 'LPA-009 Wireless Presenter WP-5, $29.90, qty 10', 'Item saved and its detail page shown', `${r.status} -> ${r.loc}; detail shows item = ${x.text.includes('Wireless Presenter WP-5')}`, r.status === 302 && /\/products\/\d+/.test(r.loc || '') && x.text.includes('Wireless Presenter WP-5'));
+  rec('UC-08', 'Add a new stock item (administrator)', 'Stock > Add item, fill the form, Save', 'LPA-009 Wireless Presenter WP-5, $29.90, qty 10', 'Item saved and its detail page shown', `${r.status} -> ${r.loc}; detail shows item = ${x.text.includes('Wireless Presenter WP-5')}`, r.status === 302 && /\/products\/LPA-009$/.test(r.loc || '') && x.text.includes('Wireless Presenter WP-5'));
 
   r = await post('admin', '/products', { form: { title: '', brand: '', price: '5' } });
   const dup = await post('admin', '/products', { form: { sku: 'lpa-001', title: 'Copy', brand: 'X', price: '1' } });
@@ -113,19 +113,19 @@ const logText = () => { try { return fs.readFileSync(path.join(APP, 'logs', 'lpa
   j = (await get('admin', `/products/${newId}`, J)).json();
   rec('UC-11', 'Disable a stock item', 'Edit item, set status Disabled, Save', 'status = disabled', 'Item status is disabled (and it leaves the shop)', `status now "${j.status}"`, j.status === 'disabled');
 
-  await post('staff', '/products/2/adjust', { form: { operation: 'add', quantity: '5', reason: 'Restocked from primary shipment' } });
-  j = (await get('staff', '/products/2', J)).json();
+  await post('staff', '/products/LPA-002/adjust', { form: { operation: 'add', quantity: '5', reason: 'Restocked from primary shipment' } });
+  j = (await get('staff', '/products/LPA-002', J)).json();
   const led = await get('staff', '/stock/ledger');
   const top = firstLedger(led.text);
   rec('UC-12', 'Stock adjustment - add (staff)', 'Signed in as staff: item WM-200 > Add stock 5, reason "Restocked", Submit', 'qty 7 + 5', 'On hand becomes 12; newest audit entry is this adjustment', `on hand ${j.quantity}; newest entry = "${top.slice(0, 70)}..."`, j.quantity === 12 && /Wireless Optical Mouse WM-200/.test(top));
   rec('UC-25', 'Audit history records who and when', 'After UC-12, open Stock > Audit history', 'signed in as mchang (Michael Chang)', 'Newest entry shows the signed-in user and a time', `user shown = ${/Michael Chang/.test(top)}; time shown = ${/\d{1,2}:\d{2}\s?[AP]M/i.test(top)}`, /Michael Chang/.test(top) && /\d{1,2}:\d{2}\s?[AP]M/i.test(top));
 
-  await post('staff', '/products/8/adjust', { form: { operation: 'remove', quantity: '50', reason: 'Damaged / write-off' } });
-  j = (await get('staff', '/products/8', J)).json();
+  await post('staff', '/products/LPA-008/adjust', { form: { operation: 'remove', quantity: '50', reason: 'Damaged / write-off' } });
+  j = (await get('staff', '/products/LPA-008', J)).json();
   rec('UC-13', 'Stock can never go negative', 'Item LPA-008 (on hand 2) > Remove 50', 'qty 2 - 50', 'On hand stops at 0 (not -48)', `on hand ${j.quantity}`, j.quantity === 0);
 
-  await post('staff', '/products/8/adjust', { form: { operation: 'reconcile', quantity: '10', reason: 'Physical inventory count' } });
-  j = (await get('staff', '/products/8', J)).json();
+  await post('staff', '/products/LPA-008/adjust', { form: { operation: 'reconcile', quantity: '10', reason: 'Physical inventory count' } });
+  j = (await get('staff', '/products/LPA-008', J)).json();
   rec('UC-14', 'Stock reconcile to a counted total', 'Item LPA-008 > Reconcile to 10', 'counted = 10', 'On hand set to exactly 10', `on hand ${j.quantity}`, j.quantity === 10);
 
   r = await post('admin', `/products/${newId}?_method=DELETE`);
@@ -156,7 +156,8 @@ const logText = () => { try { return fs.readFileSync(path.join(APP, 'logs', 'lpa
 
   // ---------- data integrity ----------
   // read the live data from the running server (not the model files)
-  const liveInv = (await get('staff', '/sales', J)).json().invoices;
+  const liveInv = [];
+  for (const i of (await get('staff', '/sales', J)).json().invoices) liveInv.push((await get('staff', '/sales/' + i.number, J)).json());
   const liveClients = (await get('staff', '/clients')).text;
   const orphans = liveInv.filter(i => !i.clientId || !liveClients.includes(i.clientId));
   rec('UC-19', 'Every invoice points to an existing client', 'Check each invoice clientId against the client list', '6 invoices', '0 invoices without a valid client', `${orphans.length} orphan invoice(s)`, orphans.length === 0);
@@ -172,9 +173,13 @@ const logText = () => { try { return fs.readFileSync(path.join(APP, 'logs', 'lpa
   rec('UC-30', 'Customer registration', 'Login page > Create an account; fill in details; Register; then sign in', 'Sam Rivera / srivera / Shop2026x', 'Account + client record created; customer can sign in and lands in the shop', `register ${r.status} -> ${r.loc}; client ${samClient || 'none'}; login -> ${reg.loc}`, r.status === 302 && /registered=1/.test(r.loc) && !!samClient && reg.loc === '/shop');
 
   // ---------- passwords ----------
-  const User = require(APP + '/app/Models/User.js');
-  const plain = User.all().filter(u => !/^scrypt\$[0-9a-f]{32}\$[0-9a-f]{128}$/.test(u.passwordHash) || u.passwordHash.includes(PASSWORD));
-  rec('UC-43', 'Passwords are stored as salted hashes', 'Inspect stored user records', `${User.all().length} users`, 'Every password is a scrypt hash with its own salt; no plain text', `${plain.length} plain/invalid; salts unique = ${new Set(User.all().map(u => u.passwordHash.split('$')[1])).size === User.all().length}`, plain.length === 0);
+  // read the stored hashes straight from the lpa_users table (what an attacker would see in a leak)
+  const db = require(APP + '/config/database.js');
+  const stored = await db.query('SELECT lpa_user_username AS username, lpa_user_password AS hash FROM lpa_users');
+  const plain = stored.filter(u => !/^scrypt\$[0-9a-f]{32}\$[0-9a-f]{128}$/.test(u.hash) || u.hash.includes(PASSWORD));
+  const uniqueSalts = new Set(stored.map(u => u.hash.split('$')[1])).size === stored.length;
+  rec('UC-43', 'Passwords are stored as salted hashes', 'SELECT lpa_user_password FROM lpa_users', `${stored.length} users`, 'Every password is a scrypt hash with its own salt; no plain text', `${plain.length} plain/invalid; salts unique = ${uniqueSalts}`, plain.length === 0 && uniqueSalts);
+  await db.pool.end();
 
   // ---------- web store ----------
   x = await get('cust', '/shop?sort=price-asc', J);
@@ -271,7 +276,7 @@ const logText = () => { try { return fs.readFileSync(path.join(APP, 'logs', 'lpa
     /LOGIN FAILED for user "palvim"/.test(log) && /LOGIN palvim/.test(log) && /REGISTER srivera/.test(log) && /ORDER INV-\d+ by aturner/.test(log) && /INVOICE INV-\d+ created/.test(log));
 
   // ---------- browser checks ----------
-  const browser = await chromium.launch();
+  const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
   const anon = await browser.newPage();
   await anon.goto(BASE + '/login');
   const ptype = await anon.getAttribute('#password', 'type');

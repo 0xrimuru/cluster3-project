@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const BASE = process.env.BASE || 'http://localhost:3000';
 const OUT = process.env.OUT || path.join(__dirname, 'shots');
-fs.mkdirSync(OUT, { recursive: true });
+if (require.main === module) fs.mkdirSync(OUT, { recursive: true });
 const DEVICES = { desktop: { w: 1366, h: 768 }, phone: { w: 412, h: 915 } };
 const results = [];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -16,7 +16,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 // ---- tiny driver adapters so the same steps run in both browsers ----
 async function chromiumDriver(device) {
   const { chromium } = require('playwright');
-  const b = await chromium.launch();
+  const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
   const ctx = await b.newContext(device === 'phone'
     ? { viewport: { width: 412, height: 915 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Mobile Safari/537.36' }
     : { viewport: { width: 1366, height: 768 } });
@@ -132,7 +132,8 @@ async function run(makeDriver, device) {
   } finally { await D.quit(); }
 }
 
-(async () => {
+module.exports = { chromiumDriver, firefoxDriver, login, BASE };
+if (require.main === module) (async () => {
   for (const make of [chromiumDriver, firefoxDriver]) for (const dev of ['desktop', 'phone']) await run(make, dev);
   fs.writeFileSync(path.join(path.dirname(OUT), 'cross-browser-results.json'), JSON.stringify(results, null, 2));
   const p = results.filter(r => r.result === 'PASS').length;

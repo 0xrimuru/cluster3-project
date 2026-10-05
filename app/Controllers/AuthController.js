@@ -5,6 +5,7 @@ const User = require('../Models/User');
 const Client = require('../Models/Client');
 const Log = require('../Models/ActivityLog');
 const { startSession, endSession } = require('../Middleware/auth');
+const { transaction } = require('../../config/database');
 
 const MESSAGES = {
   1: 'Please enter a username and password.',
@@ -21,11 +22,11 @@ exports.loginForm = (req, res) => {
   });
 };
 
-exports.login = (req, res) => {
+exports.login = async (req, res) => {
   const username = String(req.body.username || '').trim();
   const password = String(req.body.password || '');
   if (!username || !password) return res.redirect('/login?error=1');
-  const user = User.authenticate(username, password);
+  const user = await User.authenticate(username, password);
   if (!user) {
     Log.write(req, `LOGIN FAILED for user "${username.slice(0, 30)}"`);
     return res.redirect('/login?error=2&u=' + encodeURIComponent(username.slice(0, 30)));
@@ -50,7 +51,7 @@ exports.registerForm = (req, res) => {
   res.render('register', { title: 'Create an account', bare: true, hideNav: true, errors: [], form: {} });
 };
 
-exports.register = (req, res) => {
+exports.register = async (req, res) => {
   const form = {
     firstName: String(req.body.firstName || '').trim(),
     lastName: String(req.body.lastName || '').trim(),
@@ -61,7 +62,8 @@ exports.register = (req, res) => {
     confirmPassword: String(req.body.confirmPassword || ''),
     privacy: req.body.privacy === 'yes',
   };
-  const errors = User.validate(form, { isNew: true });
+  const errors = await User.validate(form, { isNew: true });
+  if (form.address.length > 250) errors.push('Address must be 250 characters or fewer.');
   if (!form.address) errors.push('Address is required (it is used for delivery and invoices).');
   if (!/^[0-9 ()+-]{8,20}$/.test(form.phone)) errors.push('Enter a valid phone number (8-20 digits, spaces, brackets, + or -).');
   if (!form.privacy) errors.push('Please confirm you have read the privacy notice.');
@@ -69,8 +71,12 @@ exports.register = (req, res) => {
     delete form.password; delete form.confirmPassword;
     return res.status(400).render('register', { title: 'Create an account', bare: true, hideNav: true, errors, form });
   }
-  const client = Client.create(form);
-  const user = User.create(Object.assign({}, form, { group: 'customer', clientId: client.code }));
+  // The client record and the login are saved together (one transaction) - never one without the other.
+  const { client, user } = await transaction(async conn => {
+    const c = await Client.create(form, conn);
+    const u = await User.create(Object.assign({}, form, { group: 'customer', clientId: c.code }), conn);
+    return { client: c, user: u };
+  });
   Log.write(req, `REGISTER ${user.username} -> client ${client.code}`);
   res.redirect('/login?registered=1&u=' + encodeURIComponent(user.username));
 };
