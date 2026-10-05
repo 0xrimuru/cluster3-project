@@ -10,13 +10,15 @@ const APP = process.env.APPDIR || path.resolve(__dirname, '../..');
 const PASSWORD = 'Lpa#2026';
 const results = [];
 const jar = {}; // user -> cookie header
+const csrf = {}; // user -> CSRF token (read from the page, like the browser does)
 
 function rec(id, title, steps, data, expected, actual, pass) {
   results.push({ id, title, steps, data, expected, actual, result: pass ? 'PASS' : 'FAIL' });
   console.log(`${pass ? 'PASS' : 'FAIL'}  ${id}  ${title}  ->  ${actual}`);
 }
-async function req(who, method, p, { form, json, accept } = {}) {
+async function req(who, method, p, { form, json, accept } = {}, extra = {}) {
   const headers = { cookie: jar[who] || '' };
+  if (method !== 'GET' && csrf[who] && !extra.noCsrf) headers['x-csrf-token'] = csrf[who];
   let body;
   if (form) { headers['content-type'] = 'application/x-www-form-urlencoded'; body = new URLSearchParams(form).toString(); }
   if (json !== undefined) { headers['content-type'] = 'application/json'; body = typeof json === 'string' ? json : JSON.stringify(json); }
@@ -33,6 +35,10 @@ async function login(who, username, password = PASSWORD) {
   const r = await fetch(BASE + '/login', { method: 'POST', redirect: 'manual', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ username, password }).toString() });
   const sc = r.headers.getSetCookie ? r.headers.getSetCookie() : [];
   jar[who] = sc.map(c => c.split(';')[0]).filter(c => !c.endsWith('=')).join('; ');
+  if (jar[who]) {
+    const page = await fetch(BASE + '/more', { headers: { cookie: jar[who] } }).then(x => x.text());
+    csrf[who] = (page.match(/name="csrf-token" content="([0-9a-f]+)"/) || [])[1] || '';
+  }
   return { status: r.status, loc: r.headers.get('location'), setCookie: sc };
 }
 const count = (html, re) => (html.match(re) || []).length;
@@ -160,7 +166,7 @@ const logText = () => { try { return fs.readFileSync(path.join(APP, 'logs', 'lpa
   // ---------- registration ----------
   r = await post('anon', '/register', { form: { firstName: 'Sam', lastName: 'Rivera', address: '22 Wharf St, Brisbane City QLD 4000', phone: '0400 111 222', username: 'aturner', password: 'short', confirmPassword: 'other' } });
   rec('UC-31', 'Registration rejects bad input', 'Register with a taken user name, short password and mismatched confirmation', 'aturner / "short" / "other"', 'Not saved (400) with a message for each problem', `${r.status}; taken = ${/already taken/.test(r.text)}, length = ${/at least 8/.test(r.text)}, match = ${/must match/.test(r.text)}`, r.status === 400 && /already taken/.test(r.text) && /at least 8/.test(r.text) && /must match/.test(r.text));
-  r = await post('anon', '/register', { form: { firstName: 'Sam', lastName: 'Rivera', address: '22 Wharf St, Brisbane City QLD 4000', phone: '0400 111 222', username: 'srivera', password: 'Shop2026x', confirmPassword: 'Shop2026x' } });
+  r = await post('anon', '/register', { form: { firstName: 'Sam', lastName: 'Rivera', address: '22 Wharf St, Brisbane City QLD 4000', phone: '0400 111 222', username: 'srivera', password: 'Shop2026x', confirmPassword: 'Shop2026x', privacy: 'yes' } });
   const reg = await login('sam', 'srivera', 'Shop2026x');
   const samClient = ((await get('staff', '/clients?q=Rivera')).text.match(/CL-\d{3}/) || [])[0];
   rec('UC-30', 'Customer registration', 'Login page > Create an account; fill in details; Register; then sign in', 'Sam Rivera / srivera / Shop2026x', 'Account + client record created; customer can sign in and lands in the shop', `register ${r.status} -> ${r.loc}; client ${samClient || 'none'}; login -> ${reg.loc}`, r.status === 302 && /registered=1/.test(r.loc) && !!samClient && reg.loc === '/shop');
@@ -239,6 +245,22 @@ const logText = () => { try { return fs.readFileSync(path.join(APP, 'logs', 'lpa
   rec('UC-42', 'Users management (administrator)', 'Users > Add staff user; sign in; set Inactive; Delete; try to delete own account', 'kpatel / Staff2026x', 'Added user can sign in; inactive user cannot; deleted user leaves the list; own account cannot be deleted',
     `add ${r.status}; login active -> ${kpLogin1.loc}; login inactive -> ${kpLogin2.loc}; listed after delete = ${listedAfter}; self-delete -> ${decodeURIComponent(self.loc || '')}`,
     r.status === 302 && kpLogin1.loc === '/' && /error=2/.test(kpLogin2.loc) && !listedAfter && /cannot delete your own/.test(decodeURIComponent(self.loc || '')));
+
+  // ---------- web security (ICTWEB514) ----------
+  const forged = await req('admin', 'POST', '/products', { form: { title: 'Forged', brand: 'X', price: '1' } }, { noCsrf: true });
+  const forgedJson = await req('cust', 'POST', '/cart', { json: { sku: 'LPA-001', qty: 1 }, accept: 'application/json' }, { noCsrf: true });
+  rec('UC-47', 'Forged requests refused (CSRF)', 'Send a POST without the page\'s CSRF token (as a forged cross-site request would)', 'admin add item; customer add to cart', 'Both refused with 403; nothing changed', `add item ${forged.status}; add to cart ${forgedJson.status}`, forged.status === 403 && forgedJson.status === 403);
+
+  const hx = await get('admin', '/');
+  const csp = hx.headers.get('content-security-policy') || '';
+  const hdrOk = /default-src 'self'/.test(csp) && /script-src 'self' 'nonce-/.test(csp) && /frame-ancestors 'none'/.test(csp) && hx.headers.get('x-content-type-options') === 'nosniff' && hx.headers.get('x-frame-options') === 'DENY' && !hx.headers.get('x-powered-by');
+  rec('UC-48', 'Security headers on every page', 'Read the response headers of Home', 'GET /', 'CSP (own scripts + nonce, no framing), nosniff, X-Frame-Options DENY, no X-Powered-By', `CSP = ${csp ? 'yes' : 'no'}; nosniff = ${hx.headers.get('x-content-type-options')}; frame = ${hx.headers.get('x-frame-options')}; powered-by = ${hx.headers.get('x-powered-by') || 'hidden'}`, hdrOk);
+
+  r = await post('admin', '/products', { form: { sku: 'LPA-099', title: '<script>alert(1)</script>Test', brand: '<b>Bold</b>', price: '1', quantity: '0', status: 'disabled' } });
+  const xp = await get('admin', '/products');
+  const escaped = xp.text.includes('&lt;script&gt;alert(1)&lt;/script&gt;Test') && !xp.text.includes('<script>alert(1)</script>');
+  await post('admin', (r.loc || '/products/0') + '?_method=DELETE');
+  rec('UC-49', 'Typed HTML/script is shown as text (XSS)', 'Add a stock item whose name contains a <script> tag; open the stock list', 'title = <script>alert(1)</script>Test', 'Shown as harmless text (escaped), never run', `escaped in page = ${escaped}`, escaped);
 
   // ---------- error handling + logging ----------
   r = await post('admin', '/sales', { json: '{"clientId": "CL-001", bad json', accept: 'application/json' });

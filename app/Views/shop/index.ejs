@@ -34,7 +34,7 @@
         <div class="product-buy">
           <span class="price">$<%= p.price.toFixed(2) %></span>
           <% if (canBuy) { %>
-          <form class="add-form" method="POST" action="/cart" data-sku="<%= p.sku %>" data-title="<%= p.title %>" data-price="<%= p.price %>" data-left="<%= left %>">
+          <form class="add-form" method="POST" action="/cart" data-sku="<%= p.sku %>" data-title="<%= p.title %>" data-price="<%= p.price %>" data-left="<%= left %>"><%- include('../partials/csrf') %>
             <input type="hidden" name="sku" value="<%= p.sku %>" />
             <label class="sr-only" for="qty-<%= p.sku %>">Quantity</label>
             <input class="qty" id="qty-<%= p.sku %>" name="qty" type="number" min="1" max="<%= left %>" step="1" value="<%= left ? 1 : 0 %>" <%= left ? '' : 'disabled' %> />

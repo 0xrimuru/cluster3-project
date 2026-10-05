@@ -20,7 +20,7 @@
         <td class="num row-actions">
           <a class="link-btn" href="/users/<%= u.id %>/edit">Edit</a>
           <% if (u.id !== user.id) { %>
-          <form method="POST" action="/users/<%= u.id %>?_method=DELETE" data-confirm="Delete user <%= u.username %>? They will no longer be able to sign in."><button class="link-btn danger" type="submit">Delete</button></form>
+          <form method="POST" action="/users/<%= u.id %>?_method=DELETE" data-confirm="Delete user <%= u.username %>? They will no longer be able to sign in."><%- include('../partials/csrf') %><button class="link-btn danger" type="submit">Delete</button></form>
           <% } %>
         </td>
       </tr>

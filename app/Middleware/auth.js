@@ -7,8 +7,8 @@ const crypto = require('crypto');
 const User = require('../Models/User');
 
 const COOKIE = 'lpa_sid';
-const sessions = new Map(); // token -> { userId, cart: [{ sku, qty }], created }
-const PUBLIC = ['/login', '/register'];
+const sessions = new Map(); // token -> { userId, cart: [{ sku, qty }], created, csrf }
+const PUBLIC = ['/login', '/register', '/privacy'];
 
 function readCookie(req, name) {
   const part = (req.headers.cookie || '').split(';').map(c => c.trim()).find(c => c.startsWith(name + '='));
@@ -17,7 +17,7 @@ function readCookie(req, name) {
 
 function startSession(res, user) {
   const token = crypto.randomBytes(32).toString('hex');
-  sessions.set(token, { userId: user.id, cart: [], created: Date.now() });
+  sessions.set(token, { userId: user.id, cart: [], created: Date.now(), csrf: crypto.randomBytes(24).toString('hex') });
   res.setHeader('Set-Cookie', `${COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax`);
   return token;
 }
@@ -41,6 +41,7 @@ function loadUser(req, res, next) {
   res.locals.role = req.user ? req.user.group : '';
   res.locals.roleLabel = req.user ? User.label(req.user.group) : '';
   res.locals.cartCount = req.session ? req.session.cart.reduce((n, i) => n + i.qty, 0) : 0;
+  res.locals.csrfToken = req.session ? req.session.csrf : '';
   next();
 }
 

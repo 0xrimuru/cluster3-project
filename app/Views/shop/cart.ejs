@@ -13,7 +13,7 @@
         <td><span class="sku"><%= l.sku %></span> <%= l.title %><% if (l.short) { %><span class="cell-sub err">Only <%= l.onHand %> left</span><% } %></td>
         <td class="num">$<%= l.price.toFixed(2) %></td>
         <td class="num">
-          <form method="POST" action="/cart/<%= l.sku %>" class="qty-form">
+          <form method="POST" action="/cart/<%= l.sku %>" class="qty-form"><%- include('../partials/csrf') %>
             <label class="sr-only" for="cq-<%= l.sku %>">Quantity of <%= l.title %></label>
             <input class="qty" id="cq-<%= l.sku %>" name="qty" type="number" min="0" max="<%= l.onHand %>" step="1" value="<%= l.qty %>" />
             <noscript><button class="btn ghost" type="submit">Update</button></noscript>
@@ -21,7 +21,7 @@
         </td>
         <td class="num line-amount">$<%= l.amount.toFixed(2) %></td>
         <td class="num">
-          <form method="POST" action="/cart/<%= l.sku %>?_method=DELETE" class="remove-form"><button class="link-btn" type="submit">Remove</button></form>
+          <form method="POST" action="/cart/<%= l.sku %>?_method=DELETE" class="remove-form"><%- include('../partials/csrf') %><button class="link-btn" type="submit">Remove</button></form>
         </td>
       </tr>
     <% }); %>

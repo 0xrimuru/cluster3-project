@@ -4,15 +4,18 @@ const express = require('express');
 const methodOverride = require('method-override');
 const routes = require('./routes');
 const { loadUser, requireLogin } = require('./app/Middleware/auth');
+const security = require('./app/Middleware/security');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'app', 'Views'));
+app.disable('x-powered-by');
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(security.headers);
+app.use(express.urlencoded({ extended: true, limit: '20kb' }));
+app.use(express.json({ limit: '20kb' }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -20,6 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // active user. Role checks per route are in routes/index.js.
 app.use(loadUser);
 app.use(requireLogin);
+app.use(security.csrf);
 
 app.use('/', routes);
 

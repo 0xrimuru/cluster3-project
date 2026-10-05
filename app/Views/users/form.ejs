@@ -1,7 +1,7 @@
 <%- include('../partials/header') %>
   <h1>User record <span class="subtle">(<%= mode %>)</span></h1>
   <% if (errors.length) { %><ul class="form-errors" role="alert"><% errors.forEach(function(e){ %><li><%= e %></li><% }); %></ul><% } %>
-  <form class="card pad stack" method="POST" action="<%= mode==='Add' ? '/users' : '/users/' + form.id + '?_method=PUT' %>" data-validate>
+  <form class="card pad stack" method="POST" action="<%= mode==='Add' ? '/users' : '/users/' + form.id + '?_method=PUT' %>" data-validate><%- include('../partials/csrf') %>
     <% if (mode==='Edit') { %><div class="kv"><span>User ID</span><strong><%= form.id %></strong></div><% } %>
     <label>User name<input name="username" value="<%= form.username || '' %>" required pattern="[a-z0-9._\-]{3,30}" title="3-30 lower-case letters, numbers, dot, dash or underscore" autocomplete="off" /></label>
     <div class="two-col">

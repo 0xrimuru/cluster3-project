@@ -15,6 +15,7 @@
         <p class="hint" id="pass-rule">At least 8 characters, with a letter and a number.</p>
         <label>Confirm password<input id="reg-pass2" name="confirmPassword" type="password" required minlength="8" autocomplete="new-password" /></label>
         <p class="hint" id="pass-match" aria-live="polite"></p>
+        <label class="check-line"><input type="checkbox" name="privacy" value="yes" required <%= form.privacy ? 'checked' : '' %> /> I have read the <a href="/privacy" target="_blank" rel="noopener">privacy notice</a>.</label>
         <button class="btn btn-block" type="submit">Register</button>
         <p class="login-alt"><a href="/login">Back to login</a></p>
       </form>

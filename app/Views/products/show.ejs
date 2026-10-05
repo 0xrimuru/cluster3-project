@@ -19,7 +19,7 @@
         <div class="actions">
           <% if (role === 'administrator') { %>
           <a class="btn" href="/products/<%= product.id %>/edit">Edit</a>
-          <form method="POST" action="/products/<%= product.id %>?_method=DELETE" data-confirm="Delete <%= product.title %>? It will be hidden from stock and the shop (history is kept).">
+          <form method="POST" action="/products/<%= product.id %>?_method=DELETE" data-confirm="Delete <%= product.title %>? It will be hidden from stock and the shop (history is kept)."><%- include('../partials/csrf') %>
             <button class="btn danger" type="submit">Delete</button>
           </form>
           <% } %>
@@ -31,7 +31,7 @@
 
   <section class="card pad" id="adjust">
     <h2>Perform stock adjustment</h2>
-    <form method="POST" action="/products/<%= product.id %>/adjust" id="adjust-form">
+    <form method="POST" action="/products/<%= product.id %>/adjust" id="adjust-form"><%- include('../partials/csrf') %>
       <div class="seg" role="group" aria-label="Adjustment operation">
         <input type="radio" id="op-add" name="operation" value="add" checked />
         <label for="op-add">+ Add stock</label>

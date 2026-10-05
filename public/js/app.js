@@ -26,6 +26,12 @@ LPA.confirm = function (title, body, okLabel) {
   });
 };
 
+// Headers for fetch() calls that change data: JSON + the CSRF token from the page.
+LPA.jsonHeaders = function () {
+  const m = document.querySelector('meta[name="csrf-token"]');
+  return { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-Token': m ? m.content : '' };
+};
+
 LPA.setCartCount = function (n) {
   const badge = document.getElementById('cart-badge');
   if (badge) { badge.textContent = n; badge.hidden = !n; }
@@ -41,6 +47,11 @@ document.addEventListener('submit', async e => {
     form.dataset.confirmed = '1';
     form.requestSubmit ? form.requestSubmit() : form.submit();
   }
+});
+
+// <select data-autosubmit> submits its form when changed (replaces inline onchange=, blocked by the CSP)
+document.addEventListener('change', e => {
+  if (e.target.matches('select[data-autosubmit]') && e.target.form) e.target.form.submit();
 });
 
 document.addEventListener('DOMContentLoaded', () => {

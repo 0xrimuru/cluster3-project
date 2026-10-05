@@ -42,7 +42,7 @@
     const ok = await LPA.confirm('Add to cart?',
       `${qty} × ${form.dataset.title} at ${money(price)} each = ${money(qty * price)} (incl. GST).`, 'Add to cart');
     if (!ok) return;
-    const r = await fetch('/cart', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    const r = await fetch('/cart', { method: 'POST', headers: LPA.jsonHeaders(),
       body: JSON.stringify({ sku: form.dataset.sku, qty }) });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) return flash(data.error || 'Could not add to cart.', false);

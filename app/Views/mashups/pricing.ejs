@@ -20,7 +20,7 @@
   <% } else { %>
     <form method="GET" action="/mashups/pricing" class="currency-picker">
       <label>Show prices in:
-        <select name="currency" onchange="this.form.submit()">
+        <select name="currency" data-autosubmit>
           <% Object.keys(rates.currencies).forEach(function (code) { %>
             <option value="<%= code %>" <%= code === selected ? 'selected' : '' %>>
               <%= code %> — <%= rates.currencies[code] %>

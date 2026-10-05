@@ -1,0 +1,20 @@
+<%- include('partials/header') %>
+  <% if (!user) { %><div class="login-backdrop"><div class="login-dialog wide"><div class="login-titlebar"><span>Privacy notice</span></div><div class="login-body"><% } else { %><h1>Privacy <span class="subtle">notice</span></h1><section class="card pad"><% } %>
+    <p><strong>Logic Peripherals Australia (LPA)</strong> collects the personal information below to run your account and fulfil your orders, in line with the <em>Privacy Act 1988</em> (Cth) and the Australian Privacy Principles.</p>
+    <h2>What we collect and why</h2>
+    <ul>
+      <li><strong>Name, address and phone</strong> &mdash; to deliver orders, issue invoices and contact you about an order.</li>
+      <li><strong>User name and password</strong> &mdash; to sign you in. Passwords are stored only as a salted hash; LPA staff cannot see them.</li>
+      <li><strong>Order history</strong> &mdash; kept for invoicing, returns and tax records.</li>
+      <li><strong>Sign-in and order events</strong> (date, time, IP address) &mdash; kept in a security log to protect your account.</li>
+    </ul>
+    <h2>What we do not do</h2>
+    <ul>
+      <li>We do not store card numbers &mdash; payment is handled by the payment provider.</li>
+      <li>We do not sell your information or send marketing email without your consent (<em>Spam Act 2003</em>).</li>
+    </ul>
+    <h2>Your choices</h2>
+    <p>You can ask to see or correct your details, or close your account, by contacting LPA at 123 Queen Street, Brisbane City QLD 4000 &middot; (07) 3000 1234. Theme and colour preferences are saved only in your own browser.</p>
+    <p><a class="btn ghost" href="<%= user ? '/' : '/register' %>">&larr; Back</a></p>
+  <% if (!user) { %></div></div></div><% } else { %></section><% } %>
+<%- include('partials/footer') %>

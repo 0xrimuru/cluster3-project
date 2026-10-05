@@ -1,7 +1,7 @@
 <%- include('../partials/header') %>
   <h1>Checkout</h1>
   <% if (errors.length) { %><ul class="form-errors" role="alert"><% errors.forEach(function(e){ %><li><%= e %></li><% }); %></ul><% } %>
-  <form class="card pad stack" method="POST" action="/checkout" id="checkout-form" data-total="<%= total.toFixed(2) %>" data-confirm="Place your order for $<%= total.toFixed(2) %> (incl. GST)? Stock is reserved for you when you confirm.">
+  <form class="card pad stack" method="POST" action="/checkout" id="checkout-form" data-total="<%= total.toFixed(2) %>" data-confirm="Place your order for $<%= total.toFixed(2) %> (incl. GST)? Stock is reserved for you when you confirm."><%- include('../partials/csrf') %>
     <h2>Customer details</h2>
     <div class="kv"><span>Name</span><strong><%= user.firstName %> <%= user.lastName %></strong></div>
     <div class="kv"><span>Client ID</span><strong><%= customer.code %></strong></div>

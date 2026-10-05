@@ -18,7 +18,7 @@
   </div>
 
   <script src="/vendor/leaflet/leaflet.min.js"></script>
-  <script>
+  <script nonce="<%= nonce %>">
     // --- Source 1: OpenStreetMap tiles rendered by Leaflet ---
     const map = L.map('map').setView([-30.5, 149.0], 4); // roughly east-coast Australia
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {

@@ -1,0 +1,182 @@
+[
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "device": "desktop",
+    "page": "1 Home",
+    "server": "stats for this user's group (tiles shown), \"Welcome, Pedro Alvim\"",
+    "client": "greeting set by JS: \"Good morning, Pedro. S\"",
+    "result": "PASS",
+    "shot": "chromium-desktop-1-home.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "device": "desktop",
+    "page": "2 Stock",
+    "server": "?q=keyboard -> 2 item(s) from the server (keyboard + numpad, category Keyboards)",
+    "client": "typing \"web\" filters live -> 1 card(s)",
+    "result": "PASS",
+    "shot": "chromium-desktop-2-stock.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "device": "desktop",
+    "page": "3 New invoice",
+    "server": "next number INV-1007; client lookup -> \"DevWorks Pty Ltd\"",
+    "client": "line added, live total $138.00",
+    "result": "PASS",
+    "shot": "chromium-desktop-3-new-invoice.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "device": "desktop",
+    "page": "4 Shop",
+    "server": "sorted by price on the server: first = \"27\" 4K UHD Monitor UM-27\"",
+    "client": "live filter \"mouse\" -> 1; add to cart -> badge 1",
+    "result": "PASS",
+    "shot": "chromium-desktop-4-shop.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "device": "desktop",
+    "page": "5 Cart",
+    "server": "total from the session $39.50; after reload $118.50",
+    "client": "qty 1 -> 3 recalculates live: $118.50",
+    "result": "PASS",
+    "shot": "chromium-desktop-5-cart.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "device": "phone",
+    "page": "1 Home",
+    "server": "stats for this user's group (tiles shown), \"Welcome, Pedro Alvim\"",
+    "client": "greeting set by JS: \"Good morning, Pedro. S\"",
+    "result": "PASS",
+    "shot": "chromium-phone-1-home.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "device": "phone",
+    "page": "2 Stock",
+    "server": "?q=keyboard -> 2 item(s) from the server (keyboard + numpad, category Keyboards)",
+    "client": "typing \"web\" filters live -> 1 card(s)",
+    "result": "PASS",
+    "shot": "chromium-phone-2-stock.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "device": "phone",
+    "page": "3 New invoice",
+    "server": "next number INV-1007; client lookup -> \"DevWorks Pty Ltd\"",
+    "client": "line added, live total $138.00",
+    "result": "PASS",
+    "shot": "chromium-phone-3-new-invoice.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "device": "phone",
+    "page": "4 Shop",
+    "server": "sorted by price on the server: first = \"27\" 4K UHD Monitor UM-27\"",
+    "client": "live filter \"mouse\" -> 1; add to cart -> badge 1",
+    "result": "PASS",
+    "shot": "chromium-phone-4-shop.png"
+  },
+  {
+    "browser": "Chromium 141.0.7390.37",
+    "device": "phone",
+    "page": "5 Cart",
+    "server": "total from the session $39.50; after reload $118.50",
+    "client": "qty 1 -> 3 recalculates live: $118.50",
+    "result": "PASS",
+    "shot": "chromium-phone-5-cart.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "device": "desktop",
+    "page": "1 Home",
+    "server": "stats for this user's group (tiles shown), \"Welcome, Pedro Alvim\"",
+    "client": "greeting set by JS: \"Good morning, Pedro. S\"",
+    "result": "PASS",
+    "shot": "firefox-desktop-1-home.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "device": "desktop",
+    "page": "2 Stock",
+    "server": "?q=keyboard -> 2 item(s) from the server (keyboard + numpad, category Keyboards)",
+    "client": "typing \"web\" filters live -> 1 card(s)",
+    "result": "PASS",
+    "shot": "firefox-desktop-2-stock.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "device": "desktop",
+    "page": "3 New invoice",
+    "server": "next number INV-1007; client lookup -> \"DevWorks Pty Ltd\"",
+    "client": "line added, live total $138.00",
+    "result": "PASS",
+    "shot": "firefox-desktop-3-new-invoice.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "device": "desktop",
+    "page": "4 Shop",
+    "server": "sorted by price on the server: first = \"27\" 4K UHD Monitor UM-27\"",
+    "client": "live filter \"mouse\" -> 1; add to cart -> badge 1",
+    "result": "PASS",
+    "shot": "firefox-desktop-4-shop.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "device": "desktop",
+    "page": "5 Cart",
+    "server": "total from the session $39.50; after reload $118.50",
+    "client": "qty 1 -> 3 recalculates live: $118.50",
+    "result": "PASS",
+    "shot": "firefox-desktop-5-cart.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "device": "phone",
+    "page": "1 Home",
+    "server": "stats for this user's group (tiles shown), \"Welcome, Pedro Alvim\"",
+    "client": "greeting set by JS: \"Good morning, Pedro. S\"",
+    "result": "PASS",
+    "shot": "firefox-phone-1-home.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "device": "phone",
+    "page": "2 Stock",
+    "server": "?q=keyboard -> 2 item(s) from the server (keyboard + numpad, category Keyboards)",
+    "client": "typing \"web\" filters live -> 1 card(s)",
+    "result": "PASS",
+    "shot": "firefox-phone-2-stock.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "device": "phone",
+    "page": "3 New invoice",
+    "server": "next number INV-1007; client lookup -> \"DevWorks Pty Ltd\"",
+    "client": "line added, live total $138.00",
+    "result": "PASS",
+    "shot": "firefox-phone-3-new-invoice.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "device": "phone",
+    "page": "4 Shop",
+    "server": "sorted by price on the server: first = \"27\" 4K UHD Monitor UM-27\"",
+    "client": "live filter \"mouse\" -> 1; add to cart -> badge 1",
+    "result": "PASS",
+    "shot": "firefox-phone-4-shop.png"
+  },
+  {
+    "browser": "Firefox 157.0",
+    "device": "phone",
+    "page": "5 Cart",
+    "server": "total from the session $39.50; after reload $118.50",
+    "client": "qty 1 -> 3 recalculates live: $118.50",
+    "result": "PASS",
+    "shot": "firefox-phone-5-cart.png"
+  }
+]

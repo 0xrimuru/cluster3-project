@@ -59,10 +59,12 @@ exports.register = (req, res) => {
     username: String(req.body.username || '').trim().toLowerCase(),
     password: String(req.body.password || ''),
     confirmPassword: String(req.body.confirmPassword || ''),
+    privacy: req.body.privacy === 'yes',
   };
   const errors = User.validate(form, { isNew: true });
   if (!form.address) errors.push('Address is required (it is used for delivery and invoices).');
   if (!/^[0-9 ()+-]{8,20}$/.test(form.phone)) errors.push('Enter a valid phone number (8-20 digits, spaces, brackets, + or -).');
+  if (!form.privacy) errors.push('Please confirm you have read the privacy notice.');
   if (errors.length) {
     delete form.password; delete form.confirmPassword;
     return res.status(400).render('register', { title: 'Create an account', bare: true, hideNav: true, errors, form });

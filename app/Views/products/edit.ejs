@@ -1,6 +1,6 @@
 <%- include('../partials/header') %>
   <h1>Stock management <span class="subtle">&mdash; edit item</span></h1>
-  <form id="product-form" class="card pad" method="POST" action="/products/<%= product.id %>?_method=PUT">
+  <form id="product-form" class="card pad" method="POST" action="/products/<%= product.id %>?_method=PUT"><%- include('../partials/csrf') %>
     <%- include('_form', { product: product }) %>
     <div class="form-actions">
       <button class="btn" type="submit">Save</button>

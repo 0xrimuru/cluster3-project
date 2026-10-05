@@ -433,3 +433,7 @@ table.data.lines td:first-child{word-break:break-word}
 .x-btn{width:28px;height:28px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--danger);font-size:1.1rem;line-height:1;cursor:pointer}
 .x-btn:hover{background:var(--bad-bg)}
 table.data td a{white-space:nowrap}
+
+.check-line{display:flex!important;align-items:flex-start;gap:.5rem;font-weight:500!important;font-size:.88rem}
+.check-line input{width:auto!important;display:inline!important;margin:.2rem 0 0!important}
+.login-body ul{padding-left:1.1rem}.login-body h2{font-size:1rem;margin-top:.9rem}

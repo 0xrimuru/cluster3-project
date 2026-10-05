@@ -92,7 +92,7 @@
     const box = $('form-errors');
     if (errs.length) { box.innerHTML = errs.map(x => `<li>${esc(x)}</li>`).join(''); box.hidden = false; return; }
     $('inv-save').disabled = true;
-    const r = await fetch('/sales', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    const r = await fetch('/sales', { method: 'POST', headers: LPA.jsonHeaders(),
       body: JSON.stringify({ clientId: client.code, date: $('inv-date').value, items: lines.map(l => ({ sku: l.sku, qty: l.qty })) }) });
     const data = await r.json().catch(() => ({}));
     if (r.ok) { location.href = data.url; return; }

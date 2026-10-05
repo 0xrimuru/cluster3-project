@@ -22,7 +22,7 @@
 
   async function save(tr, qty) {
     const r = await fetch('/cart/' + encodeURIComponent(tr.dataset.sku), { method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ qty }) });
+      headers: LPA.jsonHeaders(), body: JSON.stringify({ qty }) });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) { show(data.error || 'Could not update the cart.'); return false; }
     show('');

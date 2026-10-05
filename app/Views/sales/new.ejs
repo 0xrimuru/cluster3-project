@@ -1,6 +1,6 @@
 <%- include('../partials/header') %>
   <h1>New <span class="subtle">invoice</span></h1>
-  <form id="invoice-form" class="card pad stack" method="POST" action="/sales" novalidate>
+  <form id="invoice-form" class="card pad stack" method="POST" action="/sales" novalidate><%- include('../partials/csrf') %>
     <div class="inv-meta">
       <div><span class="lbl">Invoice number</span><strong id="inv-no"><%= nextNumber %></strong></div>
       <label class="inv-date">Date<input type="date" id="inv-date" name="date" value="<%= today %>" max="<%= today %>" required /></label>
