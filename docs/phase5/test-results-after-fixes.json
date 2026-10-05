@@ -1,0 +1,246 @@
+[
+  {
+    "id": "UC-01",
+    "title": "Login with username and password",
+    "steps": "Enter username and password, press Login",
+    "data": "jsmith / Lpa#2026",
+    "expected": "Signed in and taken to the Home page",
+    "actual": "302 -> /; cookies: otb_auth, lpa_user",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-02",
+    "title": "Login rejected with blank password",
+    "steps": "Enter username, leave password blank, press Login",
+    "data": "jsmith / (blank)",
+    "expected": "Stay on login page with an error message",
+    "actual": "302 -> /login?error=1",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-03",
+    "title": "Protected page requires sign-in",
+    "steps": "Open /products without signing in",
+    "data": "none",
+    "expected": "Redirect (302) to /login",
+    "actual": "302 -> /login",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-04",
+    "title": "Password is masked",
+    "steps": "Open login page, inspect password field",
+    "data": "type \"secret\"",
+    "expected": "Characters hidden (input type = password)",
+    "actual": "input type = \"password\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-05",
+    "title": "Home page shows business summary + promo video",
+    "steps": "Open Home",
+    "data": "seed data",
+    "expected": "8 items, 3 low, 1 out, 6 invoices, $803.50 total sales; video present",
+    "actual": "8 / 3 / 1 / 6 / $803.50 shown; promo video embedded",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-06",
+    "title": "Stock list shows all items with key fields",
+    "steps": "Open Stock",
+    "data": "seed data (8 items)",
+    "expected": "All 8 items listed with SKU, name, price, qty and status badge",
+    "actual": "8 of 8 SKUs listed; badges: In/Low/Out present = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-07",
+    "title": "Search stock",
+    "steps": "Type \"webcam\" in search, press Search",
+    "data": "q = webcam",
+    "expected": "Only 1080p HD Webcam CV-10 (LPA-005) shown",
+    "actual": "1 result(s): LPA-005",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-08",
+    "title": "Add a new stock item",
+    "steps": "Stock > Add item, fill the form, Save",
+    "data": "LPA-009 Wireless Presenter WP-5, $29.90, qty 10",
+    "expected": "Item saved and its detail page shown",
+    "actual": "302 -> /products/9; detail shows \"Wireless Presenter WP-5\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-09a",
+    "title": "Add item with no name is rejected (server)",
+    "steps": "Submit the add form with name and brand empty",
+    "data": "title = \"\", brand = \"\"",
+    "expected": "Not saved; error \"needs at least a product name and a brand\"",
+    "actual": "400; message shown = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-09b",
+    "title": "Add form validates before sending (client)",
+    "steps": "Open Add item, press Save with empty fields",
+    "data": "all fields empty",
+    "expected": "Form not submitted; browser shows \"fill out this field\"",
+    "actual": "stayed on form = true; message = \"Please fill out this field.\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-10",
+    "title": "Edit a stock item and save",
+    "steps": "Open item > Edit, change price, Save",
+    "data": "price 29.90 -> 24.90",
+    "expected": "New price saved",
+    "actual": "price now 24.9",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-11",
+    "title": "Disable a stock item",
+    "steps": "Edit item, set status Disabled, Save",
+    "data": "status = disabled",
+    "expected": "Item status is disabled",
+    "actual": "status now \"disabled\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-12",
+    "title": "Stock adjustment - add",
+    "steps": "Item WM-200 > Add stock 5, reason \"Restocked\", Submit",
+    "data": "qty 7 + 5",
+    "expected": "On hand becomes 12; adjustment appears in audit history",
+    "actual": "on hand 12; ledger entry by jsmith = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-13",
+    "title": "Stock can never go negative",
+    "steps": "Item LPA-008 (on hand 2) > Remove 50",
+    "data": "qty 2 - 50",
+    "expected": "On hand stops at 0 (not -48)",
+    "actual": "on hand 0",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-14",
+    "title": "Stock reconcile to a counted total",
+    "steps": "Item LPA-008 > Reconcile to 10",
+    "data": "counted = 10",
+    "expected": "On hand set to exactly 10",
+    "actual": "on hand 10",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-15",
+    "title": "Delete a stock item",
+    "steps": "Open LPA-009 > Delete > confirm",
+    "data": "item id 9",
+    "expected": "Item removed; opening it again returns Not found (404)",
+    "actual": "delete 302 -> /products; reopen = 404",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-16",
+    "title": "Sales & Invoicing lists invoices with total",
+    "steps": "Open Sales",
+    "data": "seed data (6 invoices)",
+    "expected": "6 invoices with Date, Client, Amount; Total $803.50",
+    "actual": "6 invoices; headers Date/Client/Amount = true; total $803.50 = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-17",
+    "title": "Search invoices by client",
+    "steps": "Type \"DevWorks\" in search, press Search",
+    "data": "q = DevWorks",
+    "expected": "2 invoices (INV-1002, INV-1005); total $220.00",
+    "actual": "2 invoices; total $220.00 = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-18",
+    "title": "Client records with address; search",
+    "steps": "Open Clients; search \"Northgate\"",
+    "data": "q = Northgate",
+    "expected": "Address column shown; 1 client (CL-004) found",
+    "actual": "address column = true; results = 1",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-19",
+    "title": "Every invoice points to an existing client",
+    "steps": "Check each invoice clientId against the client list",
+    "data": "6 invoices, 5 clients",
+    "expected": "0 invoices without a valid client",
+    "actual": "0 orphan invoices",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-20",
+    "title": "Stock available as JSON (API)",
+    "steps": "GET /products with Accept: application/json",
+    "data": "Accept: application/json",
+    "expected": "JSON array of stock items",
+    "actual": "status 200; 8 items, content-type application/json",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-21",
+    "title": "Logout ends the session",
+    "steps": "Press Logout, then try to open Stock",
+    "data": "none",
+    "expected": "Sent back to the login page",
+    "actual": "landed on /login",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-22",
+    "title": "Theme preference is remembered",
+    "steps": "Settings > choose Dark, then open Home",
+    "data": "theme = dark",
+    "expected": "Home opens in dark theme",
+    "actual": "data-theme = \"dark\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-23",
+    "title": "Mashup pages open",
+    "steps": "Open Mashups > Store locator and Pricing",
+    "data": "none",
+    "expected": "Both pages load (200)",
+    "actual": "store-locator 200, pricing 200",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-24",
+    "title": "Home page response time",
+    "steps": "Request Home 5 times, average the time",
+    "data": "5 requests",
+    "expected": "Average under 500 ms",
+    "actual": "average 5 ms (max 7 ms)",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-25",
+    "title": "Audit history records who and when",
+    "steps": "After UC-12, open Stock > Audit history",
+    "data": "signed in as jsmith",
+    "expected": "Newest entry shows user jsmith and a time",
+    "actual": "user jsmith shown = true; time shown = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-26",
+    "title": "Mobile app opens the LPA interface",
+    "steps": "Install APK on Pixel 7 emulator, open LPA eComms",
+    "data": "emulator API 34, server on :3000",
+    "expected": "Splash screen for ~2 s, then login page inside the app",
+    "actual": "Static check passed (APK launch activity = SplashActivity; INTERNET permission). On-device run to be recorded.",
+    "result": "PENDING",
+    "ms": 0
+  }
+]

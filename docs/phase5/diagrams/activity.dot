@@ -1,0 +1,52 @@
+digraph A {
+  graph [rankdir=TB, fontname="DejaVu Sans", nodesep=0.35, ranksep=0.38, pad=0.3, bgcolor="white", labelloc=t,
+         label=<<b>LPA eComms — user activity diagram (staff member)</b><br/><font point-size="9" color="#5b6660">Login → dashboard → stock / sales / clients / personalise → logout · Pedro Alvim · CTI20260187 · 04/10/2026</font>>];
+  node [fontname="DejaVu Sans", fontsize=9.5, shape=box, style="rounded,filled", fillcolor="#ffffff", color="#0a6b49", penwidth=1.2, margin="0.14,0.06"];
+  edge [fontname="DejaVu Sans", fontsize=8.5, color="#33403a", arrowsize=0.7];
+
+  start [shape=circle, label="", width=0.22, style=filled, fillcolor="#1b1f1d", color="#1b1f1d"];
+  open  [label="Open LPA eComms\n(browser or Android app)"];
+  login [label="Login page:\nenter user name + password"];
+  dv    [shape=diamond, label="Both\nfilled?", style=filled, fillcolor="#eef6f2", fontsize=8.5, width=1.1, height=0.75];
+  err   [label="Show 'Please enter a\nusername and password'", fillcolor="#fdeceb", color="#b3362e"];
+  home  [label="Home dashboard\n(stock counts, low/out, invoices, total sales)"];
+  menu  [shape=diamond, label="Choose\nsection", style=filled, fillcolor="#eef6f2", fontsize=8.5, width=1.1, height=0.75];
+
+  sstock [label="Stock list\n(search by name / brand / SKU)"];
+  sact   [shape=diamond, label="Action?", style=filled, fillcolor="#eef6f2", fontsize=8.5];
+  add    [label="Add item form"];
+  valid  [shape=diamond, label="Valid?", style=filled, fillcolor="#eef6f2", fontsize=8.5];
+  verr   [label="Field error shown\n(not submitted)", fillcolor="#fdeceb", color="#b3362e"];
+  save   [label="Save item"];
+  item   [label="Open item detail"];
+  adj    [label="Adjust stock:\nadd / remove / reconcile + reason"];
+  ledger [label="Audit history records\nuser, time, before → after", fillcolor="#fff7e6", color="#b7862b"];
+  edit   [label="Edit / disable / delete\n(save or close)"];
+
+  sales  [label="Sales & Invoicing:\nsearch invoices"];
+  stotal [label="List Date / Client / Amount\n+ total of results"];
+  clients[label="Clients: search,\nview address / phone / status"];
+  prefs  [label="Preferences:\ntheme + accent (remembered)"];
+  mash   [label="Mashups: store locator /\ninternational pricing"];
+
+  more   [shape=diamond, label="More\nwork?", style=filled, fillcolor="#eef6f2", fontsize=8.5, width=1.0, height=0.7];
+  logout [label="Logout (session ended)"];
+  end    [shape=doublecircle, label="", width=0.16, style=filled, fillcolor="#1b1f1d", color="#1b1f1d"];
+
+  start -> open -> login -> dv;
+  dv -> err [label="no"]; err -> login;
+  dv -> home [label="yes"];
+  home -> menu;
+  menu -> sstock [label="Stock"]; menu -> sales [label="Sales"]; menu -> clients [label="Clients"]; menu -> prefs [label="Settings"]; menu -> mash [label="Mashups"];
+  sstock -> sact;
+  sact -> add [label="add"]; sact -> item [label="select"];
+  add -> valid; valid -> verr [label="no"]; verr -> add; valid -> save [label="yes"];
+  item -> adj [label="adjust"]; item -> edit [label="edit"];
+  adj -> ledger;
+  sales -> stotal;
+  save -> more; ledger -> more; edit -> more; stotal -> more; clients -> more; prefs -> more; mash -> more;
+  more -> home [label="yes", constraint=false, style=dashed];
+  more -> logout [label="no"]; logout -> end;
+  { rank=same; dv; err; }
+  { rank=same; valid; verr; }
+}

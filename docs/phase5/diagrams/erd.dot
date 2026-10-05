@@ -1,0 +1,93 @@
+digraph ERD {
+  graph [rankdir=LR, fontname="DejaVu Sans", nodesep=0.5, ranksep=1.1, pad=0.3, bgcolor="white", labelloc=t,
+         label=<<b>LPA eComms — entity relationship diagram (MySQL database lpa_ecomms)</b><br/><font point-size="9" color="#5b6660">Tables from the LPA specification (lpa_ecomms.sql) · relationships made explicit · Pedro Alvim · CTI20260187 · 04/10/2026</font>>];
+  node [shape=plain, fontname="DejaVu Sans", fontsize=9.5];
+  edge [fontname="DejaVu Sans", fontsize=8.5, color="#33403a", arrowsize=0.8, dir=both];
+
+  clients [label=<
+   <table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#0a6b49">
+    <tr><td bgcolor="#0a6b49" colspan="2"><font color="white"><b>lpa_clients</b></font></td></tr>
+    <tr><td align="left"><b>PK</b></td><td align="left" port="pk"><u>lpa_client_ID</u> varchar(20)</td></tr>
+    <tr><td></td><td align="left">lpa_client_firstname varchar(50)</td></tr>
+    <tr><td></td><td align="left">lpa_client_lastname varchar(50)</td></tr>
+    <tr><td></td><td align="left">lpa_client_address varchar(250)</td></tr>
+    <tr><td></td><td align="left">lpa_client_phone text</td></tr>
+    <tr><td></td><td align="left">lpa_client_status char(1)</td></tr>
+   </table>>];
+
+  invoices [label=<
+   <table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#0a6b49">
+    <tr><td bgcolor="#0a6b49" colspan="2"><font color="white"><b>lpa_invoices</b></font></td></tr>
+    <tr><td align="left"><b>PK</b></td><td align="left" port="pk"><u>lpa_inv_no</u> varchar(20)</td></tr>
+    <tr><td></td><td align="left">lpa_inv_date datetime</td></tr>
+    <tr><td align="left" port="fk"><b>FK</b></td><td align="left">lpa_inv_client_ID varchar(20)</td></tr>
+    <tr><td></td><td align="left">lpa_inv_client_name varchar(50)</td></tr>
+    <tr><td></td><td align="left">lpa_inv_client_address varchar(250)</td></tr>
+    <tr><td></td><td align="left">lpa_inv_amount decimal(8,2)</td></tr>
+    <tr><td></td><td align="left">lpa_inv_status char(1)</td></tr>
+   </table>>];
+
+  items [label=<
+   <table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#0a6b49">
+    <tr><td bgcolor="#0a6b49" colspan="2"><font color="white"><b>lpa_invoice_items</b></font></td></tr>
+    <tr><td align="left"><b>PK</b></td><td align="left"><u>lpa_invitem_no</u> int</td></tr>
+    <tr><td align="left" port="fkinv"><b>FK</b></td><td align="left">lpa_invitem_inv_no varchar(20)</td></tr>
+    <tr><td align="left" port="fkstock"><b>FK</b></td><td align="left">lpa_invitem_stock_ID varchar(20)</td></tr>
+    <tr><td></td><td align="left">lpa_invitem_stock_name varchar(250)</td></tr>
+    <tr><td></td><td align="left">lpa_invitem_qty int *</td></tr>
+    <tr><td></td><td align="left">lpa_invitem_stock_price decimal(7,2)</td></tr>
+    <tr><td></td><td align="left">lpa_invitem_stock_amount decimal(7,2)</td></tr>
+    <tr><td></td><td align="left">lpa_invitem_status char(1) *</td></tr>
+   </table>>];
+
+  stock [label=<
+   <table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#0a6b49">
+    <tr><td bgcolor="#0a6b49" colspan="2"><font color="white"><b>lpa_stock</b></font></td></tr>
+    <tr><td align="left"><b>PK</b></td><td align="left" port="pk"><u>lpa_stock_ID</u> varchar(20)</td></tr>
+    <tr><td></td><td align="left">lpa_stock_name varchar(250)</td></tr>
+    <tr><td></td><td align="left">lpa_stock_desc text</td></tr>
+    <tr><td></td><td align="left">lpa_stock_onhand int *</td></tr>
+    <tr><td></td><td align="left">lpa_stock_price decimal(7,2)</td></tr>
+    <tr><td></td><td align="left">lpa_stock_status char(1)</td></tr>
+   </table>>];
+
+  users [label=<
+   <table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#0a6b49">
+    <tr><td bgcolor="#0a6b49" colspan="2"><font color="white"><b>lpa_users</b></font></td></tr>
+    <tr><td align="left"><b>PK</b></td><td align="left" port="pk"><u>lpa_user_ID</u> varchar(20)</td></tr>
+    <tr><td></td><td align="left">lpa_user_username varchar(30) UNIQUE</td></tr>
+    <tr><td></td><td align="left">lpa_user_password varchar(255) * (hash)</td></tr>
+    <tr><td></td><td align="left">lpa_user_firstname varchar(50)</td></tr>
+    <tr><td></td><td align="left">lpa_user_lastname varchar(50)</td></tr>
+    <tr><td></td><td align="left">lpa_user_group varchar(50)</td></tr>
+    <tr><td></td><td align="left">lpa_user_status char(1) *</td></tr>
+   </table>>];
+
+  ledger [label=<
+   <table border="1" cellborder="0" cellspacing="0" cellpadding="4" color="#b7862b" style="dashed">
+    <tr><td bgcolor="#fff3d6" colspan="2"><b>lpa_stock_ledger</b>  <font point-size="8">(proposed)</font></td></tr>
+    <tr><td align="left"><b>PK</b></td><td align="left"><u>lpa_ledger_ID</u> int auto</td></tr>
+    <tr><td align="left" port="fkstock"><b>FK</b></td><td align="left">lpa_ledger_stock_ID varchar(20)</td></tr>
+    <tr><td align="left" port="fkuser"><b>FK</b></td><td align="left">lpa_ledger_user_ID varchar(20)</td></tr>
+    <tr><td></td><td align="left">lpa_ledger_operation enum(add,remove,reconcile)</td></tr>
+    <tr><td></td><td align="left">lpa_ledger_reason varchar(100)</td></tr>
+    <tr><td></td><td align="left">lpa_ledger_before int</td></tr>
+    <tr><td></td><td align="left">lpa_ledger_after int</td></tr>
+    <tr><td></td><td align="left">lpa_ledger_at datetime</td></tr>
+   </table>>];
+
+  clients:pk:e -> invoices:fk:w     [arrowtail=teetee, arrowhead=crowodot, label="places  1 : 0..N"];
+  invoices:pk:e -> items:fkinv:w    [arrowtail=teetee, arrowhead=crowtee,  label="contains  1 : 1..N"];
+  stock:pk:e -> items:fkstock:w     [arrowtail=teetee, arrowhead=crowodot, label="sold as  1 : 0..N"];
+  stock:pk:e -> ledger:fkstock:w    [arrowtail=teetee, arrowhead=crowodot, label="adjusted in  1 : 0..N", style=dashed, color="#b7862b"];
+  users:pk:e -> ledger:fkuser:w     [arrowtail=teetee, arrowhead=crowodot, label="records  1 : 0..N", style=dashed, color="#b7862b"];
+
+  note [shape=note, fontsize=8.5, style=filled, fillcolor="#f6f8f7", color="#9fb8ac", label=<
+    <b>Validation notes</b><br align="left"/>
+    * changed from the spec dump: quantities varchar(5)/(6) → int (arithmetic + no negatives);<br align="left"/>
+      password varchar(50) → varchar(255) to hold a hash; duplicate column name lpa_inv_status<br align="left"/>
+      in invoice_items / users renamed to _invitem_status / _user_status.<br align="left"/>
+    Foreign keys added (spec dump uses MyISAM, which does not enforce them) → use InnoDB.<br align="left"/>
+    lpa_stock_ledger is new: it stores the stock audit history from the client's reference app.<br align="left"/>>];
+  { rank=same; clients; stock; users; }
+}
