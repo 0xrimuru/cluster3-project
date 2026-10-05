@@ -1,46 +1,681 @@
 {
-  "functional": [
-    {"id":"FR-01","area":"Login","req":"The system shall provide a User Login page with a username field and a masked password field, and shall block every other page until the user has signed in. A logout option shall end the session.","source":"Technical Spec - Web interface: User login page","priority":"Must","design":"AuthController (loginForm, login, logout); login.ejs; requireLogin gate in server.js","code":"app/Controllers/AuthController.js; server.js (requireLogin)","screen":"01-login","status":"Partial","note":"Sign-in gate, masked password and logout work. Checking credentials against the lpa_users table with hashed passwords is scheduled for ICTPRG537 (security).","tests":["UC-01","UC-02","UC-03","UC-04","UC-21"]},
-    {"id":"FR-02","area":"Home","req":"The system shall provide a Main Home page with a global header, navigation and footer, showing a summary of the business: number of stock items, low-stock and out-of-stock counts, number of invoices and total sales.","source":"Technical Spec - Web interface: Main home page","priority":"Must","design":"HomeController.index; home.ejs; partials/header.ejs + footer.ejs","code":"app/Controllers/HomeController.js; app/Views/home.ejs","screen":"02-dashboard","status":"Met","note":"","tests":["UC-05","UC-24"]},
-    {"id":"FR-03","area":"Stock","req":"The system shall list all stock items showing stock ID (SKU), name, category, price, on-hand quantity and status (In / Low / Out of stock).","source":"Technical Spec - Stock management page; lpa_stock table","priority":"Must","design":"ProductController.index; products/index.ejs","code":"app/Controllers/ProductController.js; app/Views/products/index.ejs","screen":"03-stock","status":"Met","note":"","tests":["UC-06"]},
-    {"id":"FR-04","area":"Stock","req":"The system shall let staff search stock by product name, brand, SKU or category.","source":"Technical Spec - Stock management page (search)","priority":"Must","design":"ProductController.index (?q=) + live filter in public/js/stock.js","code":"app/Controllers/ProductController.js; public/js/stock.js","screen":"03-stock","status":"Met","note":"","tests":["UC-07"]},
-    {"id":"FR-05","area":"Stock","req":"The system shall let staff add a new stock item (name, brand, SKU, category, price, quantity, status, description) and save it.","source":"Technical Spec - Stock management page (add / save)","priority":"Must","design":"ProductController.newForm + create; products/new.ejs + _form.ejs","code":"app/Controllers/ProductController.js; app/Views/products/_form.ejs","screen":"09-add","status":"Met","note":"","tests":["UC-08","UC-09"]},
-    {"id":"FR-06","area":"Stock","req":"The system shall let staff edit an existing stock item and save or close without saving.","source":"Technical Spec - Stock management page (edit / save / close)","priority":"Must","design":"ProductController.editForm + update (PUT); products/edit.ejs; Close link on detail page","code":"app/Controllers/ProductController.js; app/Views/products/edit.ejs","screen":"04-detail","status":"Met","note":"","tests":["UC-10"]},
-    {"id":"FR-07","area":"Stock","req":"Each stock item shall have a status of enabled (active) or disabled.","source":"lpa_stock.lpa_stock_status","priority":"Must","design":"Product.status ('active' | 'disabled'); status select in _form.ejs","code":"app/Models/Product.js","screen":"03-stock","status":"Met","note":"","tests":["UC-11"]},
-    {"id":"FR-08","area":"Stock","req":"The system shall let staff delete a stock item.","source":"MVC CRUD requirement (ICTPRG556)","priority":"Should","design":"ProductController.destroy (DELETE /products/:id)","code":"app/Controllers/ProductController.js","screen":"04-detail","status":"Met","note":"","tests":["UC-15"]},
-    {"id":"FR-09","area":"Stock","req":"The system shall let staff adjust stock on hand (add, remove or reconcile to a counted total) with a reason, and the on-hand quantity shall never go below zero.","source":"Client reference app (LPA stock adjustment); data integrity","priority":"Must","design":"ProductController.adjust; Product.adjust","code":"app/Models/Product.js (adjust); app/Controllers/ProductController.js","screen":"04-detail","status":"Met","note":"","tests":["UC-12","UC-13","UC-14"]},
-    {"id":"FR-10","area":"Stock","req":"Every stock adjustment shall be recorded in an audit history showing who made it, the item, the operation, the reason, the quantity before and after, and the time.","source":"Client reference app (stock audit history)","priority":"Should","design":"StockLedger model; stock/ledger.ejs; user read from session","code":"app/Models/StockLedger.js; app/Controllers/AuthController.js (currentUser)","screen":"05-ledger","status":"Met","note":"Fixed during validation: the ledger had recorded a fixed name and no time for new entries; it now records the signed-in user and the time.","tests":["UC-12","UC-25"]},
-    {"id":"FR-11","area":"Sales","req":"The system shall provide a Sales and Invoicing page where staff can search invoices and see the results listed by Date, Client and Amount with a total of the amounts shown.","source":"Technical Spec - Web interface: Sales and Invoicing page","priority":"Must","design":"SalesController.invoices; sales/index.ejs; Invoice.search + Invoice.total","code":"app/Controllers/SalesController.js; app/Models/Invoice.js","screen":"06-sales","status":"Met","note":"","tests":["UC-16","UC-17"]},
-    {"id":"FR-12","area":"Clients","req":"The system shall keep client records with client ID, first name, last name, address, phone and status, and let staff search them.","source":"lpa_clients table","priority":"Must","design":"Client model; SalesController.clients; clients/index.ejs","code":"app/Models/Client.js; app/Views/clients/index.ejs","screen":"07-clients","status":"Met","note":"Fixed during validation: the address field was missing; added to the model, the search and the clients table.","tests":["UC-18"]},
-    {"id":"FR-13","area":"Sales","req":"Each invoice shall reference an existing client by client ID, and carry the client's name and address.","source":"lpa_invoices (lpa_inv_client_ID, _name, _address)","priority":"Must","design":"Invoice.clientId -> Client.code lookup","code":"app/Models/Invoice.js","screen":"06-sales","status":"Met","note":"Fixed during validation: invoices stored a free-text client name with no link to the client record; they now reference the client ID and take the name/address from the Client model.","tests":["UC-19"]},
-    {"id":"FR-14","area":"Sales","req":"Invoices shall record their line items (stock ID, name, quantity, price, line amount).","source":"lpa_invoice_items table","priority":"Should","design":"Planned: invoice_items table + Invoice detail view","code":"(planned)","screen":"","status":"Planned","note":"Scheduled with the database block (ICTDBS507), where the lpa_invoice_items table is created.","tests":[]},
-    {"id":"FR-15","area":"Users","req":"The system shall store user accounts (username, hashed password, first/last name, user group) and use the user group to control access.","source":"lpa_users table; ICTPRG537","priority":"Must","design":"Planned: users table + auth middleware + roles","code":"(planned)","screen":"","status":"Planned","note":"Scheduled for the security block (ICTPRG537).","tests":[]},
-    {"id":"FR-16","area":"Data","req":"All business data (stock, clients, invoices, invoice items, users) shall be held in a centralised MySQL database (lpa_ecomms) shared by the web, mobile and desktop interfaces.","source":"Technical Spec - Create centralised database; lpa_ecomms.sql","priority":"Must","design":"Models are the single data-access layer, so moving from in-memory arrays to MySQL changes only the Models","code":"app/Models/*.js (in-memory today)","screen":"","status":"Planned","note":"Prototype uses in-memory models with the same fields as the lpa_ecomms tables. Migration scheduled for ICTDBS507; ERD below is the validated target design.","tests":[]},
-    {"id":"FR-17","area":"Mobile","req":"An Android application shall present the LPA interface using the Android WebView library, showing a splash screen and a delay before loading the main WebView activity.","source":"Technical Spec - Mobile application (Android)","priority":"Must","design":"SplashActivity (2 s delay) -> MainActivity (WebView)","code":"LPA-Mobile-App-Project/app/src/main/java/au/com/lpa/ecomms/*.java","screen":"splash-preview","status":"Met","note":"Built and signed as an APK. On-device evidence screenshots still to be captured.","tests":["UC-26"]},
-    {"id":"FR-18","area":"Desktop","req":"A desktop application (Java GUI: main window with menu, stock, sales and user frames) shall give staff access to the same data.","source":"Technical Spec - Desktop application interface","priority":"Must","design":"Planned: Java Swing app reading the shared MySQL database","code":"(planned)","screen":"","status":"Planned","note":"Scheduled for ICTPRG549 (object-oriented programming + GUI).","tests":[]},
-    {"id":"FR-19","area":"Mashup","req":"The website shall include mashups that combine data from multiple external services with LPA's own data.","source":"ICTPRG538; Technical Spec - Mashup","priority":"Must","design":"MashupController: Store Locator (OSM + Open-Meteo + stores) and International Pricing (catalogue + FX rates)","code":"app/Controllers/MashupController.js","screen":"","status":"Met","note":"","tests":["UC-23"]},
-    {"id":"FR-20","area":"UI","req":"Users shall be able to personalise the interface (light/dark theme and accent colour) and the choice shall be remembered.","source":"ICTPRG535 - customisable and personalised UI","priority":"Should","design":"settings.ejs + public/js/prefs.js (localStorage)","code":"public/js/prefs.js; app/Views/settings.ejs","screen":"08-settings","status":"Met","note":"","tests":["UC-22"]},
-    {"id":"FR-21","area":"UI","req":"The interface shall include graphics and multimedia appropriate to the business (product images, icons, a promotional video).","source":"ICTPRG535 - graphics and multimedia","priority":"Should","design":"Product icons; promo video on home page","code":"public/images/products; public/media/promo.mp4","screen":"02-dashboard","status":"Met","note":"","tests":["UC-05"]},
-    {"id":"FR-22","area":"UI","req":"Data-entry forms shall validate input on the client side and show clear error messages before submission.","source":"ICTPRG535 - client-side validation","priority":"Must","design":"HTML5 constraints + JS messages in _form.ejs","code":"app/Views/products/_form.ejs","screen":"09-add","status":"Met","note":"","tests":["UC-09"]},
-    {"id":"FR-23","area":"API","req":"Stock data shall be available as JSON (GET, POST, PUT, DELETE) so other interfaces and tools can use the same data.","source":"ICTPRG556 (four HTTP verbs); shared data for mobile/desktop","priority":"Should","design":"ProductController returns JSON when the client asks for application/json","code":"app/Controllers/ProductController.js (wantsJson)","screen":"","status":"Met","note":"","tests":["UC-20"]}
-  ],
-  "nonfunctional": [
-    {"id":"NFR-01","area":"Usability","req":"Professional, consistent look and design: one brand palette, typography and layout across all pages; mobile-first and usable on phone and desktop widths.","status":"Met","evidence":"UI Design Plan (Phase 4); all screens share header, bottom navigation and design tokens.","tests":["UC-05","UC-06"]},
-    {"id":"NFR-02","area":"Accessibility","req":"Form fields have labels, search boxes have aria-labels, text meets contrast in light and dark themes.","status":"Met","evidence":"login.ejs / _form.ejs labels; aria-label on search inputs; dark theme contrast tokens.","tests":["UC-04"]},
-    {"id":"NFR-03","area":"Maintainability","req":"Modular design for easier future extension: Models, Views, Controllers and routes kept separate (MVC).","status":"Met","evidence":"app/Models, app/Views, app/Controllers, routes/index.js.","tests":[]},
-    {"id":"NFR-04","area":"Performance","req":"Pages render server-side and respond in under 500 ms on the development machine.","status":"Met","evidence":"Measured in UC-24.","tests":["UC-24"]},
-    {"id":"NFR-05","area":"Security","req":"Protected pages require sign-in; session cookies are HttpOnly; user input is HTML-escaped when shown.","status":"Partial","evidence":"requireLogin gate; HttpOnly cookies; EJS <%= %> escaping. Hashed passwords, roles and injection-safe SQL come in ICTPRG537 / ICTDBS507.","tests":["UC-03","UC-21"]},
-    {"id":"NFR-06","area":"Availability","req":"The application should be deployable to a hosted server for 24 x 7 availability.","status":"Planned","evidence":"Runs on any Node.js host (no OS-specific code). Hosting is out of scope for the prototype; to confirm with supervisor.","tests":[]},
-    {"id":"NFR-07","area":"Portability","req":"Works in at least two browsers and on at least two devices.","status":"Partial","evidence":"Chromium + Android WebView verified. Second desktop browser (Edge/Firefox) test scheduled with ICTWEB514.","tests":["UC-26"]},
-    {"id":"NFR-08","area":"Version control","req":"All source code is kept under Git with a remote on GitHub.","status":"Met","evidence":"github.com/0xrimuru/cluster3-project commit history.","tests":[]},
-    {"id":"NFR-09","area":"Data integrity","req":"Stock on hand can never be negative and every invoice must point to an existing client.","status":"Met","evidence":"Product.adjust floors at 0; Invoice -> Client lookup.","tests":["UC-13","UC-19"]}
-  ],
-  "data": [
-    {"table":"lpa_stock","fields":"lpa_stock_ID, lpa_stock_name, lpa_stock_desc, lpa_stock_onhand, lpa_stock_price, lpa_stock_status","model":"Product","mapping":"sku, title, description, quantity, price, status (+ brand, category, image added for the UI)","status":"Consistent"},
-    {"table":"lpa_clients","fields":"lpa_client_ID, lpa_client_firstname, lpa_client_lastname, lpa_client_address, lpa_client_phone, lpa_client_status","model":"Client","mapping":"code, firstName, lastName, address, phone, status","status":"Consistent (address added during validation)"},
-    {"table":"lpa_invoices","fields":"lpa_inv_no, lpa_inv_date, lpa_inv_client_ID, lpa_inv_client_name, lpa_inv_client_address, lpa_inv_amount, lpa_inv_status","model":"Invoice","mapping":"number, date, clientId, client, clientAddress, amount, status","status":"Consistent (clientId/address/status added during validation)"},
-    {"table":"lpa_invoice_items","fields":"lpa_invitem_no, lpa_invitem_inv_no, lpa_invitem_stock_ID, lpa_invitem_stock_name, lpa_invitem_qty, lpa_invitem_stock_price, lpa_invitem_stock_amount, lpa_inv_status","model":"(none yet)","mapping":"Planned with ICTDBS507","status":"Gap - planned"},
-    {"table":"lpa_users","fields":"lpa_user_ID, lpa_user_username, lpa_user_password, lpa_user_firstname, lpa_user_lastname, lpa_user_group, lpa_inv_status","model":"(none yet)","mapping":"Planned with ICTPRG537 (password stored as a hash, not plain text)","status":"Gap - planned"},
-    {"table":"(prototype only) stock ledger","fields":"-","model":"StockLedger","mapping":"Audit trail from the client's reference app; proposed new table lpa_stock_ledger","status":"Addition - proposed to client"}
-  ]
+ "functional": [
+  {
+   "id": "FR-01",
+   "area": "Login",
+   "req": "The system shall provide a User Login page with a username field and a masked password field, and shall block every other page until the user has signed in. A logout option shall end the session.",
+   "source": "Technical Spec - Web interface: User login page",
+   "priority": "Must",
+   "design": "AuthController (login, logout); User.authenticate (scrypt hash check); auth middleware (random session token, HttpOnly cookie)",
+   "code": "app/Controllers/AuthController.js; app/Models/User.js; app/Middleware/auth.js",
+   "screen": "01-login",
+   "status": "Met",
+   "note": "Revised 05/10: credentials are now checked against user accounts with salted scrypt hashes; wrong or inactive accounts are refused and logged. Further hardening (encryption of stored data, injection-safe SQL, security strategy) continues in ICTPRG537.",
+   "tests": [
+    "UC-01",
+    "UC-02",
+    "UC-02b",
+    "UC-03",
+    "UC-04",
+    "UC-21"
+   ]
+  },
+  {
+   "id": "FR-02",
+   "area": "Home",
+   "req": "The system shall provide a Main Home page with a global header, navigation and footer, showing a summary of the business: number of stock items, low-stock and out-of-stock counts, number of invoices and total sales.",
+   "source": "Technical Spec - Web interface: Main home page",
+   "priority": "Must",
+   "design": "HomeController.index; home.ejs; partials/header.ejs + footer.ejs",
+   "code": "app/Controllers/HomeController.js; app/Views/home.ejs",
+   "screen": "02-dashboard",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-05",
+    "UC-24"
+   ]
+  },
+  {
+   "id": "FR-03",
+   "area": "Stock",
+   "req": "The system shall list all stock items showing stock ID (SKU), name, category, price, on-hand quantity and status (In / Low / Out of stock).",
+   "source": "Technical Spec - Stock management page; lpa_stock table",
+   "priority": "Must",
+   "design": "ProductController.index; products/index.ejs",
+   "code": "app/Controllers/ProductController.js; app/Views/products/index.ejs",
+   "screen": "03-stock",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-06"
+   ]
+  },
+  {
+   "id": "FR-04",
+   "area": "Stock",
+   "req": "The system shall let staff search stock by product name, brand, SKU or category.",
+   "source": "Technical Spec - Stock management page (search)",
+   "priority": "Must",
+   "design": "ProductController.index (?q=) + live filter in public/js/stock.js",
+   "code": "app/Controllers/ProductController.js; public/js/stock.js",
+   "screen": "03-stock",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-07"
+   ]
+  },
+  {
+   "id": "FR-05",
+   "area": "Stock",
+   "req": "The system shall let staff add a new stock item (name, brand, SKU, category, price, quantity, status, description) and save it.",
+   "source": "Technical Spec - Stock management page (add / save)",
+   "priority": "Must",
+   "design": "ProductController.newForm + create; products/new.ejs + _form.ejs",
+   "code": "app/Controllers/ProductController.js; app/Views/products/_form.ejs",
+   "screen": "09-add",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-08",
+    "UC-09"
+   ]
+  },
+  {
+   "id": "FR-06",
+   "area": "Stock",
+   "req": "The system shall let staff edit an existing stock item and save or close without saving.",
+   "source": "Technical Spec - Stock management page (edit / save / close)",
+   "priority": "Must",
+   "design": "ProductController.editForm + update (PUT); products/edit.ejs; Close link on detail page",
+   "code": "app/Controllers/ProductController.js; app/Views/products/edit.ejs",
+   "screen": "04-detail",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-10"
+   ]
+  },
+  {
+   "id": "FR-07",
+   "area": "Stock",
+   "req": "Each stock item shall have a status of enabled (active) or disabled.",
+   "source": "lpa_stock.lpa_stock_status",
+   "priority": "Must",
+   "design": "Product.status ('active' | 'disabled'); status select in _form.ejs",
+   "code": "app/Models/Product.js",
+   "screen": "03-stock",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-11"
+   ]
+  },
+  {
+   "id": "FR-08",
+   "area": "Stock",
+   "req": "The system shall let staff delete a stock item.",
+   "source": "MVC CRUD requirement (ICTPRG556)",
+   "priority": "Should",
+   "design": "ProductController.destroy (DELETE /products/:id)",
+   "code": "app/Controllers/ProductController.js",
+   "screen": "04-detail",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-15"
+   ]
+  },
+  {
+   "id": "FR-09",
+   "area": "Stock",
+   "req": "The system shall let staff adjust stock on hand (add, remove or reconcile to a counted total) with a reason, and the on-hand quantity shall never go below zero.",
+   "source": "Client reference app (LPA stock adjustment); data integrity",
+   "priority": "Must",
+   "design": "ProductController.adjust; Product.adjust",
+   "code": "app/Models/Product.js (adjust); app/Controllers/ProductController.js",
+   "screen": "04-detail",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-12",
+    "UC-13",
+    "UC-14"
+   ]
+  },
+  {
+   "id": "FR-10",
+   "area": "Stock",
+   "req": "Every stock adjustment shall be recorded in an audit history showing who made it, the item, the operation, the reason, the quantity before and after, and the time.",
+   "source": "Client reference app (stock audit history)",
+   "priority": "Should",
+   "design": "StockLedger model; stock/ledger.ejs; user read from session",
+   "code": "app/Models/StockLedger.js; app/Controllers/AuthController.js (currentUser)",
+   "screen": "05-ledger",
+   "status": "Met",
+   "note": "Fixed during validation: the ledger had recorded a fixed name and no time for new entries; it now records the signed-in user and the time.",
+   "tests": [
+    "UC-12",
+    "UC-25"
+   ]
+  },
+  {
+   "id": "FR-11",
+   "area": "Sales",
+   "req": "The system shall provide a Sales and Invoicing page where staff can search invoices and see the results listed by Date, Client and Amount with a total of the amounts shown.",
+   "source": "Technical Spec - Web interface: Sales and Invoicing page",
+   "priority": "Must",
+   "design": "SalesController.invoices; sales/index.ejs; Invoice.search + Invoice.total",
+   "code": "app/Controllers/SalesController.js; app/Models/Invoice.js",
+   "screen": "06-sales",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-16",
+    "UC-17"
+   ]
+  },
+  {
+   "id": "FR-12",
+   "area": "Clients",
+   "req": "The system shall keep client records with client ID, first name, last name, address, phone and status, and let staff search them.",
+   "source": "lpa_clients table",
+   "priority": "Must",
+   "design": "Client model; SalesController.clients; clients/index.ejs",
+   "code": "app/Models/Client.js; app/Views/clients/index.ejs",
+   "screen": "07-clients",
+   "status": "Met",
+   "note": "Fixed during validation: the address field was missing; added to the model, the search and the clients table.",
+   "tests": [
+    "UC-18"
+   ]
+  },
+  {
+   "id": "FR-13",
+   "area": "Sales",
+   "req": "Each invoice shall reference an existing client by client ID, and carry the client's name and address.",
+   "source": "lpa_invoices (lpa_inv_client_ID, _name, _address)",
+   "priority": "Must",
+   "design": "Invoice.clientId -> Client.code lookup",
+   "code": "app/Models/Invoice.js",
+   "screen": "06-sales",
+   "status": "Met",
+   "note": "Fixed during validation: invoices stored a free-text client name with no link to the client record; they now reference the client ID and take the name/address from the Client model.",
+   "tests": [
+    "UC-19"
+   ]
+  },
+  {
+   "id": "FR-14",
+   "area": "Sales",
+   "req": "Invoices shall record their line items (stock ID, name, quantity, price, line amount).",
+   "source": "lpa_invoice_items table",
+   "priority": "Should",
+   "design": "Invoice.items[] (sku, name, qty, price, amount); amount always calculated from the items",
+   "code": "app/Models/Invoice.js",
+   "screen": "",
+   "status": "Met",
+   "note": "Revised 05/10: every invoice now carries its line items (lpa_invoice_items); seed invoices rebuilt with items that add up to the original amounts.",
+   "tests": [
+    "UC-27",
+    "UC-39"
+   ]
+  },
+  {
+   "id": "FR-15",
+   "area": "Users",
+   "req": "The system shall store user accounts (username, hashed password, first/last name, user group) and use the user group to control access.",
+   "source": "lpa_users table; ICTPRG537",
+   "priority": "Must",
+   "design": "User model (id, username, scrypt password hash, first/last name, group, status); requireRole middleware",
+   "code": "app/Models/User.js; app/Middleware/auth.js; routes/index.js",
+   "screen": "",
+   "status": "Met",
+   "note": "Revised 05/10: built now (was planned for ICTPRG537) because the Developer UI Guide and reference app require it for the login and users pages.",
+   "tests": [
+    "UC-28",
+    "UC-42",
+    "UC-43"
+   ]
+  },
+  {
+   "id": "FR-16",
+   "area": "Data",
+   "req": "All business data (stock, clients, invoices, invoice items, users) shall be held in a centralised MySQL database (lpa_ecomms) shared by the web, mobile and desktop interfaces.",
+   "source": "Technical Spec - Create centralised database; lpa_ecomms.sql",
+   "priority": "Must",
+   "design": "Models are the single data-access layer, so moving from in-memory arrays to MySQL changes only the Models",
+   "code": "app/Models/*.js (in-memory today)",
+   "screen": "",
+   "status": "Planned",
+   "note": "Prototype uses in-memory models with the same fields as the lpa_ecomms tables (now including users and invoice items). Migration scheduled for ICTDBS507; ERD is the validated target design.",
+   "tests": []
+  },
+  {
+   "id": "FR-17",
+   "area": "Mobile",
+   "req": "An Android application shall present the LPA interface using the Android WebView library, showing a splash screen and a delay before loading the main WebView activity.",
+   "source": "Technical Spec - Mobile application (Android)",
+   "priority": "Must",
+   "design": "SplashActivity (2 s delay) -> MainActivity (WebView)",
+   "code": "LPA-Mobile-App-Project/app/src/main/java/au/com/lpa/ecomms/*.java",
+   "screen": "splash-preview",
+   "status": "Met",
+   "note": "Built and signed as an APK. On-device evidence screenshots still to be captured.",
+   "tests": [
+    "UC-26"
+   ]
+  },
+  {
+   "id": "FR-18",
+   "area": "Desktop",
+   "req": "A desktop application (Java GUI: main window with menu, stock, sales and user frames) shall give staff access to the same data.",
+   "source": "Technical Spec - Desktop application interface",
+   "priority": "Must",
+   "design": "Planned: Java Swing app reading the shared MySQL database",
+   "code": "(planned)",
+   "screen": "",
+   "status": "Planned",
+   "note": "Scheduled for ICTPRG549 (object-oriented programming + GUI).",
+   "tests": []
+  },
+  {
+   "id": "FR-19",
+   "area": "Mashup",
+   "req": "The website shall include mashups that combine data from multiple external services with LPA's own data.",
+   "source": "ICTPRG538; Technical Spec - Mashup",
+   "priority": "Must",
+   "design": "MashupController: Store Locator (OSM + Open-Meteo + stores) and International Pricing (catalogue + FX rates)",
+   "code": "app/Controllers/MashupController.js",
+   "screen": "",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-23"
+   ]
+  },
+  {
+   "id": "FR-20",
+   "area": "UI",
+   "req": "Users shall be able to personalise the interface (light/dark theme and accent colour) and the choice shall be remembered.",
+   "source": "ICTPRG535 - customisable and personalised UI",
+   "priority": "Should",
+   "design": "settings.ejs + public/js/prefs.js (localStorage)",
+   "code": "public/js/prefs.js; app/Views/settings.ejs",
+   "screen": "08-settings",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-22"
+   ]
+  },
+  {
+   "id": "FR-21",
+   "area": "UI",
+   "req": "The interface shall include graphics and multimedia appropriate to the business (product images, icons, a promotional video).",
+   "source": "ICTPRG535 - graphics and multimedia",
+   "priority": "Should",
+   "design": "Product icons; promo video on home page",
+   "code": "public/images/products; public/media/promo.mp4",
+   "screen": "02-dashboard",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-05"
+   ]
+  },
+  {
+   "id": "FR-22",
+   "area": "UI",
+   "req": "Data-entry forms shall validate input on the client side and show clear error messages before submission.",
+   "source": "ICTPRG535 - client-side validation",
+   "priority": "Must",
+   "design": "HTML5 constraints + JS messages in _form.ejs",
+   "code": "app/Views/products/_form.ejs",
+   "screen": "09-add",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-09"
+   ]
+  },
+  {
+   "id": "FR-23",
+   "area": "API",
+   "req": "Stock data shall be available as JSON (GET, POST, PUT, DELETE) so other interfaces and tools can use the same data.",
+   "source": "ICTPRG556 (four HTTP verbs); shared data for mobile/desktop",
+   "priority": "Should",
+   "design": "ProductController returns JSON when the client asks for application/json",
+   "code": "app/Controllers/ProductController.js (wantsJson)",
+   "screen": "",
+   "status": "Met",
+   "note": "",
+   "tests": [
+    "UC-20"
+   ]
+  },
+  {
+   "id": "FR-24",
+   "area": "Access",
+   "req": "The system shall limit pages and actions by user group: administrators (everything), staff users (dashboard, stock view and adjustment, sales and clients view) and customers (web store, cart, checkout, own orders).",
+   "source": "Developer UI Guide (Help: user vs administrator); reference app menus",
+   "priority": "Must",
+   "design": "requireRole() on every route",
+   "code": "routes/index.js; app/Middleware/auth.js",
+   "screen": "home",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-28"
+   ]
+  },
+  {
+   "id": "FR-25",
+   "area": "UI",
+   "req": "After sign-in the interface shall greet the user by name, show their user group, and show the menu for that group.",
+   "source": "Developer UI Guide (\"Welcome <name>\"); ICTPRG535 personalised UI",
+   "priority": "Should",
+   "design": "Welcome strip in header; role-based bottom navigation and More menu",
+   "code": "app/Views/partials/header.ejs; footer.ejs; more.ejs",
+   "screen": "home",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-29"
+   ]
+  },
+  {
+   "id": "FR-26",
+   "area": "Web store",
+   "req": "New customers shall be able to register (first name, last name, address, phone, user name, password + confirmation) with validation; registration creates their client record.",
+   "source": "SUB1 Phase 5 example (\"secure registration for new customer\"); reference reg.php",
+   "priority": "Must",
+   "design": "AuthController.register; User.validate; Client.create",
+   "code": "app/Controllers/AuthController.js; app/Views/register.ejs",
+   "screen": "register",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-30",
+    "UC-31"
+   ]
+  },
+  {
+   "id": "FR-27",
+   "area": "Web store",
+   "req": "Customers shall browse a product catalogue of active items with image, description, price and availability, search it, filter by category and sort by price.",
+   "source": "SUB1 Phase 5 example (\"sort the items for sale by price\"); reference products.php",
+   "priority": "Must",
+   "design": "ShopController.index (server sort/filter) + shop.js live filter",
+   "code": "app/Controllers/ShopController.js; app/Views/shop/index.ejs",
+   "screen": "shop",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-32"
+   ]
+  },
+  {
+   "id": "FR-28",
+   "area": "Web store",
+   "req": "When adding an item for purchase the system shall display the price and ask for confirmation, and shall not allow more than the quantity on hand.",
+   "source": "SUB1 Phase 5 example (\"display the price and ask for confirmation\"); reference addToCart",
+   "priority": "Must",
+   "design": "shop.js confirm dialog; ShopController.add server check",
+   "code": "public/js/shop.js; app/Controllers/ShopController.js",
+   "screen": "add-confirm",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-33",
+    "UC-34"
+   ]
+  },
+  {
+   "id": "FR-29",
+   "area": "Web store",
+   "req": "A shopping cart shall show every added product with price, quantity and amount, allow quantities to be changed or removed, and show the total (incl. GST).",
+   "source": "SUB1 Phase 5 example (\"cart should display all added products along with price and quantity\"); reference cart.php",
+   "priority": "Must",
+   "design": "Cart in server session; cart.js live totals",
+   "code": "app/Controllers/ShopController.js; public/js/cart.js",
+   "screen": "cart",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-35"
+   ]
+  },
+  {
+   "id": "FR-30",
+   "area": "Web store",
+   "req": "Checkout shall confirm the customer details and require a payment option before the order is placed.",
+   "source": "SUB1 Phase 5 example (\"payment option\"); reference checkout.php",
+   "priority": "Must",
+   "design": "ShopController.checkoutForm / checkout",
+   "code": "app/Views/shop/checkout.ejs",
+   "screen": "checkout",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-36"
+   ]
+  },
+  {
+   "id": "FR-31",
+   "area": "Web store",
+   "req": "Placing an order shall create an invoice with line items for the customer, reduce stock, record the sale in the audit history, empty the cart, and show the order in My orders (customers see only their own orders).",
+   "source": "Reference complete.php; data integrity",
+   "priority": "Must",
+   "design": "ShopController.checkout -> Invoice.create, Product.changeQty, StockLedger.record",
+   "code": "app/Controllers/ShopController.js",
+   "screen": "order",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-37",
+    "UC-38"
+   ]
+  },
+  {
+   "id": "FR-32",
+   "area": "Sales",
+   "req": "Administrators shall create a new invoice by searching the client by ID and adding stock items by ID with a quantity (Save / Close), and shall be able to delete an invoice (its stock is returned).",
+   "source": "Developer UI Guide (New Invoice page); reference addSale.php / deleteSale.php",
+   "priority": "Must",
+   "design": "SalesController.newForm / create / destroy; JSON lookups; invoice.js",
+   "code": "app/Controllers/SalesController.js; public/js/invoice.js; app/Views/sales/new.ejs",
+   "screen": "new-invoice",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-39",
+    "UC-40",
+    "UC-41"
+   ]
+  },
+  {
+   "id": "FR-33",
+   "area": "Users",
+   "req": "Administrators shall search, add, edit and delete users and set each user's group and active / inactive status.",
+   "source": "Developer UI Guide (Users Management Search; User Record Management)",
+   "priority": "Must",
+   "design": "UserController; users/index + users/form",
+   "code": "app/Controllers/UserController.js; app/Views/users/*.ejs",
+   "screen": "users",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-42"
+   ]
+  },
+  {
+   "id": "FR-34",
+   "area": "UI",
+   "req": "A Help page shall explain each menu for each user group, and an About page shall present LPA's mission.",
+   "source": "Developer UI Guide (Help guide); reference mashup.php (About)",
+   "priority": "Should",
+   "design": "help.ejs; mashups/index.ejs (About LPA)",
+   "code": "app/Views/help.ejs; app/Views/mashups/index.ejs",
+   "screen": "help",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-44",
+    "UC-23"
+   ]
+  },
+  {
+   "id": "FR-35",
+   "area": "Security",
+   "req": "Key events (sign-in success and failure, registration, orders, invoices, user changes) shall be written to an activity log.",
+   "source": "Reference app lpa_log()",
+   "priority": "Should",
+   "design": "ActivityLog.write",
+   "code": "app/Models/ActivityLog.js; logs/lpa.log",
+   "screen": "",
+   "status": "Met",
+   "note": "Added 05/10 after the requirements audit.",
+   "tests": [
+    "UC-46"
+   ]
+  }
+ ],
+ "nonfunctional": [
+  {
+   "id": "NFR-01",
+   "area": "Usability",
+   "req": "Professional, consistent look and design: one brand palette, typography and layout across all pages; mobile-first and usable on phone and desktop widths.",
+   "status": "Met",
+   "evidence": "UI Design Plan (Phase 4); all screens share header, bottom navigation and design tokens.",
+   "tests": [
+    "UC-05",
+    "UC-06",
+    "UC-29"
+   ]
+  },
+  {
+   "id": "NFR-02",
+   "area": "Accessibility",
+   "req": "Form fields have labels, search boxes have aria-labels, text meets contrast in light and dark themes.",
+   "status": "Met",
+   "evidence": "login.ejs / _form.ejs labels; aria-label on search inputs; dark theme contrast tokens.",
+   "tests": [
+    "UC-04"
+   ]
+  },
+  {
+   "id": "NFR-03",
+   "area": "Maintainability",
+   "req": "Modular design for easier future extension: Models, Views, Controllers and routes kept separate (MVC).",
+   "status": "Met",
+   "evidence": "app/Models, app/Views, app/Controllers, routes/index.js.",
+   "tests": []
+  },
+  {
+   "id": "NFR-04",
+   "area": "Performance",
+   "req": "Pages render server-side and respond in under 500 ms on the development machine.",
+   "status": "Met",
+   "evidence": "Measured in UC-24.",
+   "tests": [
+    "UC-24"
+   ]
+  },
+  {
+   "id": "NFR-05",
+   "area": "Security",
+   "req": "Protected pages require sign-in; session cookies are HttpOnly; user input is HTML-escaped when shown.",
+   "status": "Partial",
+   "evidence": "Every page needs sign-in (random 256-bit session token, HttpOnly cookie); access checked per user group; passwords stored as salted scrypt hashes; errors never show stack traces; key events logged; EJS escapes output. Encryption of stored data and injection-safe SQL come in ICTPRG537 / ICTDBS507.",
+   "tests": [
+    "UC-28",
+    "UC-43",
+    "UC-45",
+    "UC-46"
+   ]
+  },
+  {
+   "id": "NFR-06",
+   "area": "Availability",
+   "req": "The application should be deployable to a hosted server for 24 x 7 availability.",
+   "status": "Planned",
+   "evidence": "Runs on any Node.js host (no OS-specific code). Hosting is out of scope for the prototype; to confirm with supervisor.",
+   "tests": []
+  },
+  {
+   "id": "NFR-07",
+   "area": "Portability",
+   "req": "Works in at least two browsers and on at least two devices.",
+   "status": "Partial",
+   "evidence": "Chromium + Android WebView verified. Second desktop browser (Edge/Firefox) test scheduled with ICTWEB514.",
+   "tests": [
+    "UC-26"
+   ]
+  },
+  {
+   "id": "NFR-08",
+   "area": "Version control",
+   "req": "All source code is kept under Git with a remote on GitHub.",
+   "status": "Met",
+   "evidence": "github.com/0xrimuru/cluster3-project commit history.",
+   "tests": []
+  },
+  {
+   "id": "NFR-09",
+   "area": "Data integrity",
+   "req": "Stock on hand can never be negative and every invoice must point to an existing client.",
+   "status": "Met",
+   "evidence": "Product.adjust floors at 0; Invoice -> Client lookup.",
+   "tests": [
+    "UC-13",
+    "UC-19"
+   ]
+  }
+ ],
+ "data": [
+  {
+   "table": "lpa_stock",
+   "fields": "lpa_stock_ID, lpa_stock_name, lpa_stock_desc, lpa_stock_onhand, lpa_stock_price, lpa_stock_status",
+   "model": "Product",
+   "mapping": "sku, title, description, quantity, price, status (+ brand, category, image added for the UI)",
+   "status": "Consistent"
+  },
+  {
+   "table": "lpa_clients",
+   "fields": "lpa_client_ID, lpa_client_firstname, lpa_client_lastname, lpa_client_address, lpa_client_phone, lpa_client_status",
+   "model": "Client",
+   "mapping": "code, firstName, lastName, address, phone, status",
+   "status": "Consistent (address added 04/10; web customers get a client record on registration)"
+  },
+  {
+   "table": "lpa_invoices",
+   "fields": "lpa_inv_no, lpa_inv_date, lpa_inv_client_ID, lpa_inv_client_name, lpa_inv_client_address, lpa_inv_amount, lpa_inv_status",
+   "model": "Invoice",
+   "mapping": "number, date, clientId, client, clientAddress, amount, status",
+   "status": "Consistent (clientId/address/status added during validation)"
+  },
+  {
+   "table": "lpa_invoice_items",
+   "fields": "lpa_invitem_no, lpa_invitem_inv_no, lpa_invitem_stock_ID, lpa_invitem_stock_name, lpa_invitem_qty, lpa_invitem_stock_price, lpa_invitem_stock_amount, lpa_inv_status",
+   "model": "Invoice.items[]",
+   "mapping": "lpa_invitem_inv_no = invoice number; stock_ID = sku; stock_name = name; qty; stock_price = price; stock_amount = amount",
+   "status": "Consistent (added 05/10)"
+  },
+  {
+   "table": "lpa_users",
+   "fields": "lpa_user_ID, lpa_user_username, lpa_user_password, lpa_user_firstname, lpa_user_lastname, lpa_user_group, lpa_inv_status",
+   "model": "User",
+   "mapping": "id, username, passwordHash (scrypt, never plain text), firstName, lastName, group (administrator / user / customer), status",
+   "status": "Consistent (added 05/10)"
+  },
+  {
+   "table": "(prototype only) stock ledger",
+   "fields": "-",
+   "model": "StockLedger",
+   "mapping": "Audit trail from the client's reference app; proposed new table lpa_stock_ledger",
+   "status": "Addition - proposed to client"
+  }
+ ]
 }

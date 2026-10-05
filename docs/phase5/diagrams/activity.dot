@@ -1,12 +1,23 @@
 digraph A {
   graph [rankdir=TB, fontname="DejaVu Sans", nodesep=0.35, ranksep=0.38, pad=0.3, bgcolor="white", labelloc=t,
-         label=<<b>LPA eComms — user activity diagram (staff member)</b><br/><font point-size="9" color="#5b6660">Login → dashboard → stock / sales / clients / personalise → logout · Pedro Alvim · CTI20260187 · 04/10/2026</font>>];
+         label=<<b>LPA eComms — user activity diagram (customers, staff, administrators)</b><br/><font point-size="9" color="#5b6660">Register / login → by user group: web store (customer) or dashboard (staff, admin) → logout · Pedro Alvim · CTI20260187 · 05/10/2026</font>>];
   node [fontname="DejaVu Sans", fontsize=9.5, shape=box, style="rounded,filled", fillcolor="#ffffff", color="#0a6b49", penwidth=1.2, margin="0.14,0.06"];
   edge [fontname="DejaVu Sans", fontsize=8.5, color="#33403a", arrowsize=0.7];
 
   start [shape=circle, label="", width=0.22, style=filled, fillcolor="#1b1f1d", color="#1b1f1d"];
   open  [label="Open LPA eComms\n(browser or Android app)"];
   login [label="Login page:\nenter user name + password"];
+  reg   [label="New customer?\nRegister (details + password x2)"];
+  regv  [shape=diamond, label="Valid?", style=filled, fillcolor="#eef6f2", fontsize=8.5];
+  regerr[label="Show what to fix", fillcolor="#fdeceb", color="#b3362e"];
+  cred  [shape=diamond, label="Account\nfound,\npassword ok?", style=filled, fillcolor="#eef6f2", fontsize=8, width=1.2, height=0.9];
+  credErr [label="'Login failed' +\nattempt logged", fillcolor="#fdeceb", color="#b3362e"];
+  grp   [shape=diamond, label="User\ngroup?", style=filled, fillcolor="#eef6f2", fontsize=8.5, width=1.0, height=0.7];
+  shop  [label="Shop: search, filter,\nsort by price", color="#b7862b"];
+  add2  [label="Add to cart:\nprice shown → confirm\n(qty ≤ on hand)", color="#b7862b"];
+  cart  [label="Cart: change qty / remove\n(live total + GST)", color="#b7862b"];
+  chk   [label="Checkout: details +\npayment option → confirm", color="#b7862b"];
+  done  [label="Order completed:\ninvoice + stock + audit", fillcolor="#fff7e6", color="#b7862b"];
   dv    [shape=diamond, label="Both\nfilled?", style=filled, fillcolor="#eef6f2", fontsize=8.5, width=1.1, height=0.75];
   err   [label="Show 'Please enter a\nusername and password'", fillcolor="#fdeceb", color="#b3362e"];
   home  [label="Home dashboard\n(stock counts, low/out, invoices, total sales)"];
@@ -24,6 +35,8 @@ digraph A {
   edit   [label="Edit / disable / delete\n(save or close)"];
 
   sales  [label="Sales & Invoicing:\nsearch invoices"];
+  newinv [label="New invoice: client by ID,\nitems by ID + qty → Save"];
+  users  [label="Users: search, add,\nedit, delete"];
   stotal [label="List Date / Client / Amount\n+ total of results"];
   clients[label="Clients: search,\nview address / phone / status"];
   prefs  [label="Preferences:\ntheme + accent (remembered)"];
@@ -35,18 +48,25 @@ digraph A {
 
   start -> open -> login -> dv;
   dv -> err [label="no"]; err -> login;
-  dv -> home [label="yes"];
+  dv -> cred [label="yes"];
+  cred -> credErr [label="no"]; credErr -> login;
+  cred -> grp [label="yes"];
+  grp -> home [label="admin /\nstaff"];
+  grp -> shop [label="customer"];
+  shop -> add2 -> cart -> chk -> done -> more;
+  login -> reg [style=dashed, label="Create an\naccount"]; reg -> regv; regv -> regerr [label="no"]; regerr -> reg; regv -> login [label="yes", constraint=false];
   home -> menu;
-  menu -> sstock [label="Stock"]; menu -> sales [label="Sales"]; menu -> clients [label="Clients"]; menu -> prefs [label="Settings"]; menu -> mash [label="Mashups"];
+  menu -> sstock [label="Stock"]; menu -> sales [label="Sales"]; menu -> newinv [label="Sales > Add\n(admin)"]; menu -> users [label="Users\n(admin)"]; menu -> clients [label="Clients"]; menu -> prefs [label="Settings"]; menu -> mash [label="Mashups"];
   sstock -> sact;
   sact -> add [label="add"]; sact -> item [label="select"];
   add -> valid; valid -> verr [label="no"]; verr -> add; valid -> save [label="yes"];
   item -> adj [label="adjust"]; item -> edit [label="edit"];
   adj -> ledger;
   sales -> stotal;
-  save -> more; ledger -> more; edit -> more; stotal -> more; clients -> more; prefs -> more; mash -> more;
-  more -> home [label="yes", constraint=false, style=dashed];
+  newinv -> more; users -> more; save -> more; ledger -> more; edit -> more; stotal -> more; clients -> more; prefs -> more; mash -> more;
+  more -> grp [label="yes", constraint=false, style=dashed];
   more -> logout [label="no"]; logout -> end;
-  { rank=same; dv; err; }
+  { rank=same; dv; err; reg; }
+  { rank=same; cred; credErr; }
   { rank=same; valid; verr; }
 }

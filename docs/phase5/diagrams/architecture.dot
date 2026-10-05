@@ -1,44 +1,46 @@
 digraph G {
-  graph [rankdir=LR, compound=true, newrank=true, fontname="DejaVu Sans", fontsize=11, nodesep=0.35, ranksep=0.7, pad=0.3, bgcolor="white", labelloc=t, label=<<b>LPA eComms — system architecture (MVC, three interfaces, one data layer)</b><br/><font point-size="9" color="#5b6660">Pedro Alvim · CTI20260187 · Phase 5 (ICTPRG546) · validated 04/10/2026</font>>];
+  graph [rankdir=LR, compound=true, newrank=true, fontname="DejaVu Sans", fontsize=11, nodesep=0.35, ranksep=0.7, pad=0.3, bgcolor="white", labelloc=t, label=<<b>LPA eComms — system architecture (MVC, three interfaces, one data layer)</b><br/><font point-size="9" color="#5b6660">Pedro Alvim · CTI20260187 · Phase 5 (ICTPRG546) · validated 05/10/2026</font>>];
   node  [fontname="DejaVu Sans", fontsize=10, shape=box, style="rounded,filled", fillcolor="#ffffff", color="#9fb8ac", penwidth=1.2];
   edge  [fontname="DejaVu Sans", fontsize=8.5, color="#5b6660", arrowsize=0.7];
 
   subgraph cluster_clients { label=<<b>Interfaces (presentation)</b>>; style="rounded,dashed"; color="#9fb8ac"; fontsize=10;
-    web    [label=<<b>Web browser</b><br/><font point-size="8">Chrome / Edge · mobile-first EJS pages</font>>];
+    web    [label=<<b>Web browser — staff</b><br/><font point-size="8">administrator · user (staff)</font>>];
+    cust   [label=<<b>Web browser — customers</b><br/><font point-size="8">web store: register, shop, cart, checkout</font>>];
     mobile [label=<<b>Android app</b><br/><font point-size="8">SplashActivity → MainActivity (WebView)</font>>];
     desk   [label=<<b>Desktop app (Java)</b><br/><font point-size="8">planned · ICTPRG549</font>>, style="rounded,dashed,filled", fillcolor="#f6f8f7"];
     api    [label=<<b>API clients</b><br/><font point-size="8">Postman · JSON</font>>];
   }
 
   subgraph cluster_server { label=<<b>Node.js + Express server (server.js)</b>>; style="rounded,filled"; fillcolor="#eef6f2"; color="#0a6b49"; fontsize=10;
-    gate   [label=<<b>Login gate</b><br/><font point-size="8">requireLogin · HttpOnly session cookie</font>>, fillcolor="#fff7e6", color="#d9a441"];
+    gate   [label=<<b>Auth middleware</b><br/><font point-size="8">loadUser · requireLogin · requireRole<br/>random session token (HttpOnly)</font>>, fillcolor="#fff7e6", color="#d9a441"];
     routes [label=<<b>Router</b><br/><font point-size="8">routes/index.js · GET POST PUT DELETE</font>>];
     subgraph cluster_c { label="Controllers"; style="rounded"; color="#0a6b49"; fontsize=9;
-      cAuth [label="AuthController"]; cHome [label="HomeController"]; cProd [label="ProductController"]; cSales [label="SalesController"]; cMash [label="MashupController"];
+      cAuth [label="AuthController"]; cHome [label="HomeController"]; cProd [label="ProductController"]; cSales [label="SalesController"]; cShop [label="ShopController"]; cUser [label="UserController"]; cMash [label="MashupController"];
     }
     subgraph cluster_m { label="Models"; style="rounded"; color="#0a6b49"; fontsize=9;
-      mProd [label="Product"]; mLed [label="StockLedger"]; mInv [label="Invoice"]; mCli [label="Client"]; mStore [label="Store"];
+      mUser [label="User"]; mProd [label="Product"]; mLed [label="StockLedger"]; mInv [label="Invoice\n(+ line items)"]; mCli [label="Client"]; mStore [label="Store"]; mLog [label="ActivityLog"];
     }
-    views  [label=<<b>Views (EJS)</b><br/><font point-size="8">login · home · products · sales · clients<br/>stock/ledger · settings · mashups · partials</font>>];
-    static [label=<<b>public/</b><br/><font point-size="8">css · js (prefs, stock) · images · promo video</font>>];
+    views  [label=<<b>Views (EJS)</b><br/><font point-size="8">login · register · home · products · sales · clients · users<br/>shop · cart · checkout · orders · help · more · mashups</font>>];
+    static [label=<<b>public/</b><br/><font point-size="8">css · js (app, shop, cart, invoice, prefs, stock)<br/>images · promo video</font>>];
   }
 
   subgraph cluster_data { label=<<b>Data</b>>; style="rounded,dashed"; color="#9fb8ac"; fontsize=10;
     mem   [label=<<b>In-memory store</b><br/><font point-size="8">prototype (today)</font>>];
+    logf  [label=<<b>logs/lpa.log</b><br/><font point-size="8">activity log</font>>, shape=note];
     mysql [label=<<b>MySQL · lpa_ecomms</b><br/><font point-size="8">target · ICTDBS507</font>>, shape=cylinder, style="filled,dashed", fillcolor="#f6f8f7"];
   }
   subgraph cluster_ext { label=<<b>External services (mashups)</b>>; style="rounded,dashed"; color="#9fb8ac"; fontsize=10;
     ext [label=<OpenStreetMap / Leaflet<br/>Open-Meteo weather<br/>Frankfurter (ECB) · er-api FX>, fontsize=9];
   }
 
-  web -> gate [label="HTTP"]; mobile -> gate [label="HTTP (WebView)"]; desk -> gate [style=dashed, label="HTTP/JSON"]; api -> gate [label="JSON"];
+  web -> gate [label="HTTP"]; cust -> gate [label="HTTP"]; mobile -> gate [label="HTTP (WebView)"]; desk -> gate [style=dashed, label="HTTP/JSON"]; api -> gate [label="JSON"];
   gate -> routes;
-  routes -> cAuth; routes -> cHome; routes -> cProd; routes -> cSales; routes -> cMash;
-  cHome -> mProd; cHome -> mInv; cProd -> mProd; cProd -> mLed; cSales -> mInv; cSales -> mCli; mInv -> mCli [label="clientId", style=dashed]; cMash -> mStore; cMash -> mProd;
-  cProd -> views [style=dotted, label="render"]; cSales -> views [style=dotted]; cHome -> views [style=dotted]; cAuth -> views [style=dotted];
+  routes -> cAuth; routes -> cHome; routes -> cProd; routes -> cSales; routes -> cShop; routes -> cUser; routes -> cMash;
+  cAuth -> mUser; cUser -> mUser; cHome -> mProd; cHome -> mInv; cProd -> mProd; cProd -> mLed; cSales -> mInv; cSales -> mCli; cShop -> mProd; cShop -> mInv; cShop -> mLed; mInv -> mCli [label="clientId", style=dashed]; cMash -> mStore; cMash -> mProd; cAuth -> mLog [style=dotted]; mLog -> logf [style=dotted];
+  cProd -> views [style=dotted, label="render"]; cSales -> views [style=dotted]; cHome -> views [style=dotted]; cAuth -> views [style=dotted]; cShop -> views [style=dotted]; cUser -> views [style=dotted];
   mProd -> mem [ltail=cluster_m, label="read / write", color="#0a6b49"];
   mem -> mysql [style=dashed, label="migrate", color="#0a6b49"];
   cMash -> ext [label="fetch (server-side)", lhead=cluster_ext];
-  { rank=same; mem; ext; }
+  { rank=same; mem; ext; logf; }
   views -> static [style=invis];
 }
