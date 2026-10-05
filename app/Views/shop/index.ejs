@@ -29,7 +29,8 @@
       <img src="<%= p.image %>" alt="<%= p.title %>" loading="lazy" />
       <div class="product-body">
         <div class="stock-top"><span class="cat"><%= p.category %></span><span class="badge badge-<%= lv %>"><%= lv==='out'?'Out of stock':(lv==='low'?'Only '+p.quantity+' left':'In stock') %></span></div>
-        <h2 class="product-title"><%= p.title %></h2>
+        <h2 class="product-title"><a href="/shop/<%= p.sku %>"><%= p.title %></a></h2>
+        <% var rt = ratings[p.sku]; %><p class="card-rating"><% if (rt) { %><%- include('../partials/stars', { value: rt.avg, small: true }) %> <a href="/shop/<%= p.sku %>#reviews"><%= rt.avg.toFixed(1) %> (<%= rt.count %>)</a><% } else { %><span class="subtle">No reviews yet</span><% } %></p>
         <p class="product-desc"><%= p.description %></p>
         <div class="product-buy">
           <span class="price">$<%= p.price.toFixed(2) %></span>

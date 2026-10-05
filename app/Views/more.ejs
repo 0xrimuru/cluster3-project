@@ -3,9 +3,11 @@
   <nav class="menu-list" aria-label="More">
     <% if (role === 'administrator') { %>
     <a href="/users"><strong>Users</strong><span>Search, add, edit and delete users</span></a>
+    <a href="/activity"><strong>Activity log</strong><span>Sign-ins, orders, invoices and changes (MongoDB)</span></a>
     <% } %>
     <% if (role !== 'customer') { %>
     <a href="/stock/ledger"><strong>Stock audit history</strong><span>Every stock adjustment: who, when, why</span></a>
+    <a href="/reviews"><strong>Product reviews</strong><span>Search, hide or publish customer reviews</span></a>
     <a href="/shop"><strong>Web store</strong><span>The shop as customers see it</span></a>
     <% } %>
     <a href="/mashups"><strong>About LPA</strong><span>Our mission, store locator and international pricing</span></a>

@@ -49,6 +49,13 @@ class Invoice {
         i.lpa_inv_client_address, DATE_FORMAT(i.lpa_inv_date, '%Y-%m-%d')) LIKE ? ORDER BY i.lpa_inv_no`, [like(q.trim())]));
   }
 
+  // Has this client bought this product (on an active invoice)? Used for "verified" reviews.
+  static async hasBought(clientId, sku) {
+    const rows = await query(`SELECT 1 AS yes FROM lpa_invoice_items t JOIN lpa_invoices i ON i.lpa_inv_no = t.lpa_invitem_inv_no
+      WHERE i.lpa_inv_client_ID = ? AND t.lpa_invitem_stock_ID = ? AND i.lpa_inv_status = 'a' LIMIT 1`, [clientId, String(sku || '').toUpperCase()]);
+    return rows.length > 0;
+  }
+
   static total(list) { return round2((list || []).reduce((sum, i) => sum + i.amount, 0)); }
 
   // Total sales, worked out by the database (dashboard).

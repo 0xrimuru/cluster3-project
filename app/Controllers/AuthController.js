@@ -3,7 +3,7 @@
 // server-side session is started on success. Every attempt is written to the activity log.
 const User = require('../Models/User');
 const Client = require('../Models/Client');
-const Log = require('../Models/ActivityLog');
+const Log = require('../Models/NoSql/ActivityLog');
 const { startSession, endSession } = require('../Middleware/auth');
 const { transaction } = require('../../config/database');
 
@@ -28,20 +28,20 @@ exports.login = async (req, res) => {
   if (!username || !password) return res.redirect('/login?error=1');
   const user = await User.authenticate(username, password);
   if (!user) {
-    Log.write(req, `LOGIN FAILED for user "${username.slice(0, 30)}"`);
+    Log.write(req, `LOGIN FAILED for user "${username.slice(0, 30)}"`, { user: username.slice(0, 30).toLowerCase() });
     return res.redirect('/login?error=2&u=' + encodeURIComponent(username.slice(0, 30)));
   }
-  startSession(res, user);
-  Log.write(req, `LOGIN ${user.username} (${user.group})`);
+  await startSession(req, res, user);
+  Log.write(req, `LOGIN ${user.username} (${user.group})`, { user: user.username });
   return res.redirect(user.group === 'customer' ? '/shop' : '/');
 };
 
 // The signed-in user's full name (used by the stock audit history).
 exports.currentUser = (req) => (req.user ? User.fullName(req.user) : 'Unknown user');
 
-exports.logout = (req, res) => {
+exports.logout = async (req, res) => {
   if (req.user) Log.write(req, `LOGOUT ${req.user.username}`);
-  endSession(req, res);
+  await endSession(req, res);
   res.redirect('/login');
 };
 
@@ -77,6 +77,6 @@ exports.register = async (req, res) => {
     const u = await User.create(Object.assign({}, form, { group: 'customer', clientId: c.code }), conn);
     return { client: c, user: u };
   });
-  Log.write(req, `REGISTER ${user.username} -> client ${client.code}`);
+  Log.write(req, `REGISTER ${user.username} -> client ${client.code}`, { user: user.username, clientId: client.code });
   res.redirect('/login?registered=1&u=' + encodeURIComponent(user.username));
 };

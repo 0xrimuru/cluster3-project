@@ -6,7 +6,9 @@
 const Product = require('../Models/Product');
 const Invoice = require('../Models/Invoice');
 const Client = require('../Models/Client');
-const Log = require('../Models/ActivityLog');
+const Log = require('../Models/NoSql/ActivityLog');
+const SessionStore = require('../Models/NoSql/SessionStore');
+const Review = require('../Models/NoSql/Review');
 const { transaction } = require('../../config/database');
 const { takeStock, RuleError } = require('./SalesController');
 
@@ -16,7 +18,9 @@ const wantsJson = req => (req.get('accept') || '').includes('application/json');
 const isCustomer = req => req.user && req.user.group === 'customer';
 
 // Build the cart lines from the session using current catalogue prices (one SQL query).
+// The cart itself is stored in the session document in MongoDB.
 async function cartView(session) {
+  const before = session.cart.length;
   const found = await Product.findMany(session.cart.map(i => i.sku));
   const bySku = Object.fromEntries(found.map(p => [p.sku, p]));
   const lines = [];
@@ -27,6 +31,7 @@ async function cartView(session) {
                  amount: round2(p.price * item.qty), short: item.qty > p.quantity });
     return true;
   });
+  if (session.cart.length !== before) await SessionStore.saveCart(session);
   const total = round2(lines.reduce((s, l) => s + l.amount, 0));
   return { lines, total, gst: round2(total / 11), count: lines.reduce((n, l) => n + l.qty, 0) };
 }
@@ -37,11 +42,12 @@ exports.index = async (req, res) => {
   const sort = Product.SORTS.includes(req.query.sort) ? req.query.sort : 'featured';
   const category = String(req.query.category || '');
   const [list, categories] = await Promise.all([Product.forSale({ q, category, sort }), Product.categories()]);
+  const ratings = await Review.summaries(list.map(p => p.sku)); // MongoDB product_ratings
   const inCart = {};
   if (req.session) req.session.cart.forEach(i => { inCart[i.sku] = i.qty; });
-  if (wantsJson(req)) return res.json(list.map(p => ({ sku: p.sku, title: p.title, price: p.price, onHand: p.quantity, category: p.category })));
+  if (wantsJson(req)) return res.json(list.map(p => ({ sku: p.sku, title: p.title, price: p.price, onHand: p.quantity, category: p.category, rating: ratings[p.sku] || null })));
   res.render('shop/index', { title: 'Shop', pageName: 'Shop', nav: 'shop', products: list, q, sort, category, categories,
-    inCart, level: Product.level, canBuy: isCustomer(req), added: req.query.added || '' });
+    inCart, ratings, level: Product.level, canBuy: isCustomer(req), added: req.query.added || '' });
 };
 
 // POST /cart  { sku, qty } - add to cart
@@ -56,6 +62,7 @@ exports.add = async (req, res) => {
   const already = line ? line.qty : 0;
   if (already + qty > p.quantity) return fail(409, p.quantity === 0 ? `${p.title} is out of stock.` : `Only ${p.quantity} in stock (you already have ${already} in your cart).`);
   if (line) line.qty += qty; else req.session.cart.push({ sku: p.sku, qty });
+  await SessionStore.saveCart(req.session);
   const view = await cartView(req.session);
   const message = `${qty} x ${p.title} added to your cart.`;
   if (wantsJson(req)) return res.json({ ok: true, message, count: view.count, total: view.total, inCart: already + qty });
@@ -79,6 +86,7 @@ exports.update = async (req, res) => {
   else if (qty > p.quantity) error = `Only ${p.quantity} of ${p.title} in stock.`;
   else if (qty === 0) req.session.cart = req.session.cart.filter(i => i !== line);
   else line.qty = qty;
+  if (!error) await SessionStore.saveCart(req.session);
   const view = await cartView(req.session);
   if (wantsJson(req)) return error ? res.status(400).json({ error, total: view.total, count: view.count }) : res.json(Object.assign({ ok: true }, view));
   res.redirect('/cart' + (error ? '?error=' + encodeURIComponent(error) : ''));
@@ -87,6 +95,7 @@ exports.update = async (req, res) => {
 // DELETE /cart/:sku
 exports.remove = async (req, res) => {
   req.session.cart = req.session.cart.filter(i => i.sku !== String(req.params.sku).toUpperCase());
+  await SessionStore.saveCart(req.session);
   const view = await cartView(req.session);
   if (wantsJson(req)) return res.json(Object.assign({ ok: true }, view));
   res.redirect('/cart');
@@ -137,6 +146,7 @@ exports.checkout = async (req, res) => {
     throw err;
   }
   req.session.cart = [];
+  await SessionStore.saveCart(req.session);
   Log.write(req, `ORDER ${inv.number} by ${req.user.username}: ${inv.items.length} line(s), $${inv.amount.toFixed(2)}, ${form.payment}`);
   res.redirect(`/orders/${inv.number}?placed=1`);
 };

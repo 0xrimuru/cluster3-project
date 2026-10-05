@@ -1,0 +1,98 @@
+<%- include('../partials/header') %>
+  <p class="crumbs"><a href="/shop">&larr; Shop</a></p>
+  <% var fmt = function(d){ return new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Australia/Brisbane' }); }; %>
+  <article class="card pad detail">
+    <div class="detail-head">
+      <img class="cover-large" src="<%= product.image %>" alt="<%= product.title %>" />
+      <div class="detail-info">
+        <div class="stock-top"><span class="sku"><%= product.sku %></span><span class="cat"><%= product.category %></span></div>
+        <h1><%= product.title %></h1>
+        <p class="meta">by <%= product.brand %></p>
+        <p class="rating-line">
+          <% if (summary) { %><%- include('../partials/stars', { value: summary.avg }) %> <a href="#reviews"><strong><%= summary.avg.toFixed(1) %></strong> &middot; <%= summary.count %> review<%= summary.count===1?'':'s' %></a>
+          <% } else { %><span class="subtle">No reviews yet</span><% } %>
+        </p>
+        <p class="price">$<%= product.price.toFixed(2) %></p>
+        <p class="badges"><span class="badge badge-<%= level %>"><%= level==='out'?'Out of stock':(level==='low'?'Only '+product.quantity+' left':'In stock') %></span></p>
+        <p class="desc"><%= product.description %></p>
+        <% if (canBuy) { var left = Math.max(0, product.quantity - inCart); %>
+        <form class="add-inline" method="POST" action="/cart" data-confirm="Add 1 x <%= product.title %> for $<%= product.price.toFixed(2) %> to your cart?"><%- include('../partials/csrf') %>
+          <input type="hidden" name="sku" value="<%= product.sku %>" /><input type="hidden" name="qty" value="1" />
+          <button class="btn" type="submit" <%= left ? '' : 'disabled' %>><%= product.quantity === 0 ? 'Sold out' : (left ? 'Add to cart' : 'All in cart') %></button>
+        </form>
+        <% } %>
+      </div>
+    </div>
+  </article>
+
+  <section class="card pad" id="reviews" aria-labelledby="reviews-h">
+    <div class="page-head"><h2 id="reviews-h">Customer reviews</h2>
+      <% if (role !== 'customer') { %><a class="btn ghost" href="/reviews?sku=<%= product.sku %>">Moderate</a><% } %></div>
+    <% if (notice) { %><div class="flash ok" role="status"><%= notice %></div><% } %>
+    <% if (voteError) { %><div class="flash warn" role="alert"><%= voteError %></div><% } %>
+    <% if (errors.length) { %><ul class="form-errors" role="alert"><% errors.forEach(function(e){ %><li><%= e %></li><% }); %></ul><% } %>
+
+    <% if (summary) { %>
+    <div class="rating-summary">
+      <div class="rating-big"><strong><%= summary.avg.toFixed(1) %></strong><%- include('../partials/stars', { value: summary.avg }) %><span class="subtle"><%= summary.count %> review<%= summary.count===1?'':'s' %></span></div>
+      <ul class="rating-bars" aria-label="Ratings by stars">
+        <% [5,4,3,2,1].forEach(function(n){ var c = summary.stars[String(n)] || 0; %>
+        <li><span><%= n %> &#9733;</span><span class="bar"><span style="width:<%= summary.count ? Math.round(c / summary.count * 100) : 0 %>%"></span></span><span class="n"><%= c %></span></li>
+        <% }); %>
+      </ul>
+    </div>
+    <% } %>
+
+    <% if (canReview) { %>
+    <details class="review-write" <%= errors.length ? 'open' : '' %>>
+      <summary class="btn">Write a review</summary>
+      <form method="POST" action="/shop/<%= product.sku %>/reviews" id="review-form"><%- include('../partials/csrf') %>
+        <%- include('../partials/review-form', { f: form, idp: 'new' }) %>
+        <div class="form-actions"><button class="btn" type="submit">Publish review</button></div>
+      </form>
+    </details>
+    <% } else if (role === 'customer' && !mine) { %>
+    <p class="subtle">You can review this product after you have bought it.</p>
+    <% } %>
+
+    <% if (reviews.length) { %>
+    <form class="review-sort" method="GET" action="/shop/<%= product.sku %>#reviews">
+      <label>Sort reviews
+        <select name="sort" data-autosubmit>
+          <option value="newest" <%= sort==='newest'?'selected':'' %>>Newest</option>
+          <option value="helpful" <%= sort==='helpful'?'selected':'' %>>Most helpful</option>
+          <option value="highest" <%= sort==='highest'?'selected':'' %>>Highest rating</option>
+          <option value="lowest" <%= sort==='lowest'?'selected':'' %>>Lowest rating</option>
+        </select></label>
+    </form>
+    <ul class="review-list">
+      <% reviews.forEach(function(r){ %>
+      <li class="review<%= r.mine ? ' is-mine' : '' %>" id="r-<%= r.id %>">
+        <div class="review-top"><%- include('../partials/stars', { value: r.rating, small: true }) %><strong class="review-title"><%= r.title %></strong></div>
+        <div class="review-meta"><span><%= r.author %></span><% if (r.verified) { %><span class="badge badge-on">Verified purchase</span><% } %><span><%= fmt(r.createdAt) %><%= r.edited ? ' (edited)' : '' %></span></div>
+        <p class="review-text"><%= r.comment %></p>
+        <% if (r.tags.length) { %><p class="tags"><% r.tags.forEach(function(t){ %><span class="rtag"><%= t %></span><% }); %></p><% } %>
+        <div class="review-actions">
+          <span class="subtle helpful-count"><%= r.helpful %> found this helpful</span>
+          <% if (!r.mine && !r.votedByMe) { %>
+          <form method="POST" action="/reviews/<%= r.id %>/helpful" class="inline"><%- include('../partials/csrf') %><button class="btn ghost sm" type="submit">Helpful</button></form>
+          <% } else if (r.votedByMe) { %><span class="subtle">&#10003; You voted</span><% } %>
+          <% if (r.mine || role === 'administrator') { %>
+          <form method="POST" action="/reviews/<%= r.id %>?_method=DELETE" class="inline" data-confirm="Delete this review? This cannot be undone."><%- include('../partials/csrf') %><button class="btn ghost sm danger-text" type="submit">Delete</button></form>
+          <% } %>
+        </div>
+        <% if (r.mine) { %>
+        <details class="review-edit" <%= editing ? 'open' : '' %>>
+          <summary>Edit my review</summary>
+          <form method="POST" action="/reviews/<%= r.id %>?_method=PUT"><%- include('../partials/csrf') %>
+            <%- include('../partials/review-form', { f: editing ? form : r, idp: 'edit' }) %>
+            <div class="form-actions"><button class="btn" type="submit">Save changes</button></div>
+          </form>
+        </details>
+        <% } %>
+      </li>
+      <% }); %>
+    </ul>
+    <% } else { %><p class="empty-msg">No reviews yet<%= canReview ? ' - be the first!' : '.' %></p><% } %>
+  </section>
+<%- include('../partials/footer') %>

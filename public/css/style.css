@@ -437,3 +437,61 @@ table.data td a{white-space:nowrap}
 .check-line{display:flex!important;align-items:flex-start;gap:.5rem;font-weight:500!important;font-size:.88rem}
 .check-line input{width:auto!important;display:inline!important;margin:.2rem 0 0!important}
 .login-body ul{padding-left:1.1rem}.login-body h2{font-size:1rem;margin-top:.9rem}
+
+/* ---- Block 8: product page, reviews (MongoDB), activity log ---- */
+.crumbs{margin:.2rem 0 .4rem;font-size:.9rem}
+.crumbs a{color:var(--brand-dark);text-decoration:none}
+.stars{position:relative;display:inline-block;color:var(--line);font-size:1.05rem;letter-spacing:1px;line-height:1;white-space:nowrap;vertical-align:middle}
+.stars .stars-fill{position:absolute;inset:0 auto 0 0;overflow:hidden;color:#e0a100}
+.stars.sm{font-size:.85rem}
+.rating-line{display:flex;align-items:center;gap:.4rem;margin:.2rem 0;font-size:.9rem}
+.rating-line a,.card-rating a{color:var(--ink);text-decoration:none}
+.card-rating{display:flex;align-items:center;gap:.3rem;margin:.1rem 0 .3rem;font-size:.8rem}
+.product-title a{color:inherit;text-decoration:none}
+.product-title a:hover{text-decoration:underline}
+.add-inline{margin-top:.6rem}
+.rating-summary{display:flex;flex-wrap:wrap;gap:1.2rem;align-items:center;margin:.4rem 0 1rem}
+.rating-big{display:flex;flex-direction:column;align-items:flex-start;gap:.2rem;min-width:110px}
+.rating-big strong{font-size:2.2rem;line-height:1}
+.rating-bars{list-style:none;margin:0;padding:0;flex:1;min-width:200px;display:flex;flex-direction:column;gap:.25rem}
+.rating-bars li{display:grid;grid-template-columns:2.6rem 1fr 1.6rem;gap:.5rem;align-items:center;font-size:.82rem}
+.rating-bars .bar{height:.5rem;background:var(--brand-soft);border-radius:999px;overflow:hidden}
+.rating-bars .bar span{display:block;height:100%;background:#e0a100}
+.rating-bars .n{text-align:right;color:var(--muted)}
+.review-write{margin:.4rem 0 1rem}
+.review-write>summary{list-style:none;display:inline-block;cursor:pointer}
+.review-write>summary::-webkit-details-marker{display:none}
+.review-write form,.review-edit form{margin-top:.6rem}
+.star-pick{border:0;padding:0;margin:.6rem 0}
+.star-pick legend{font-weight:600;margin-bottom:.3rem}
+.review-sort{max-width:220px}
+.review-sort label{margin:.2rem 0 .6rem;font-size:.85rem}
+.review-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.7rem}
+.review{border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;background:var(--card)}
+.review.is-mine{border-color:var(--brand)}
+.review.is-hidden{opacity:.7;border-style:dashed}
+.review-top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.review-title{font-size:.98rem}
+.review-meta{font-size:.8rem;color:var(--muted);margin:.2rem 0;display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.review-meta a{color:var(--brand-dark)}
+.review-text{margin:.35rem 0;white-space:pre-line;overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:.3rem;margin:.3rem 0}
+.rtag{font-size:.75rem;padding:.1rem .5rem;border-radius:999px;background:var(--brand-soft);color:var(--brand-dark)}
+.review-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:.3rem;font-size:.82rem}
+form.inline{display:inline;margin:0}
+.btn.sm{padding:.3rem .65rem;font-size:.8rem}
+.btn.ghost.danger-text{color:var(--danger)}
+.review-edit summary{cursor:pointer;color:var(--brand-dark);font-size:.85rem;margin-top:.4rem}
+.flash.warn{background:var(--warn-bg,#fff3e0);color:var(--warn);border:1px solid transparent}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin:.3rem 0 .6rem}
+.chip{font-size:.78rem;padding:.2rem .6rem;border-radius:999px;border:1px solid var(--line);color:var(--ink);text-decoration:none;background:var(--card);text-transform:capitalize}
+.chip.on{border-color:var(--brand);background:var(--brand-soft)}
+.inline-label{display:flex;align-items:center;gap:.3rem;margin:0;font-size:.85rem;font-weight:600}
+.inline-label input{margin:0;width:auto}
+.activity .ev-msg{font-size:.9rem;margin-top:.15rem;overflow-wrap:anywhere}
+.activity .ev-user{font-size:.85rem}
+.activity .badge{text-transform:capitalize}
+[data-theme="dark"] .review{background:var(--card)}
+.review-meta>span+span::before,.review-meta>.badge+span::before{content:"\00B7";margin-right:.3rem;color:var(--muted)}
+.activity .ev-user{text-transform:none}
+.product-card .product-title a{text-decoration:none}

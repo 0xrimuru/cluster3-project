@@ -10,10 +10,11 @@ const crypto = require('crypto');
 const ROOT = path.join(__dirname, '..');
 const ENV = path.join(ROOT, '.env');
 
-if (!fs.existsSync(ENV)) {
+if (!fs.existsSync(ENV)) fs.writeFileSync(ENV, fs.readFileSync(path.join(ROOT, '.env.example'), 'utf8'));
+if (/^DB_PASSWORD=(change-me)?\s*$/m.test(fs.readFileSync(ENV, 'utf8'))) {
   const pw = crypto.randomBytes(18).toString('base64url');
-  fs.writeFileSync(ENV, fs.readFileSync(path.join(ROOT, '.env.example'), 'utf8').replace('DB_PASSWORD=change-me', 'DB_PASSWORD=' + pw));
-  console.log('Created .env with a random password for lpa_app (this file is not committed).');
+  fs.writeFileSync(ENV, fs.readFileSync(ENV, 'utf8').replace(/^DB_PASSWORD=.*$/m, 'DB_PASSWORD=' + pw));
+  console.log('Set a random password for lpa_app in .env (this file is not committed).');
 }
 require('dotenv').config({ path: ENV, quiet: true });
 const mysql = require('mysql2/promise');

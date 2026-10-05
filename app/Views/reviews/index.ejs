@@ -1,0 +1,41 @@
+<%- include('../partials/header') %>
+  <% var fmt = function(d){ return new Date(d).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Australia/Brisbane' }); }; %>
+  <% var qs = new URLSearchParams(f).toString(); %>
+  <h1>Product reviews <span class="subtle">moderation</span></h1>
+  <% if (notice) { %><div class="flash ok" role="status"><%= notice %></div><% } %>
+  <form class="shop-filters" method="GET" action="/reviews" role="search">
+    <input name="q" type="search" class="search" value="<%= f.q %>" placeholder="Search words in reviews&hellip;" aria-label="Search reviews" />
+    <select name="status" aria-label="Status">
+      <option value="">Any status</option>
+      <option value="published" <%= f.status==='published'?'selected':'' %>>Published</option>
+      <option value="hidden" <%= f.status==='hidden'?'selected':'' %>>Hidden</option>
+    </select>
+    <select name="maxRating" aria-label="Rating">
+      <option value="">Any rating</option>
+      <% [1,2,3,4].forEach(function(n){ %><option value="<%= n %>" <%= f.maxRating===String(n)?'selected':'' %>><%= n %> star<%= n>1?'s':'' %> or less</option><% }); %>
+    </select>
+    <input name="sku" value="<%= f.sku %>" placeholder="Stock ID" aria-label="Stock ID" maxlength="20" />
+    <button class="btn ghost" type="submit">Search</button>
+  </form>
+  <p class="result-count"><%= reviews.length %> review<%= reviews.length===1?'':'s' %></p>
+  <ul class="review-list">
+    <% reviews.forEach(function(r){ %>
+    <li class="review<%= r.status==='hidden' ? ' is-hidden' : '' %>">
+      <div class="review-top"><%- include('../partials/stars', { value: r.rating, small: true }) %><strong class="review-title"><%= r.title %></strong>
+        <span class="badge <%= r.status==='hidden'?'badge-off':'badge-on' %>"><%= r.status==='hidden'?'Hidden':'Published' %></span></div>
+      <div class="review-meta"><span><a href="/shop/<%= r.sku %>#reviews"><%= r.sku %></a></span><span><%= r.author %> (<%= r.clientId %>)</span><span><%= fmt(r.createdAt) %></span><span><%= r.helpful %> helpful</span></div>
+      <p class="review-text"><%= r.comment %></p>
+      <% if (r.tags.length) { %><p class="tags"><% r.tags.forEach(function(t){ %><span class="rtag"><%= t %></span><% }); %></p><% } %>
+      <div class="review-actions">
+        <form method="POST" action="/reviews/<%= r.id %>/status?_method=PUT" class="inline"><%- include('../partials/csrf') %>
+          <input type="hidden" name="status" value="<%= r.status==='hidden'?'published':'hidden' %>" /><input type="hidden" name="qs" value="<%= qs %>" />
+          <button class="btn ghost sm" type="submit"><%= r.status==='hidden'?'Publish':'Hide' %></button></form>
+        <% if (role === 'administrator') { %>
+        <form method="POST" action="/reviews/<%= r.id %>?_method=DELETE" class="inline" data-confirm="Delete this review permanently?"><%- include('../partials/csrf') %><button class="btn ghost sm danger-text" type="submit">Delete</button></form>
+        <% } %>
+      </div>
+    </li>
+    <% }); %>
+  </ul>
+  <% if (!reviews.length) { %><p class="empty-msg">No reviews match.</p><% } %>
+<%- include('../partials/footer') %>

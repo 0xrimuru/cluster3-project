@@ -5,33 +5,39 @@
 One connected e-commerce application built across the Cluster 3 blocks: stock management, sales and invoicing, clients, users, and a customer web store. It runs in the browser and inside the LPA Android app.
 
 ## Tech stack
-Node.js · Express · EJS on a Model–View–Controller structure · **MySQL / MariaDB** (via `mysql2`, prepared statements, connection pool, transactions).
+Node.js · Express · EJS on a Model–View–Controller structure · **MySQL / MariaDB** (via `mysql2`: stock, clients, invoices, users) · **MongoDB** (official driver: sessions + carts, activity log, product reviews, rating trigger).
 
 ## Run it
-1. Install **Node.js 18+** and **MySQL 8 or MariaDB 10.4+** (XAMPP is fine: start *MySQL* in the XAMPP Control Panel).
+1. Install **Node.js 18+**, **MySQL 8 or MariaDB 10.4+** (XAMPP is fine: start *MySQL* in the XAMPP Control Panel) and **MongoDB Community Server 7/8** (+ Compass to look at the data).
 2. In this folder:
    ```
    npm install          # first time only
-   npm run db:setup     # creates lpa_ecomms, the tables, the starting data and the lpa_app account
+   npm run db:setup     # MySQL: creates lpa_ecomms, the tables, the starting data and the lpa_app account
+   npm run nosql:setup  # MongoDB: creates lpa_nosql, validators, indexes, reviews, the lpa_nosql_app account
    npm start            # then open http://localhost:3000
    ```
+   `nosql:setup` prints how to switch on MongoDB logins and the replica set (needed for the change-stream trigger) in `mongod.cfg`; without them the app still works and runs the trigger itself.
    `db:setup` creates `.env` (database settings, a random password for `lpa_app`). If your MySQL `root` has a password, put it in `.env` as `DB_ADMIN_PASSWORD` and run `npm run db:setup` again. **`.env` is never committed.**
 3. Demo accounts (password `Lpa#2026`): `palvim` administrator · `mchang` staff · `aturner` customer.
 
-Other commands: `npm run db:export` (saves the live database to `db/export.sql`) · `npm run db:setup` again resets the data.
+Other commands: `npm run db:export` (MySQL → `db/export.sql`) · `npm run nosql:export` (MongoDB → `db/nosql/export/*.json`) · running a setup again resets its data.
 
 ## Structure
 ```
 app/
-  Models/       data (M) — Product, Client, Invoice, StockLedger, User (SQL), Store, ActivityLog
-  Controllers/  logic (C) — Home, Auth, Product, Sales, Shop, User, Mashup
+  Models/       data (M) — Product, Client, Invoice, StockLedger, User (SQL), Store (static)
+  Controllers/  logic (C) — Home, Auth, Product, Sales, Shop, User, Review, Activity, Mashup
   Views/        EJS templates (V)
+  Models/NoSql/ MongoDB models — SessionStore, ActivityLog, Review, RatingTrigger
   Middleware/   auth (sessions, roles), security (CSP, CSRF)
+  Security/     crypto.js (AES-256-GCM field encryption, token hashing)
 config/
   database.js   the MySQL connection pool (settings from .env)
+  nosql.js      the MongoDB client (settings from .env)
 db/
   schema.sql    tables, keys, constraints     seed.sql   starting data
   setup.js      npm run db:setup              export.js  npm run db:export -> export.sql
+  nosql/        collections.js (data model: validators, indexes, TTL), seed-reviews.js, setup.js, export.js
 routes/         URL -> controller mapping (with the user groups allowed)
 public/         css, js, images, media
 docs/           plans, minutes, requirements, test scripts and results per phase
@@ -46,4 +52,5 @@ server.js       application entry point
 - **Block 5 — ICTPRG546:** SRS v1.1 and design validation (`docs/phase5`).
 - **Block 6 — ICTWEB514:** dynamic pages, security headers, CSRF, privacy (`docs/phase6`).
 - **Block 7 — ICTDBS507:** MySQL database integration (`config/`, `db/`, `docs/phase7`).
-- Blocks 8–11 — NoSQL, application security, OOP desktop app, advanced programming — to come.
+- **Block 8 — ICTPRG554:** MongoDB — sessions, activity log, product reviews, change-stream trigger (`config/nosql.js`, `db/nosql`, `docs/phase8`).
+- Blocks 9–11 — application security, OOP desktop app, advanced programming — to come.

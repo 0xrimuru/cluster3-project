@@ -1,0 +1,155 @@
+[
+  {
+    "id": "N-01",
+    "title": "Login required and least privilege",
+    "steps": "Connect as the app; try to drop a collection and create a user; connect with no login and with a wrong password",
+    "query": "connectionStatus; drop(); createUser; find() without auth",
+    "expected": "App = lpa_nosql_app (SCRAM) with find/insert/update/remove only; drop + createUser refused; no-login and wrong password refused",
+    "actual": "lpa_nosql_app@lpa_nosql; actions changeStream, collStats, find, insert, listCollections, listIndexes, remove, update; drop -> Unauthorized; createUser -> Unauthorized; no login -> Unauthorized; wrong password -> AuthenticationFailed",
+    "result": "PASS"
+  },
+  {
+    "id": "N-02",
+    "title": "Encryption in transit (TLS)",
+    "steps": "Connect with TLS (the app) and without TLS",
+    "query": "net.tls.mode: requireTLS",
+    "expected": "TLS connection works; plain-text connection refused",
+    "actual": "TLS ok = true; without TLS -> MongoServerSelectionError",
+    "result": "PASS"
+  },
+  {
+    "id": "N-03",
+    "title": "Personal data encrypted; session tokens hashed",
+    "steps": "Read the stored login event and session straight from MongoDB",
+    "query": "activity_log.ipEnc (AES-256-GCM); sessions._id = SHA-256(token)",
+    "expected": "IP stored only encrypted and decrypts with the key; a changed ciphertext is rejected; the cookie token is not stored",
+    "actual": "stored \"v1.y3N_CbpClDO52igX.ji...\" -> \"127.0.0.1\"; plain IP in doc = false; tampered -> Unsupported state or unable to authentic; session found by hash = true; raw token stored = false",
+    "result": "PASS"
+  },
+  {
+    "id": "N-04",
+    "title": "Data types enforced by the database",
+    "steps": "Insert reviews straight into MongoDB with rating 7, rating \"5\" (text) and no dates",
+    "query": "$jsonSchema validator (validationAction: error)",
+    "expected": "All 3 refused with DocumentValidationFailure (121)",
+    "actual": "codes 121, 121, 121; rating = int 1-5, tags = array (max 5)",
+    "result": "PASS"
+  },
+  {
+    "id": "N-05",
+    "title": "Indexes built (incl. TTL, unique, text)",
+    "steps": "List the indexes of each collection",
+    "query": "db.collection.getIndexes()",
+    "expected": "TTL on sessions.expiresAt (0 s) and activity_log.at (365 days); unique one review per client; text index",
+    "actual": "sessions: _id_, ttl_expiresAt, by_user | activity_log: _id_, ttl_at, type_at, user_at | product_reviews: _id_, one_review_per_client, sku_status_newest, status_rating, text_search; TTL 0s / 365 days",
+    "result": "PASS"
+  },
+  {
+    "id": "N-06",
+    "title": "Queries are answered from indexes",
+    "steps": "explain() the product-page, activity-filter and text-search queries; compare with an un-indexed regex",
+    "query": "find({sku, status}).sort({createdAt:-1}); find({type}).sort({at:-1}); $text; {comment: /quiet/}",
+    "expected": "IXSCAN / TEXT on the right index (no COLLSCAN); the regex query needs a COLLSCAN",
+    "actual": "reviews FETCH>IXSCAN (sku_status_newest); activity FETCH>IXSCAN (type_at); text TEXT; regex COLLSCAN",
+    "result": "PASS"
+  },
+  {
+    "id": "N-07",
+    "title": "Insert many + read/write throughput",
+    "steps": "insertMany 1000 activity events (unordered), read them back by index, deleteMany",
+    "query": "insertMany(docs, {ordered:false}); find({user}); deleteMany({user})",
+    "expected": "1000 inserted, 1000 read, 1000 deleted",
+    "actual": "1000 inserted in 40 ms (25000 writes/s); 1000 read in 32 ms (31250 reads/s); 1000 deleted",
+    "result": "PASS"
+  },
+  {
+    "id": "N-08",
+    "title": "Insert one review from the web page",
+    "steps": "Customer reviews a dock she never bought; then buys the webcam and reviews it (tags repeated, mixed case)",
+    "query": "insertOne(review) + trigger -> product_ratings",
+    "expected": "First refused (400); review saved with verified=true, tags cleaned to a unique list; product rating updated",
+    "actual": "not bought -> 400; order 302 -> /orders/INV-1007?placed=1; review -> 302; doc: 3 stars, tags [video quality, microphone], verified true, author Alex Turner; rating 5 (1) -> 4 (2)",
+    "result": "PASS"
+  },
+  {
+    "id": "N-09",
+    "title": "One review per customer per product",
+    "steps": "Post a second review of the webcam; insert a copy straight into MongoDB",
+    "query": "unique index { sku, author.clientId }",
+    "expected": "Web: refused with \"already reviewed\"; database: duplicate key error 11000",
+    "actual": "web 400 \"already reviewed...\"; database -> 11000",
+    "result": "PASS"
+  },
+  {
+    "id": "N-10",
+    "title": "Find one, find many, text search, filter by index",
+    "steps": "Open the webcam page (JSON); staff search reviews for \"noise\"; filter 2 stars or less; shop list with ratings",
+    "query": "findOne / find({sku}) / $text / {rating:{$lte:2}} / product_ratings {_id:{$in}}",
+    "expected": "Webcam page has its reviews + summary; text search finds the reviews that mention noise; filter finds the 2-star review; shop shows ratings",
+    "actual": "webcam: 2 reviews, avg 4; \"noise\": LPA-006, LPA-005; <=2 stars: LPA-008 2; shop items with rating: 5/7",
+    "result": "PASS"
+  },
+  {
+    "id": "N-11",
+    "title": "Update: edit a review; helpful votes counted once",
+    "steps": "Customer edits her review (3 -> 4 stars); staff clicks Helpful twice at the same moment, admin once; customer votes on her own review",
+    "query": "findOneAndUpdate($set); updateOne({voters:{$ne:id}}, {$inc, $addToSet})",
+    "expected": "Edit saved with a new updatedAt; helpful = 2 (one per person); own vote refused",
+    "actual": "302; rating 3 -> 4; updatedAt changed = true; votes 200/409/200; own 409; helpful = 2 (U-002, U-001)",
+    "result": "PASS"
+  },
+  {
+    "id": "N-12",
+    "title": "Change-stream trigger reacts to database changes",
+    "steps": "Insert a 1-star review straight into MongoDB (no app code involved)",
+    "query": "collection.watch() on product_reviews (replica set rs0)",
+    "expected": "Within seconds: product_ratings for LPA-008 rebuilt and a REVIEW_ALERT logged; resume token saved",
+    "actual": "rating 3.67 (3) -> 3 (4) in 112 ms; alert = \"REVIEW_ALERT 1-star review of LPA-008 by Logi...\"; resume token saved = true",
+    "result": "PASS"
+  },
+  {
+    "id": "N-13",
+    "title": "Delete: authors delete only their own review",
+    "steps": "Customer tries to delete another client's review; then deletes her own",
+    "query": "findOneAndDelete({_id, author.userId}) + trigger (pre-image)",
+    "expected": "Other review: 404 (kept); own review removed; webcam rating rebuilt without it",
+    "actual": "other -> 404; own -> 302; still in DB = 0; webcam 4.5 (2) -> 5 (1)",
+    "result": "PASS"
+  },
+  {
+    "id": "N-14",
+    "title": "Moderation and page permissions",
+    "steps": "Staff hides a review; customer opens Reviews moderation and the Activity log; staff opens the Activity log",
+    "query": "updateOne({$set:{status}}); requireRole",
+    "expected": "Hidden review disappears from the shop; customer and staff blocked from pages that are not theirs (403)",
+    "actual": "hide 302; still visible to customers = false; customer /reviews 403; staff /activity 403; customer /activity 403",
+    "result": "PASS"
+  },
+  {
+    "id": "N-15",
+    "title": "Sessions stored in MongoDB",
+    "steps": "Add to cart, then open the cart on a NEW app process; sign out; deactivate the user",
+    "query": "insertOne / findOne(_id: hash) / deleteOne / deleteMany({userId})",
+    "expected": "Cart still there after the restart; logout deletes that session; deactivation deletes all of the user's sessions",
+    "actual": "cart after restart 200, numpad kept = true; sessions 2 -> logout 1 -> deactivate 0",
+    "result": "PASS"
+  },
+  {
+    "id": "N-16",
+    "title": "TTL index removes expired sessions",
+    "steps": "Store a session that expired a minute ago; use its cookie; wait for the TTL monitor",
+    "query": "index { expiresAt: 1 } expireAfterSeconds: 0",
+    "expected": "Expired cookie refused at once (redirect to login); MongoDB deletes the document by itself (TTL monitor runs every 60 s)",
+    "actual": "cookie -> 302 /login; document deleted after 58 s",
+    "result": "PASS"
+  },
+  {
+    "id": "N-17",
+    "title": "Clear message when MongoDB is not available",
+    "steps": "Start the app with a wrong MongoDB password; try to sign in",
+    "query": "AuthenticationFailed (18)",
+    "expected": "Console warning; 503 \"database is not available\"; no technical details",
+    "actual": "warning = true; status 503; message = true; leaks = false",
+    "result": "PASS"
+  }
+]

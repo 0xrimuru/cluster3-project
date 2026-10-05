@@ -1,0 +1,186 @@
+[
+  {
+    "_id": {
+      "$oid": "6ac30219789e8cc77ce06b85"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:13.926Z"
+    },
+    "type": "LOGIN",
+    "user": "aturner",
+    "message": "LOGIN aturner (customer)",
+    "ipEnc": "v1.y3N_CbpClDO52igX.jiAXxvUz6f1MMBoR4XYnMw.G1WrzUax_lvO",
+    "meta": {}
+  },
+  {
+    "_id": {
+      "$oid": "6ac30219789e8cc77ce06b86"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:13.989Z"
+    },
+    "type": "LOGIN",
+    "user": "palvim",
+    "message": "LOGIN palvim (administrator)",
+    "ipEnc": "v1.g-L10_3JtXuFAwbk.zDvaYrlo1ZKBU146MVJirQ.C-BCA9Ek1F4f",
+    "meta": {}
+  },
+  {
+    "_id": {
+      "$oid": "6ac3021a789e8cc77ce06b87"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:14.044Z"
+    },
+    "type": "LOGIN",
+    "user": "mchang",
+    "message": "LOGIN mchang (user)",
+    "ipEnc": "v1.6tEyusCHEDf-2Lel.Z5ZZv45K8RpUG2fXi6mPjA.jczXQjnmRzSe",
+    "meta": {}
+  },
+  {
+    "_id": {
+      "$oid": "6ac3021a789e8cc77ce06b88"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:14.513Z"
+    },
+    "type": "ORDER",
+    "user": "aturner",
+    "message": "ORDER INV-1007 by aturner: 1 line(s), $69.00, Visa",
+    "ipEnc": "v1.ldEQU0bpVs2nHc0k.ExV3Ofo3rA9AzUiA5aqMkw.knAm3MG6Pd2Z",
+    "meta": {}
+  },
+  {
+    "_id": {
+      "$oid": "6ac3021a789e8cc77ce06b8a"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:14.526Z"
+    },
+    "type": "REVIEW",
+    "user": "aturner",
+    "message": "REVIEW LPA-005 3-star by aturner",
+    "ipEnc": "v1.NUkw1SPwOjCpSOtx.hsBC3zzB7110lc4oWvz0Sw.ojPV7ITN4Ltn",
+    "meta": {
+      "sku": "LPA-005",
+      "reviewId": "6ac3021a789e8cc77ce06b89"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac3021b789e8cc77ce06b8c"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:15.876Z"
+    },
+    "type": "REVIEW_ALERT",
+    "user": "trigger",
+    "message": "REVIEW_ALERT 1-star review of LPA-008 by Logic Peripherals Australia: \"Cable arrived broken\"",
+    "ipEnc": null,
+    "meta": {
+      "sku": "LPA-008",
+      "reviewId": "6ac3021b7eec6b8b5ddc55f5"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac3021b789e8cc77ce06b8d"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:15.998Z"
+    },
+    "type": "REVIEW",
+    "user": "aturner",
+    "message": "REVIEW LPA-005 review 6ac3021a789e8cc77ce06b89 deleted by aturner",
+    "ipEnc": "v1.dC1KykVn64FnP-bC.fCknx18qOJ8vNktrYPyYwg.X_ORDKhKDSAA",
+    "meta": {
+      "sku": "LPA-005",
+      "reviewId": "6ac3021a789e8cc77ce06b89"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac3021c789e8cc77ce06b8e"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:16.121Z"
+    },
+    "type": "REVIEW",
+    "user": "mchang",
+    "message": "REVIEW LPA-002 review 6ac30214eba3d982b16263c9 hidden by mchang",
+    "ipEnc": "v1.Wf7ulBRFJzrYnZtJ.2-W7shYwh01GcIs-8kPSyA.GzznULfNUjV4",
+    "meta": {
+      "sku": "LPA-002",
+      "reviewId": "6ac30214eba3d982b16263c9"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac3021c789e8cc77ce06b8f"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:16.141Z"
+    },
+    "type": "REVIEW",
+    "user": "mchang",
+    "message": "REVIEW LPA-002 review 6ac30214eba3d982b16263c9 published by mchang",
+    "ipEnc": "v1.Uf0tb-4XNLoyZAQH._Ad2DzlROyNJeRWKiTmJJg.OwrMiRu3kE0I",
+    "meta": {
+      "sku": "LPA-002",
+      "reviewId": "6ac30214eba3d982b16263c9"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac3021e789e8cc77ce06b90"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:18.079Z"
+    },
+    "type": "LOGIN",
+    "user": "aturner",
+    "message": "LOGIN aturner (customer)",
+    "ipEnc": "v1.v3AJVb6EmugBvo0W._AUo5LhLS-kYH8TnFhtKtQ.AryKycaCe6JH",
+    "meta": {}
+  },
+  {
+    "_id": {
+      "$oid": "6ac3021e789e8cc77ce06b91"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:18.088Z"
+    },
+    "type": "LOGOUT",
+    "user": "aturner",
+    "message": "LOGOUT aturner",
+    "ipEnc": "v1.pEyFgHK7VojtYluD.pEjIzQ2gxElZJhe4SU0sBA.DzlIxzes_oZs",
+    "meta": {}
+  },
+  {
+    "_id": {
+      "$oid": "6ac3021e789e8cc77ce06b92"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:18.099Z"
+    },
+    "type": "USER",
+    "user": "palvim",
+    "message": "USER aturner updated by palvim",
+    "ipEnc": "v1.lOxZVTXgwsJGVMxm.VMeV2cilWBpICRidndT1yQ.JPO2a3DvFw-n",
+    "meta": {}
+  },
+  {
+    "_id": {
+      "$oid": "6ac3021e789e8cc77ce06b93"
+    },
+    "at": {
+      "$date": "2026-10-05T01:49:18.105Z"
+    },
+    "type": "USER",
+    "user": "palvim",
+    "message": "USER aturner updated by palvim",
+    "ipEnc": "v1.4YEwBCXxdWuQLfJc.epqRZgbfOydHMJ6mfOWGuw.FDhyhCOyDbDs",
+    "meta": {}
+  }
+]

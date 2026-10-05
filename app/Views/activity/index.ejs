@@ -1,0 +1,26 @@
+<%- include('../partials/header') %>
+  <h1>Activity log <span class="subtle">MongoDB</span></h1>
+  <% if (counts.length) { %>
+  <p class="chips" aria-label="Events in the last 7 days"><% counts.forEach(function(c){ %><a class="chip<%= f.type===c.type?' on':'' %>" href="/activity?type=<%= c.type %>"><%= c.type.replace('_',' ').toLowerCase() %> <strong><%= c.n %></strong></a><% }); %><span class="subtle">last 7 days</span></p>
+  <% } %>
+  <form class="shop-filters" method="GET" action="/activity" role="search">
+    <select name="type" aria-label="Event type">
+      <option value="">All events</option>
+      <% types.forEach(function(t){ %><option value="<%= t %>" <%= f.type===t?'selected':'' %>><%= t.replace('_',' ').toLowerCase() %></option><% }); %>
+    </select>
+    <input name="user" value="<%= f.user %>" placeholder="User name" aria-label="User name" maxlength="30" />
+    <label class="inline-label">From<input type="date" name="from" value="<%= f.from %>" /></label>
+    <label class="inline-label">To<input type="date" name="to" value="<%= f.to %>" /></label>
+    <button class="btn ghost" type="submit">Filter</button>
+  </form>
+  <ul class="ledger big activity">
+    <% events.forEach(function(e){ %>
+    <li>
+      <div class="ledger-top"><span class="badge badge-<%= /FAILED|ALERT/.test(e.type) ? 'off' : 'on' %>"><%= e.type.replace('_',' ').toLowerCase() %></span><strong class="ev-user"><%= e.user || '-' %></strong></div>
+      <div class="ev-msg"><%= e.message %></div>
+      <div class="ledger-sub"><%= new Date(e.at).toLocaleString('en-AU', { timeZone: 'Australia/Brisbane', hour12: true }) %><% if (e.ip) { %> &middot; IP <%= e.ip %><% } %></div>
+    </li>
+    <% }); %>
+  </ul>
+  <% if (!events.length) { %><p class="empty-msg">No events match.</p><% } %>
+<%- include('../partials/footer') %>

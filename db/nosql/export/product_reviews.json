@@ -1,0 +1,357 @@
+[
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263c5"
+    },
+    "sku": "LPA-001",
+    "author": {
+      "userId": null,
+      "clientId": "CL-001",
+      "name": "Riverside College Library"
+    },
+    "rating": 5,
+    "title": "Students love it",
+    "comment": "Solid build and the hot-swap switches made repairs easy. We bought one for the help desk.",
+    "tags": [
+      "build quality",
+      "repairable"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 3,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-06T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-06T00:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263c6"
+    },
+    "sku": "LPA-001",
+    "author": {
+      "userId": null,
+      "clientId": "CL-002",
+      "name": "DevWorks Pty Ltd"
+    },
+    "rating": 4,
+    "title": "Great keys, loud office",
+    "comment": "Typing feel is excellent. The blue switches are loud in an open office, so pick quieter ones.",
+    "tags": [
+      "typing feel",
+      "noisy"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 2,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-08T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-08T00:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263c7"
+    },
+    "sku": "LPA-001",
+    "author": {
+      "userId": null,
+      "clientId": "CL-005",
+      "name": "Brisbane Coders Guild"
+    },
+    "rating": 5,
+    "title": "Best value mechanical",
+    "comment": "Compact layout and bright RGB at a fair price. The cable could be longer.",
+    "tags": [
+      "value",
+      "compact"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 0,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-09T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-09T00:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263c8"
+    },
+    "sku": "LPA-002",
+    "author": {
+      "userId": null,
+      "clientId": "CL-002",
+      "name": "DevWorks Pty Ltd"
+    },
+    "rating": 4,
+    "title": "Quiet and comfortable",
+    "comment": "Silent clicks are great for meetings. Battery lasted about five weeks.",
+    "tags": [
+      "quiet",
+      "battery"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 1,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-02T00:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263c9"
+    },
+    "sku": "LPA-002",
+    "author": {
+      "userId": null,
+      "clientId": "CL-003",
+      "name": "Logic Peripherals Australia"
+    },
+    "rating": 3,
+    "title": "Fine for everyday use",
+    "comment": "Does the job, but the scroll wheel feels a bit loose after a month.",
+    "tags": [
+      "scroll wheel"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 0,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-05T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-05T00:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263ca"
+    },
+    "sku": "LPA-005",
+    "author": {
+      "userId": null,
+      "clientId": "CL-003",
+      "name": "Logic Peripherals Australia"
+    },
+    "rating": 5,
+    "title": "Sharp picture for calls",
+    "comment": "Auto-focus is quick and the dual microphones pick up the whole room.",
+    "tags": [
+      "video quality",
+      "microphone"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 4,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-04T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-04T00:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263cb"
+    },
+    "sku": "LPA-006",
+    "author": {
+      "userId": null,
+      "clientId": "CL-003",
+      "name": "Logic Peripherals Australia"
+    },
+    "rating": 4,
+    "title": "Good noise cancelling",
+    "comment": "Blocks most of the office noise. Gets warm after a few hours.",
+    "tags": [
+      "noise cancelling",
+      "comfort"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 0,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-03T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-03T00:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263cc"
+    },
+    "sku": "LPA-007",
+    "author": {
+      "userId": null,
+      "clientId": "CL-004",
+      "name": "Northgate High School"
+    },
+    "rating": 4,
+    "title": "Handy for the finance class",
+    "comment": "Students use it with laptops for spreadsheet work. Keys match the MK-87.",
+    "tags": [
+      "spreadsheets"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 0,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-07T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-07T00:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263cd"
+    },
+    "sku": "LPA-007",
+    "author": {
+      "userId": null,
+      "clientId": "CL-002",
+      "name": "DevWorks Pty Ltd"
+    },
+    "rating": 5,
+    "title": "Perfect add-on",
+    "comment": "Pairs nicely with the MK-87 keyboard. USB-C cable included.",
+    "tags": [
+      "matches keyboard"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 1,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-10T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-10T00:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263ce"
+    },
+    "sku": "LPA-008",
+    "author": {
+      "userId": null,
+      "clientId": "CL-001",
+      "name": "Riverside College Library"
+    },
+    "rating": 2,
+    "title": "One cable failed",
+    "comment": "Four of five work well, but one stopped giving a picture after two weeks.",
+    "tags": [
+      "reliability"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 0,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-05T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-05T00:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263cf"
+    },
+    "sku": "LPA-008",
+    "author": {
+      "userId": null,
+      "clientId": "CL-004",
+      "name": "Northgate High School"
+    },
+    "rating": 4,
+    "title": "Works with our projectors",
+    "comment": "Gives 4K to the classroom projectors with no adapter. Braiding feels tough.",
+    "tags": [
+      "4K",
+      "durable"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 0,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-06T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-06T00:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ac30214eba3d982b16263d0"
+    },
+    "sku": "LPA-008",
+    "author": {
+      "userId": null,
+      "clientId": "CL-002",
+      "name": "DevWorks Pty Ltd"
+    },
+    "rating": 5,
+    "title": "Reliable 4K at 60Hz",
+    "comment": "No flicker on our 4K monitors. Two metres is the right length for desks.",
+    "tags": [
+      "4K"
+    ],
+    "verified": true,
+    "status": "published",
+    "helpful": {
+      "count": 0,
+      "voters": []
+    },
+    "createdAt": {
+      "$date": "2026-08-02T00:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-02T00:00:00Z"
+    }
+  }
+]

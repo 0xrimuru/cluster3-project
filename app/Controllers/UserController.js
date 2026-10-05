@@ -2,7 +2,8 @@
 // Matches the LPA Developer UI Guide: User ID, Username, First/Last name, Group, Status.
 // Reads and writes the lpa_users table through the User model.
 const User = require('../Models/User');
-const Log = require('../Models/ActivityLog');
+const Log = require('../Models/NoSql/ActivityLog');
+const SessionStore = require('../Models/NoSql/SessionStore');
 
 const base = { pageName: 'Users', nav: 'more' };
 const pick = b => ({
@@ -52,6 +53,8 @@ exports.update = async (req, res) => {
   if (u.id === req.user.id && (form.group !== 'administrator' || form.status !== 'active')) errors.push('You cannot remove your own administrator access or deactivate yourself.');
   if (errors.length) { form.id = u.id; delete form.password; return res.status(400).render('users/form', Object.assign({ title: 'Edit user', mode: 'Edit', form, errors, groups: User.GROUPS, label: User.label }, base)); }
   await User.update(u.id, form);
+  // deactivated or new password -> sign that user out everywhere (deleteMany on sessions)
+  if (u.id !== req.user.id && (form.status === 'inactive' || form.password)) await SessionStore.destroyForUser(u.id);
   Log.write(req, `USER ${u.username} updated by ${req.user.username}${form.password ? ' (password changed)' : ''}`);
   res.redirect('/users?saved=' + u.id);
 };
@@ -62,6 +65,7 @@ exports.destroy = async (req, res) => {
   if (!u) return res.status(404).render('error', { title: 'Not found', message: 'User not found.', nav: 'more' });
   if (u.id === req.user.id) return res.redirect('/users?error=' + encodeURIComponent('You cannot delete your own account.'));
   await User.remove(u.id);
+  await SessionStore.destroyForUser(u.id);
   Log.write(req, `USER ${u.username} deleted by ${req.user.username}`);
   res.redirect('/users?deleted=' + u.id);
 };

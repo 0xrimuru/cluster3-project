@@ -12,6 +12,8 @@ const AuthController = require('../app/Controllers/AuthController');
 const MashupController = require('../app/Controllers/MashupController');
 const ShopController = require('../app/Controllers/ShopController');
 const UserController = require('../app/Controllers/UserController');
+const ReviewController = require('../app/Controllers/ReviewController');
+const ActivityController = require('../app/Controllers/ActivityController');
 const { requireRole, STAFF } = require('../app/Middleware/auth');
 
 // Controller actions are async (they wait for MySQL). Express 4 does not catch errors from
@@ -41,6 +43,7 @@ router.get('/help', HomeController.help);
 router.get('/more', HomeController.more);
 router.get('/settings', HomeController.settings);
 router.get('/shop', ShopController.index);
+router.get('/shop/:sku', ReviewController.show);
 
 // Stock (staff view + adjust; administrators add / edit / delete)
 router.get('/stock/ledger', staff, ProductController.ledger);
@@ -80,6 +83,18 @@ router.get('/checkout', customer, ShopController.checkoutForm);
 router.post('/checkout', customer, ShopController.checkout);
 router.get('/orders', customer, ShopController.orders);
 router.get('/orders/:number', customer, ShopController.order);
+
+// Product reviews (MongoDB): customers write / edit / delete their own; anyone signed in can vote;
+// staff moderate; administrators can delete any review
+router.post('/shop/:sku/reviews', customer, ReviewController.create);
+router.put('/reviews/:id', customer, ReviewController.update);
+router.delete('/reviews/:id', requireRole('customer', 'administrator'), ReviewController.destroy);
+router.post('/reviews/:id/helpful', ReviewController.vote);
+router.get('/reviews', staff, ReviewController.index);
+router.put('/reviews/:id/status', staff, ReviewController.setStatus);
+
+// Activity log (MongoDB) - administrators
+router.get('/activity', admin, ActivityController.index);
 
 // Mashups (About / More)
 router.get('/mashups', MashupController.index);

@@ -43,7 +43,6 @@ async function login(who, username, password = PASSWORD) {
 }
 const count = (html, re) => (html.match(re) || []).length;
 const firstLedger = html => { const m = html.match(/<ul class="ledger big">([\s\S]*?)<\/li>/); return m ? m[1].replace(/<[^>]+>/g, ' ').replace(/&middot;/g, '·').replace(/&rarr;/g, '→').replace(/\s+/g, ' ').trim() : ''; };
-const logText = () => { try { return fs.readFileSync(path.join(APP, 'logs', 'lpa.log'), 'utf8'); } catch (e) { return ''; } };
 
 (async () => {
   // ---------- sign-in ----------
@@ -53,7 +52,7 @@ const logText = () => { try { return fs.readFileSync(path.join(APP, 'logs', 'lpa
   let r = await post('anon', '/login', { form: { username: 'palvim', password: '' } });
   rec('UC-02', 'Login rejected with blank password', 'Enter user name, leave password blank, press Login', 'palvim / (blank)', 'Stay on login page with "Please enter a username and password"', `${r.status} -> ${r.loc}`, r.status === 302 && r.loc === '/login?error=1');
 
-  const logBefore = logText().length;
+  const runStart = new Date(Date.now() - 1000); // activity events from this run (MongoDB activity_log)
   r = await post('anon', '/login', { form: { username: 'palvim', password: 'wrong-pass1' } });
   const failCookie = (r.headers.get('set-cookie') || '').includes('lpa_sid=');
   rec('UC-02b', 'Login rejected with wrong password', 'Enter a valid user name with a wrong password', 'palvim / wrong-pass1', 'Not signed in; "Login failed" message; attempt logged', `${r.status} -> ${r.loc}; session cookie set = ${failCookie}`, r.status === 302 && /error=2/.test(r.loc) && !failCookie);
@@ -271,8 +270,9 @@ const logText = () => { try { return fs.readFileSync(path.join(APP, 'logs', 'lpa
   r = await post('admin', '/sales', { json: '{"clientId": "CL-001", bad json', accept: 'application/json' });
   rec('UC-45', 'Errors do not leak internal details', 'Send broken JSON to /sales', '{"clientId": "CL-001", bad json', 'Plain error (400), no stack trace or file paths', `${r.status} ${r.text.slice(0, 60)}; leaks paths = ${/\/root\/|node_modules|at [A-Z]\w+\./.test(r.text)}`, r.status === 400 && !/\/root\/|node_modules|at [A-Z]\w+\./.test(r.text));
 
-  const log = logText().slice(logBefore);
-  rec('UC-46', 'Activity log records key events', 'Read logs/lpa.log after the test run', 'this run', 'Failed login, logins, registration, order and invoice events written', `failed = ${/LOGIN FAILED for user "palvim"/.test(log)}, login = ${/LOGIN palvim/.test(log)}, register = ${/REGISTER srivera/.test(log)}, order = ${/ORDER INV-\d+ by aturner/.test(log)}, invoice = ${/INVOICE INV-\d+ created/.test(log)}`,
+  await new Promise(r => setTimeout(r, 300)); // log writes do not block the response
+  const log = (await get('admin', '/activity?limit=500', J)).json().events.filter(e => new Date(e.at) >= runStart).map(e => e.message).join('\n');
+  rec('UC-46', 'Activity log records key events', 'Read the activity log (MongoDB activity_log, /activity) after the test run', 'this run', 'Failed login, logins, registration, order and invoice events written', `failed = ${/LOGIN FAILED for user "palvim"/.test(log)}, login = ${/LOGIN palvim/.test(log)}, register = ${/REGISTER srivera/.test(log)}, order = ${/ORDER INV-\d+ by aturner/.test(log)}, invoice = ${/INVOICE INV-\d+ created/.test(log)}`,
     /LOGIN FAILED for user "palvim"/.test(log) && /LOGIN palvim/.test(log) && /REGISTER srivera/.test(log) && /ORDER INV-\d+ by aturner/.test(log) && /INVOICE INV-\d+ created/.test(log));
 
   // ---------- browser checks ----------

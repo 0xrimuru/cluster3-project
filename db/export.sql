@@ -1,5 +1,5 @@
 -- LPA eComms database export
--- Exported 2026-10-05T01:27:44.015Z from server 10.11.14-MariaDB-0ubuntu0.24.04.1 by db/export.js
+-- Exported 2026-10-05T01:49:07.614Z from server 10.11.14-MariaDB-0ubuntu0.24.04.1 by db/export.js
 
 CREATE DATABASE IF NOT EXISTS lpa_ecomms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE lpa_ecomms;
@@ -52,9 +52,7 @@ INSERT INTO `lpa_stock` (`lpa_stock_ID`, `lpa_stock_name`, `lpa_stock_brand`, `l
   ('LPA-006', 'Noise-Cancelling Headset HS-90', 'AudioCore', 'Audio', 'Over-ear ANC headset, USB + 3.5mm, boom microphone.', '/images/products/headset.png', 3, 119, 'd'),
   ('LPA-007', 'Mechanical Numpad NP-22', 'Vertex', 'Keyboards', 'Standalone 22-key mechanical number pad, USB-C.', '/images/products/numpad.png', 13, 34, 'a'),
   ('LPA-008', 'USB-C to HDMI Cable 2m', 'NovaLink', 'Cables & Adapters', '2-metre USB-C to HDMI 4K@60Hz cable, braided.', '/images/products/cable.png', 2, 19, 'a'),
-  ('LPA-020', 'Laptop Stand LS-3', 'Orbit', 'Accessories', 'Aluminium laptop stand.', '/images/products/placeholder.png', 12, 39.95, 'x'),
-  ('LPA-031', 'Ergonomic Wrist Rest WR-1', 'Orbit', 'Accessories', '', '/images/products/placeholder.png', 6, 19.95, 'x'),
-  ('LPA-032', 'Ergonomic Wrist Rest WR-1', 'Orbit', 'Accessories', '', '/images/products/placeholder.png', 6, 19.95, 'x');
+  ('LPA-020', 'Laptop Stand LS-3', 'Orbit', 'Accessories', 'Aluminium laptop stand.', '/images/products/placeholder.png', 12, 39.95, 'x');
 
 DROP TABLE IF EXISTS `lpa_users`;
 CREATE TABLE `lpa_users` (
@@ -103,8 +101,8 @@ INSERT INTO `lpa_invoices` (`lpa_inv_no`, `lpa_inv_date`, `lpa_inv_client_ID`, `
   ('INV-1004', '2026-08-01 14:20:00', 'CL-004', 'Northgate High School', '5 Ridge St, Northgate QLD 4013', 45, 'Account', 'a'),
   ('INV-1005', '2026-08-03 15:45:00', 'CL-002', 'DevWorks Pty Ltd', '88 Ann St, Brisbane City QLD 4000', 123, 'Account', 'a'),
   ('INV-1006', '2026-08-04 16:10:00', 'CL-005', 'Brisbane Coders Guild', '40 Grey St, South Brisbane QLD 4101', 89, 'Account', 'a'),
-  ('INV-1007', '2026-10-05 11:27:28', 'CL-001', 'Riverside College Library', '12 River Rd, Indooroopilly QLD 4068', 596, 'Account', 'a'),
-  ('INV-1008', '2026-10-05 11:27:28', 'CL-006', 'Alex Turner', '7 Park Rd, Milton QLD 4064', 68, 'PayPal', 'a');
+  ('INV-1007', '2026-10-05 11:49:04', 'CL-001', 'Riverside College Library', '12 River Rd, Indooroopilly QLD 4068', 596, 'Account', 'a'),
+  ('INV-1008', '2026-10-05 11:49:04', 'CL-006', 'Alex Turner', '7 Park Rd, Milton QLD 4064', 68, 'PayPal', 'a');
 
 DROP TABLE IF EXISTS `lpa_invoice_items`;
 CREATE TABLE `lpa_invoice_items` (
@@ -163,7 +161,7 @@ INSERT INTO `lpa_stock_ledger` (`lpa_ledger_ID`, `lpa_ledger_stock_ID`, `lpa_led
   (2, 'LPA-005', 'U-001', 'add', 'Restocked from primary shipment', 12, 20, '2026-08-05 10:40:00'),
   (3, 'LPA-003', 'U-001', 'remove', 'Damaged / write-off', 2, 0, '2026-08-05 11:15:00'),
   (4, 'LPA-004', 'U-002', 'reconcile', 'Physical inventory count', 5, 4, '2026-08-05 11:54:00'),
-  (5, 'LPA-004', 'U-001', 'remove', 'Sold - INV-1007', 4, 0, '2026-10-05 11:27:28'),
-  (6, 'LPA-007', 'U-003', 'remove', 'Sold - INV-1008', 15, 13, '2026-10-05 11:27:28');
+  (5, 'LPA-004', 'U-001', 'remove', 'Sold - INV-1007', 4, 0, '2026-10-05 11:49:04'),
+  (6, 'LPA-007', 'U-003', 'remove', 'Sold - INV-1008', 15, 13, '2026-10-05 11:49:04');
 
 SET FOREIGN_KEY_CHECKS = 1;

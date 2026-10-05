@@ -6,7 +6,7 @@ const Invoice = require('../Models/Invoice');
 const Client = require('../Models/Client');
 const Product = require('../Models/Product');
 const StockLedger = require('../Models/StockLedger');
-const Log = require('../Models/ActivityLog');
+const Log = require('../Models/NoSql/ActivityLog');
 const { transaction } = require('../../config/database');
 
 const wantsJson = req => (req.get('accept') || '').includes('application/json');
