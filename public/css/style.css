@@ -297,3 +297,7 @@ body.bare{background:#eaece9}
 h1{font-weight:800}
 h2{font-weight:800}
 .q-card strong,.stock-title,.detail-info h1{font-weight:700}
+
+/* Clients table: address as a muted second line so the table fits a phone screen */
+table.data .cell-sub{display:block;font-size:.8rem;color:var(--muted,#5b6660);margin-top:.15rem;line-height:1.3}
+table.data td.nowrap{white-space:nowrap}

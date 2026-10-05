@@ -2,6 +2,7 @@
 // Returns HTML views to the browser and JSON to API clients (Postman).
 const Product = require('../Models/Product');
 const StockLedger = require('../Models/StockLedger');
+const { currentUser } = require('./AuthController');
 
 function wantsJson(req) {
   return req.is('application/json') || (req.get('accept') || '').includes('application/json');
@@ -83,7 +84,7 @@ exports.adjust = (req, res) => {
   if (!product) return res.status(404).render('error', { title: 'Not found', message: 'Stock item not found.', nav: 'stock' });
   const result = Product.adjust(req.params.id, { operation: req.body.operation, quantity: req.body.quantity });
   if (result && (result.delta !== 0 || req.body.operation === 'reconcile')) {
-    StockLedger.record({ sku: product.sku, title: product.title, user: 'Pedro Alvim', operation: req.body.operation, reason: req.body.reason, before: result.before, after: result.after });
+    StockLedger.record({ sku: product.sku, title: product.title, user: currentUser(req), operation: req.body.operation, reason: req.body.reason, before: result.before, after: result.after });
   }
   res.redirect(`/products/${product.id}?adjusted=1`);
 };

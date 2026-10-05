@@ -12,7 +12,8 @@ class StockLedger {
   static all() { return entries.slice().reverse(); } // most recent first
   static forSku(sku) { return entries.filter(e => e.sku === sku).reverse(); }
   static record({ sku, title, user, operation, reason, before, after }) {
-    const e = { id: nextId++, sku, title, user: user || 'Pedro Alvim', operation, reason: reason || '', before, after, at: '' };
+    const at = new Date().toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase();
+    const e = { id: nextId++, sku, title, user: user || 'Unknown user', operation, reason: reason || '', before, after, at };
     entries.push(e);
     return e;
   }

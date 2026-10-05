@@ -7,13 +7,25 @@ exports.loginForm = (req, res) =>
 
 exports.login = (req, res) => {
   if (req.body.username && req.body.password) {
-    res.setHeader('Set-Cookie', 'otb_auth=1; Path=/; HttpOnly; SameSite=Lax');
+    // Remember who signed in, so the stock audit trail records the real user.
+    const user = encodeURIComponent(String(req.body.username).trim().slice(0, 30));
+    res.setHeader('Set-Cookie', [
+      'otb_auth=1; Path=/; HttpOnly; SameSite=Lax',
+      `lpa_user=${user}; Path=/; HttpOnly; SameSite=Lax`,
+    ]);
     return res.redirect('/');
   }
   return res.redirect('/login?error=1');
 };
 
+// Read the signed-in user name from the cookie (used by the audit ledger).
+exports.currentUser = (req) => {
+  const m = (req.headers.cookie || '').split(';').map(c => c.trim()).find(c => c.startsWith('lpa_user='));
+  const name = m ? decodeURIComponent(m.slice('lpa_user='.length)) : '';
+  return name || 'Unknown user';
+};
+
 exports.logout = (req, res) => {
-  res.setHeader('Set-Cookie', 'otb_auth=; Path=/; Max-Age=0');
+  res.setHeader('Set-Cookie', ['otb_auth=; Path=/; Max-Age=0', 'lpa_user=; Path=/; Max-Age=0']);
   res.redirect('/login');
 };

@@ -5,10 +5,10 @@
     <button class="btn ghost" type="submit">Search</button>
   </form>
   <table class="data">
-    <thead><tr><th>Code</th><th>Name</th><th>Phone</th><th>Status</th></tr></thead>
+    <thead><tr><th>Code</th><th>Name &amp; address</th><th>Phone</th><th>Status</th></tr></thead>
     <tbody>
     <% clients.forEach(function(c){ %>
-      <tr><td><%= c.code %></td><td><%= c.firstName %> <%= c.lastName %></td><td><%= c.phone %></td>
+      <tr><td><%= c.code %></td><td><%= c.firstName %> <%= c.lastName %><span class="cell-sub"><%= c.address %></span></td><td class="nowrap"><%= c.phone %></td>
       <td><span class="badge <%= c.status==='disabled'?'badge-off':'badge-on' %>"><%= c.status==='disabled'?'Disabled':'Active' %></span></td></tr>
     <% }); %>
     <% if (clients.length===0){ %><tr><td colspan="4" class="empty-msg">No clients match.</td></tr><% } %>
