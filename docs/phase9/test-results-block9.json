@@ -1,0 +1,461 @@
+[
+  {
+    "id": "UC-01",
+    "title": "Login with user name and password",
+    "steps": "Enter user name and password, press Login",
+    "data": "palvim / Lpa#2026",
+    "expected": "Signed in (HttpOnly session cookie) and taken to Home",
+    "actual": "302 -> /; cookie HttpOnly = true, random token = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-02",
+    "title": "Login rejected with blank password",
+    "steps": "Enter user name, leave password blank, press Login",
+    "data": "palvim / (blank)",
+    "expected": "Stay on login page with \"Please enter a username and password\"",
+    "actual": "302 -> /login?error=1",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-02b",
+    "title": "Login rejected with wrong password",
+    "steps": "Enter a valid user name with a wrong password",
+    "data": "palvim / wrong-pass1",
+    "expected": "Not signed in; \"Login failed\" message; attempt logged",
+    "actual": "302 -> /login?error=2&u=palvim; session cookie set = false",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-03",
+    "title": "Protected page requires sign-in",
+    "steps": "Open /products without signing in",
+    "data": "none",
+    "expected": "Redirect (302) to /login",
+    "actual": "302 -> /login",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-04",
+    "title": "Password is masked",
+    "steps": "Open login page, inspect password field",
+    "data": "type \"secret\"",
+    "expected": "Characters hidden (input type = password)",
+    "actual": "input type = \"password\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-05",
+    "title": "Home page shows business summary + promo video",
+    "steps": "Sign in as staff/admin, open Home",
+    "data": "seed data",
+    "expected": "8 items, 3 low, 1 out, 6 invoices, $803.50 total sales; video present",
+    "actual": "8 / 3 / 1 / 6 / $803.50 shown; promo video embedded",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-06",
+    "title": "Stock list shows all items with key fields",
+    "steps": "Open Stock",
+    "data": "seed data (8 items)",
+    "expected": "All 8 items listed with SKU, name, price, qty and status badge",
+    "actual": "8 of 8 SKUs; In/Low/Out badges = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-07",
+    "title": "Search stock",
+    "steps": "Type \"webcam\" in search, press Search",
+    "data": "q = webcam",
+    "expected": "Only 1080p HD Webcam CV-10 (LPA-005) shown",
+    "actual": "1 result(s): LPA-005",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-08",
+    "title": "Add a new stock item (administrator)",
+    "steps": "Stock > Add item, fill the form, Save",
+    "data": "LPA-009 Wireless Presenter WP-5, $29.90, qty 10",
+    "expected": "Item saved and its detail page shown",
+    "actual": "302 -> /products/LPA-009; detail shows item = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-09a",
+    "title": "Invalid stock item rejected by the server",
+    "steps": "Submit with no name; then with an existing Stock ID",
+    "data": "title = \"\"; SKU = lpa-001",
+    "expected": "Not saved (400) with a clear message each time",
+    "actual": "empty name 400 \"true\"; duplicate ID 400 \"true\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-09b",
+    "title": "Add form validates before sending (client)",
+    "steps": "Open Add item, press Save with empty fields",
+    "data": "all fields empty",
+    "expected": "Form not submitted; browser shows \"fill out this field\"",
+    "actual": "stayed on form = true; message = \"Please fill out this field.\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-10",
+    "title": "Edit a stock item and save",
+    "steps": "Open item > Edit, change price, Save",
+    "data": "price 29.90 -> 24.90",
+    "expected": "New price saved",
+    "actual": "price now 24.9",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-11",
+    "title": "Disable a stock item",
+    "steps": "Edit item, set status Disabled, Save",
+    "data": "status = disabled",
+    "expected": "Item status is disabled (and it leaves the shop)",
+    "actual": "status now \"disabled\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-12",
+    "title": "Stock adjustment - add (staff)",
+    "steps": "Signed in as staff: item WM-200 > Add stock 5, reason \"Restocked\", Submit",
+    "data": "qty 7 + 5",
+    "expected": "On hand becomes 12; newest audit entry is this adjustment",
+    "actual": "on hand 12; newest entry = \"Wireless Optical Mouse WM-200 LPA-002 +5 add · 7 → 12 units · Restocke...\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-13",
+    "title": "Stock can never go negative",
+    "steps": "Item LPA-008 (on hand 2) > Remove 50",
+    "data": "qty 2 - 50",
+    "expected": "On hand stops at 0 (not -48)",
+    "actual": "on hand 0",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-14",
+    "title": "Stock reconcile to a counted total",
+    "steps": "Item LPA-008 > Reconcile to 10",
+    "data": "counted = 10",
+    "expected": "On hand set to exactly 10",
+    "actual": "on hand 10",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-15",
+    "title": "Delete a stock item (administrator)",
+    "steps": "Open LPA-009 > Delete > confirm",
+    "data": "item id LPA-009",
+    "expected": "Item hidden from stock (soft delete, history kept); opening it returns 404",
+    "actual": "delete 302 -> /products; reopen = 404; still listed = false",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-16",
+    "title": "Sales & Invoicing lists invoices with total",
+    "steps": "Open Sales",
+    "data": "seed data (6 invoices)",
+    "expected": "6 invoices with Date, Client, Amount; Total $803.50",
+    "actual": "6 invoices; total $803.50 = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-17",
+    "title": "Search invoices (client, date)",
+    "steps": "Search \"DevWorks\"; then search \"2026-08-01\"",
+    "data": "q = DevWorks; q = 2026-08-01",
+    "expected": "DevWorks: 2 invoices, total $220.00; date: 1 invoice (INV-1004)",
+    "actual": "DevWorks 2 / $220.00 = true; date 1",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-18",
+    "title": "Client records with address; search",
+    "steps": "Open Clients; search \"Northgate\"",
+    "data": "q = Northgate",
+    "expected": "Address shown; 1 client (CL-004) found",
+    "actual": "address shown = true; results = 1",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-19",
+    "title": "Every invoice points to an existing client",
+    "steps": "Check each invoice clientId against the client list",
+    "data": "6 invoices",
+    "expected": "0 invoices without a valid client",
+    "actual": "0 orphan invoice(s)",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-20",
+    "title": "Stock available as JSON (API)",
+    "steps": "GET /products with Accept: application/json",
+    "data": "Accept: application/json",
+    "expected": "JSON array of stock items",
+    "actual": "status 200; 8 items",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-21",
+    "title": "Logout ends the session",
+    "steps": "Press Logout, then try to open Stock",
+    "data": "none",
+    "expected": "Sent back to the login page",
+    "actual": "landed on /login",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-22",
+    "title": "Theme preference is remembered",
+    "steps": "Settings > choose Dark, then open Home",
+    "data": "theme = dark",
+    "expected": "Home opens in dark theme",
+    "actual": "data-theme = \"dark\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-23",
+    "title": "Mashup pages and About LPA open",
+    "steps": "Open More > About LPA, Store locator, Pricing",
+    "data": "none",
+    "expected": "All load (200); About shows LPA mission",
+    "actual": "store-locator 200, pricing 200, about 200, mission = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-24",
+    "title": "Home page response time",
+    "steps": "Request Home 5 times, average the time",
+    "data": "5 requests",
+    "expected": "Average under 500 ms",
+    "actual": "average 6 ms (max 7 ms)",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-25",
+    "title": "Audit history records who and when",
+    "steps": "After UC-12, open Stock > Audit history",
+    "data": "signed in as mchang (Michael Chang)",
+    "expected": "Newest entry shows the signed-in user and a time",
+    "actual": "user shown = true; time shown = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-26",
+    "title": "Mobile app opens the LPA interface",
+    "steps": "Install APK on Pixel 7 emulator, open LPA eComms",
+    "data": "emulator API 34, server on :3000",
+    "expected": "Splash screen for ~2 s, then login page inside the app",
+    "actual": "Static check passed (APK launch activity = SplashActivity; INTERNET permission). On-device run to be recorded.",
+    "result": "PENDING"
+  },
+  {
+    "id": "UC-27",
+    "title": "Invoices have line items that add up",
+    "steps": "For each invoice compare the amount with the sum of its line items",
+    "data": "6 invoices",
+    "expected": "Every invoice has >= 1 item and amount = sum of (qty x price)",
+    "actual": "0 invoice(s) wrong; 13 line items checked",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-28",
+    "title": "Pages limited by user group",
+    "steps": "Open admin pages as staff, staff pages as a customer",
+    "data": "staff /users; staff /products/new; staff /sales/new; cust /products; cust /sales; cust /clients; cust /api/stock/LPA-001; admin /cart",
+    "expected": "All refused with 403; staff can still view stock",
+    "actual": "staff /users 403; staff /products/new 403; staff /sales/new 403; cust /products 403; cust /sales 403; cust /clients 403; cust /api/stock/LPA-001 403; admin /cart 403; staff /products 200",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-29",
+    "title": "Personalised header and menus by user group",
+    "steps": "Sign in as admin, staff and customer; look at header and menus",
+    "data": "palvim / mchang / aturner",
+    "expected": "Welcome + name + group; customers get Shop/Cart/Orders; Users only for admins",
+    "actual": "admin welcome = true; staff More has Users = false; customer nav = true; customer welcome = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-30",
+    "title": "Customer registration",
+    "steps": "Login page > Create an account; fill in details; Register; then sign in",
+    "data": "Sam Rivera / srivera / Shop2026x",
+    "expected": "Account + client record created; customer can sign in and lands in the shop",
+    "actual": "register 302 -> /login?registered=1&u=srivera; client CL-007; login -> /shop",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-31",
+    "title": "Registration rejects bad input",
+    "steps": "Register with a taken user name, short password and mismatched confirmation",
+    "data": "aturner / \"short\" / \"other\"",
+    "expected": "Not saved (400) with a message for each problem",
+    "actual": "400; taken = true, length = true, match = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-32",
+    "title": "Shop lists active items, sortable by price",
+    "steps": "Shop > sort \"Price: low to high\"",
+    "data": "sort = price-asc",
+    "expected": "Only active items (no disabled headset); prices in ascending order",
+    "actual": "7 items; headset shown = false; ascending = true (19, 34, 39.5, 69, 89, 149, 429)",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-33",
+    "title": "Cart quantity limited to stock on hand",
+    "steps": "Add 5 of the dock (4 on hand); add 2; add the out-of-stock monitor",
+    "data": "LPA-004 x5, x2; LPA-003 x1",
+    "expected": "5 refused; 2 accepted; monitor refused (out of stock)",
+    "actual": "x5 409 \"Only 4 in stock (you already have 0 in your cart).\"; x2 200 (cart 2); monitor 409",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-34",
+    "title": "Price shown and confirmed before adding to cart",
+    "steps": "Shop > Add to cart on the numpad; Cancel; then Add to cart again and confirm",
+    "data": "LPA-007 x1",
+    "expected": "Dialog shows quantity, price and total; Cancel adds nothing; confirm adds it (badge 1)",
+    "actual": "dialog: \"Add to cart?1 × Mechanical Numpad NP-22 at $34.00 each = $34.00 (incl. GST).Add \"; after cancel badge 0; after confirm badge 1",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-35",
+    "title": "Cart totals recalculated on the server",
+    "steps": "Cart: change webcam qty to 3; then set dock qty to 99",
+    "data": "LPA-005 qty 3; LPA-004 qty 99",
+    "expected": "Total = 2 x $149 + 3 x $69 = $505.00, GST $45.91; qty 99 refused",
+    "actual": "total $505 GST $45.91; qty 99 -> 400",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-36",
+    "title": "Checkout needs a payment option",
+    "steps": "Checkout without choosing a payment option",
+    "data": "payment = (none)",
+    "expected": "Order not placed (400): \"Choose a payment option\"",
+    "actual": "400; message = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-37",
+    "title": "Place an order",
+    "steps": "Checkout > choose Visa > Place order > confirm",
+    "data": "cart: 2 x LPA-004, 3 x LPA-005",
+    "expected": "Invoice for CL-006 ($505.00), stock reduced, audit entry \"Sold\", cart emptied, shown in My orders",
+    "actual": "302 -> /orders/INV-1007?placed=1; INV-1007 CL-006 $505.00; dock 4 -> 2; cart empty = true; in My orders = true; audit \"Sold - INV-1007\"",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-38",
+    "title": "Customers see only their own orders",
+    "steps": "Open someone else's order as a customer",
+    "data": "aturner -> INV-1001; srivera -> INV-1007",
+    "expected": "Not found (404) both times",
+    "actual": "aturner/INV-1001 404; srivera/INV-1007 404",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-39",
+    "title": "New invoice (administrator)",
+    "steps": "Sales > Add: search client CL-004, add LPA-002 x2 and LPA-007 x1, Save",
+    "data": "sent a fake price of $0.01 for LPA-002",
+    "expected": "Invoice saved with catalogue prices ($39.50 x2 + $34.00 = $113.00); stock reduced",
+    "actual": "lookups: Northgate High School / Wireless Optical Mouse WM-200; 201 INV-1008 $113.00; mouse 12 -> 10",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-40",
+    "title": "New invoice rejects bad input",
+    "steps": "Save an invoice for disabled client CL-005 with 500 cables",
+    "data": "CL-005; LPA-008 x500",
+    "expected": "Refused (400): client disabled; not enough stock",
+    "actual": "400; Client CL-005 is disabled. | Only 10 of USB-C to HDMI Cable 2m on hand (asked for 500).",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-41",
+    "title": "Delete an invoice returns its stock",
+    "steps": "Open INV-1008 > Delete > confirm",
+    "data": "INV-1008",
+    "expected": "Invoice removed (404); 2 mice back in stock",
+    "actual": "302 -> /sales?deleted=INV-1008; reopen 404; mouse 10 -> 12",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-42",
+    "title": "Users management (administrator)",
+    "steps": "Users > Add staff user; sign in; set Inactive; Delete; try to delete own account",
+    "data": "kpatel / Staff2026x",
+    "expected": "Added user can sign in; inactive user cannot; deleted user leaves the list; own account cannot be deleted",
+    "actual": "add 302; login active -> /; login inactive -> /login?error=2&u=kpatel; listed after delete = false; self-delete -> /users?error=You cannot delete your own account.",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-43",
+    "title": "Passwords are stored as salted hashes",
+    "steps": "SELECT lpa_user_password FROM lpa_users",
+    "data": "4 users",
+    "expected": "Every password is a scrypt hash with its own salt; no plain text",
+    "actual": "0 plain/invalid; salts unique = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-44",
+    "title": "Help guide for each user group",
+    "steps": "Open More > Help as admin, staff and customer",
+    "data": "3 roles",
+    "expected": "Help explains each menu; your own group is highlighted",
+    "actual": "admin 200, staff 200, cust 200; highlight = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-45",
+    "title": "Errors do not leak internal details",
+    "steps": "Send broken JSON to /sales",
+    "data": "{\"clientId\": \"CL-001\", bad json",
+    "expected": "Plain error (400), no stack trace or file paths",
+    "actual": "400 {\"error\":\"Bad request\"}; leaks paths = false",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-46",
+    "title": "Activity log records key events",
+    "steps": "Read the activity log (MongoDB activity_log, /activity) after the test run",
+    "data": "this run",
+    "expected": "Failed login, logins, registration, order and invoice events written",
+    "actual": "failed = true, login = true, register = true, order = true, invoice = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-47",
+    "title": "Forged requests refused (CSRF)",
+    "steps": "Send a POST without the page's CSRF token (as a forged cross-site request would)",
+    "data": "admin add item; customer add to cart",
+    "expected": "Both refused with 403; nothing changed",
+    "actual": "add item 403; add to cart 403",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-48",
+    "title": "Security headers on every page",
+    "steps": "Read the response headers of Home",
+    "data": "GET /",
+    "expected": "CSP (own scripts + nonce, no framing), nosniff, X-Frame-Options DENY, no X-Powered-By",
+    "actual": "CSP = yes; nosniff = nosniff; frame = DENY; powered-by = hidden",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-49",
+    "title": "Typed HTML/script is shown as text (XSS)",
+    "steps": "Add a stock item whose name contains a <script> tag; open the stock list",
+    "data": "title = <script>alert(1)</script>Test",
+    "expected": "Shown as harmless text (escaped), never run",
+    "actual": "escaped in page = true",
+    "result": "PASS"
+  }
+]

@@ -495,3 +495,14 @@ form.inline{display:inline;margin:0}
 .review-meta>span+span::before,.review-meta>.badge+span::before{content:"\00B7";margin-right:.3rem;color:var(--muted)}
 .activity .ev-user{text-transform:none}
 .product-card .product-title a{text-decoration:none}
+
+/* ---- Block 9: security page ---- */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.policy td.c,table.policy th.c{text-align:center;width:3.4rem;padding-left:.3rem;padding-right:.3rem}
+table.policy td.yes{color:var(--ok);font-weight:700}
+table.policy td.no{color:var(--muted)}
+table.policy code{font-size:.82rem}
+.check-list{list-style:none;margin:.4rem 0;padding:0;display:flex;flex-direction:column;gap:.3rem;font-size:.9rem}
+.check-list li::before{content:"\2713";display:inline-block;width:1.3rem;color:var(--ok);font-weight:700}
+.check-list li.bad::before{content:"\2717";color:var(--danger)}
+.mono-list{list-style:none;margin:.2rem 0 .6rem;padding:0;font-size:.78rem;overflow-wrap:anywhere}

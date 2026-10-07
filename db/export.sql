@@ -1,5 +1,5 @@
 -- LPA eComms database export
--- Exported 2026-10-05T01:49:07.614Z from server 10.11.14-MariaDB-0ubuntu0.24.04.1 by db/export.js
+-- Exported 2026-10-07T04:19:43.612Z from server 10.11.14-MariaDB-0ubuntu0.24.04.1 by db/export.js
 
 CREATE DATABASE IF NOT EXISTS lpa_ecomms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE lpa_ecomms;
@@ -11,19 +11,21 @@ CREATE TABLE `lpa_clients` (
   `lpa_client_firstname` varchar(50) NOT NULL,
   `lpa_client_lastname` varchar(50) NOT NULL,
   `lpa_client_address` varchar(250) NOT NULL,
-  `lpa_client_phone` varchar(30) NOT NULL,
+  `lpa_client_phone` varchar(160) NOT NULL,
+  `lpa_client_phone_idx` char(64) DEFAULT NULL,
   `lpa_client_status` char(1) NOT NULL DEFAULT 'a',
   PRIMARY KEY (`lpa_client_ID`),
+  KEY `ix_client_phone_idx` (`lpa_client_phone_idx`),
   CONSTRAINT `ck_client_status` CHECK (`lpa_client_status` in ('a','d'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `lpa_clients` (`lpa_client_ID`, `lpa_client_firstname`, `lpa_client_lastname`, `lpa_client_address`, `lpa_client_phone`, `lpa_client_status`) VALUES
-  ('CL-001', 'Riverside College', 'Library', '12 River Rd, Indooroopilly QLD 4068', '(07) 3100 2200', 'a'),
-  ('CL-002', 'DevWorks', 'Pty Ltd', '88 Ann St, Brisbane City QLD 4000', '(07) 3211 4545', 'a'),
-  ('CL-003', 'Logic Peripherals', 'Australia', '123 Queen St, Brisbane City QLD 4000', '(07) 3000 1234', 'a'),
-  ('CL-004', 'Northgate', 'High School', '5 Ridge St, Northgate QLD 4013', '(07) 3266 7788', 'a'),
-  ('CL-005', 'Brisbane Coders', 'Guild', '40 Grey St, South Brisbane QLD 4101', '(07) 3400 9911', 'd'),
-  ('CL-006', 'Alex', 'Turner', '7 Park Rd, Milton QLD 4064', '0412 345 678', 'a');
+INSERT INTO `lpa_clients` (`lpa_client_ID`, `lpa_client_firstname`, `lpa_client_lastname`, `lpa_client_address`, `lpa_client_phone`, `lpa_client_phone_idx`, `lpa_client_status`) VALUES
+  ('CL-001', 'Riverside College', 'Library', '12 River Rd, Indooroopilly QLD 4068', 'v1.VMeRTTcZliTkaVaZ.SWd-E5woauqO9UpIjcW56A.z44RGdKVGEivFepFjfE', '7061954e6ee95907680b86c471a99ef8bb5bc62394223aaf38b8985e3e02100a', 'a'),
+  ('CL-002', 'DevWorks', 'Pty Ltd', '88 Ann St, Brisbane City QLD 4000', 'v1.9X53poWQod92EtGa.4AJ3FGswfQUeVQdHtkcfdw.oGB4LQcFJyiEixdJEyg', '04b39dca7f6c368df8737dc1fad16d8de9ea51d6dd7d3682582471bdc476779c', 'a'),
+  ('CL-003', 'Logic Peripherals', 'Australia', '123 Queen St, Brisbane City QLD 4000', 'v1.oBN9hPpZx0cgUN-X.z58L4NEjwG0H7kna-VUKHA.soIkeo9KOmu48273LX0', '98ac99e327197c8837bf12f108056d564698dc28de1ad35c4da94fccc60b69d6', 'a'),
+  ('CL-004', 'Northgate', 'High School', '5 Ridge St, Northgate QLD 4013', 'v1.8ZagR82kFMWKW598.nNaV-dJnlRjNLr7POvncXA.cjdad4_ZHcMlGe9-JoU', '922a8ed7e7d05da7a2f7ae02ccef50ff99ab8c00b28f0b717e815a9ce1467179', 'a'),
+  ('CL-005', 'Brisbane Coders', 'Guild', '40 Grey St, South Brisbane QLD 4101', 'v1.D3uQnCXEpMLJh22A.8ce2f2EAVe5C0EScEBa2IQ.TEIZPoCp1CdCxASyflQ', '2057b9b88af3f464e819826134c79b180d96ce1bcbb23633bcdc585c5962c1f2', 'd'),
+  ('CL-006', 'Alex', 'Turner', '7 Park Rd, Milton QLD 4064', 'v1.6AtFa3Zv1MgM7b16.dzMN0dKsqDp6EPU5NZ16_w.KpNdsa3UfNpaTXBX', '445c995c252abed06bc90980d672bccada53415e3b9595390dedb42b16d80043', 'a');
 
 DROP TABLE IF EXISTS `lpa_stock`;
 CREATE TABLE `lpa_stock` (
@@ -101,8 +103,8 @@ INSERT INTO `lpa_invoices` (`lpa_inv_no`, `lpa_inv_date`, `lpa_inv_client_ID`, `
   ('INV-1004', '2026-08-01 14:20:00', 'CL-004', 'Northgate High School', '5 Ridge St, Northgate QLD 4013', 45, 'Account', 'a'),
   ('INV-1005', '2026-08-03 15:45:00', 'CL-002', 'DevWorks Pty Ltd', '88 Ann St, Brisbane City QLD 4000', 123, 'Account', 'a'),
   ('INV-1006', '2026-08-04 16:10:00', 'CL-005', 'Brisbane Coders Guild', '40 Grey St, South Brisbane QLD 4101', 89, 'Account', 'a'),
-  ('INV-1007', '2026-10-05 11:49:04', 'CL-001', 'Riverside College Library', '12 River Rd, Indooroopilly QLD 4068', 596, 'Account', 'a'),
-  ('INV-1008', '2026-10-05 11:49:04', 'CL-006', 'Alex Turner', '7 Park Rd, Milton QLD 4064', 68, 'PayPal', 'a');
+  ('INV-1007', '2026-10-07 14:19:40', 'CL-003', 'Logic Peripherals Australia', '123 Queen St, Brisbane City QLD 4000', 596, 'Account', 'a'),
+  ('INV-1008', '2026-10-07 14:19:40', 'CL-006', 'Alex Turner', '7 Park Rd, Milton QLD 4064', 68, 'PayPal', 'a');
 
 DROP TABLE IF EXISTS `lpa_invoice_items`;
 CREATE TABLE `lpa_invoice_items` (
@@ -161,7 +163,7 @@ INSERT INTO `lpa_stock_ledger` (`lpa_ledger_ID`, `lpa_ledger_stock_ID`, `lpa_led
   (2, 'LPA-005', 'U-001', 'add', 'Restocked from primary shipment', 12, 20, '2026-08-05 10:40:00'),
   (3, 'LPA-003', 'U-001', 'remove', 'Damaged / write-off', 2, 0, '2026-08-05 11:15:00'),
   (4, 'LPA-004', 'U-002', 'reconcile', 'Physical inventory count', 5, 4, '2026-08-05 11:54:00'),
-  (5, 'LPA-004', 'U-001', 'remove', 'Sold - INV-1007', 4, 0, '2026-10-05 11:49:04'),
-  (6, 'LPA-007', 'U-003', 'remove', 'Sold - INV-1008', 15, 13, '2026-10-05 11:49:04');
+  (5, 'LPA-004', 'U-001', 'remove', 'Sold - INV-1007', 4, 0, '2026-10-07 14:19:40'),
+  (6, 'LPA-007', 'U-003', 'remove', 'Sold - INV-1008', 15, 13, '2026-10-07 14:19:40');
 
 SET FOREIGN_KEY_CHECKS = 1;

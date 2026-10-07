@@ -15,6 +15,10 @@
 --   7.4 Status codes documented: a = active, d = disabled / inactive,
 --       x = deleted (soft delete - kept for invoices and the audit trail).
 --   7.5 Indexes for the searches the pages run (name, category, username).
+-- Change made in ICTPRG537 (application security):
+--   9.1 lpa_client_phone holds the phone number ENCRYPTED (AES-256-GCM, widened to 160)
+--       + lpa_client_phone_idx: HMAC-SHA256 blind index so staff can still find a client
+--       by exact phone number. db/setup.js encrypts the seed phones after loading them.
 -- =====================================================================
 
 CREATE DATABASE IF NOT EXISTS lpa_ecomms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -29,9 +33,11 @@ CREATE TABLE lpa_clients (
   lpa_client_firstname VARCHAR(50)  NOT NULL,
   lpa_client_lastname  VARCHAR(50)  NOT NULL,
   lpa_client_address   VARCHAR(250) NOT NULL,
-  lpa_client_phone     VARCHAR(30)  NOT NULL,
+  lpa_client_phone     VARCHAR(160) NOT NULL,                -- 9.1 encrypted: v1.<iv>.<tag>.<ciphertext>
+  lpa_client_phone_idx CHAR(64)     NULL,                    -- 9.1 blind index (HMAC-SHA256 of the digits)
   lpa_client_status    CHAR(1)      NOT NULL DEFAULT 'a',   -- a = active, d = disabled
   PRIMARY KEY (lpa_client_ID),
+  KEY ix_client_phone_idx (lpa_client_phone_idx),
   CONSTRAINT ck_client_status CHECK (lpa_client_status IN ('a','d'))
 ) ENGINE=InnoDB;
 

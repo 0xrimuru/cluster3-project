@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  LPA eComms - network security (ICTPRG537).
+  - Plain HTTP is BLOCKED everywhere by default: data must travel over HTTPS (TLS).
+  - Exception: the development computer only (10.0.2.2 = the PC seen from the Android
+    emulator, and localhost), so the app can be tested against `npm start` on the PC.
+  - Only the phone's built-in (system) certificate authorities are trusted. In debug builds
+    certificates the tester installs on the phone are also trusted, so the self-signed
+    development certificate (npm run security:cert) can be used for HTTPS testing.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
+
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>

@@ -1,0 +1,55 @@
+<%- include('../partials/header') %>
+  <h1>Security <span class="subtle">policy &amp; status</span></h1>
+
+  <section class="card pad">
+    <h2>Access policy <span class="subtle">v<%= matrix.version %> &middot; <%= matrix.updated %> &middot; deny by default</span></h2>
+    <p class="subtle">From <code>config/security-policy.json</code>. Every page and action asks for one of these permissions.</p>
+    <div class="table-wrap"><table class="data policy">
+      <thead><tr><th>Permission</th><% matrix.groups.forEach(function(g){ %><th class="c" title="<%= matrix.roles[g] %>"><%= { administrator: 'Admin', user: 'Staff', customer: 'Cust.' }[g] || g %></th><% }); %></tr></thead>
+      <tbody><% matrix.rows.forEach(function(r){ %><tr><td><code><%= r.name %></code><div class="cell-sub"><%= r.description %></div></td>
+        <% r.allowed.forEach(function(a){ %><td class="c <%= a ? 'yes' : 'no' %>" aria-label="<%= a ? 'allowed' : 'denied' %>"><%= a ? '✓' : '–' %></td><% }); %></tr><% }); %></tbody>
+    </table></div>
+  </section>
+
+  <section class="card pad">
+    <h2>Code-access security</h2>
+    <% if (status.sandbox.enabled) { %>
+      <p><span class="badge <%= status.sandbox.ok ? 'badge-on' : 'badge-off' %>"><%= status.sandbox.ok ? 'ON - policy enforced' : 'ON - check the rules' %></span> Running under Node's permission model (<code>npm run start:secure</code>).</p>
+      <ul class="check-list"><% status.sandbox.checks.forEach(function(c){ %><li class="<%= c.allowed === c.expect ? 'ok' : 'bad' %>"><%= c.what %>: <strong><%= c.allowed ? 'allowed' : 'denied' %></strong></li><% }); %></ul>
+    <% } else { %>
+      <p><span class="badge badge-off">OFF</span> Started with <code>npm start</code>. Use <code>npm run start:secure</code> to limit what the code can read, write and run.</p>
+    <% } %>
+  </section>
+
+  <section class="card pad">
+    <h2>Sign-in protection</h2>
+    <ul class="check-list">
+      <li class="ok">Passwords: 8+ characters, a letter and a number, not a common password, not the user name</li>
+      <li class="ok">Lockout: <%= status.lockout.maxPerUser %> failed sign-ins per user name or <%= status.lockout.maxPerIp %> per address in <%= status.lockout.minutes %> minutes</li>
+      <li class="ok">Sessions: random 256-bit token, HttpOnly + SameSite cookie<%= status.https ? ' + Secure' : '' %>, ends after 2 h idle / 12 h</li>
+      <li class="ok">CSRF token on every form and request that changes data</li>
+    </ul>
+  </section>
+
+  <section class="card pad">
+    <h2>Encryption</h2>
+    <table class="data"><tbody><% status.encryption.forEach(function(e){ %><tr><td><%= e.what %></td><td><%= e.how %></td></tr><% }); %></tbody></table>
+  </section>
+
+  <section class="card pad">
+    <h2>Database accounts <span class="subtle">least privilege</span></h2>
+    <% if (status.mysql.error) { %><p class="flash warn">MySQL: <%= status.mysql.error %></p><% } else { %>
+    <p>MySQL: <strong><%= status.mysql.who %></strong></p><ul class="mono-list"><% status.mysql.grants.forEach(function(g){ %><li><code><%= g %></code></li><% }); %></ul><% } %>
+    <% if (status.mongo.error) { %><p class="flash warn">MongoDB: <%= status.mongo.error %></p><% } else { %>
+    <p>MongoDB: <strong><%= status.mongo.who %></strong> on <%= status.mongo.db %> &middot; TLS <%= status.mongo.tls ? 'on' : 'off' %> &middot; replica set <%= status.mongo.replicaSet || 'none' %></p><% } %>
+  </section>
+
+  <section class="card pad">
+    <h2>Recent security events</h2>
+    <ul class="ledger big activity"><% events.forEach(function(e){ %>
+      <li><div class="ledger-top"><span class="badge badge-<%= /FAILED|LOCKED|DENIED/.test(e.type) ? 'off' : 'on' %>"><%= e.type.replace('_',' ').toLowerCase() %></span><strong class="ev-user"><%= e.user || '-' %></strong></div>
+      <div class="ev-msg"><%= e.message %></div><div class="ledger-sub"><%= new Date(e.at).toLocaleString('en-AU', { timeZone: 'Australia/Brisbane', hour12: true }) %></div></li><% }); %></ul>
+    <% if (!events.length) { %><p class="empty-msg">No security events.</p><% } %>
+    <p><a href="/activity">Open the full activity log</a></p>
+  </section>
+<%- include('../partials/footer') %>

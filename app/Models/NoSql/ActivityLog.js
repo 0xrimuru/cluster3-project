@@ -9,16 +9,19 @@ const path = require('path');
 const { col, C } = require('../../../config/nosql');
 const { encrypt, decrypt } = require('../../Security/crypto');
 
-const TYPES = ['LOGIN', 'LOGIN_FAILED', 'LOGOUT', 'REGISTER', 'ORDER', 'INVOICE', 'USER', 'REVIEW', 'REVIEW_ALERT', 'STOCK', 'OTHER'];
+const TYPES = ['LOGIN', 'LOGIN_FAILED', 'LOGIN_LOCKED', 'LOGOUT', 'REGISTER', 'PASSWORD', 'ACCESS_DENIED', 'SECURITY', 'ORDER', 'INVOICE', 'USER', 'REVIEW', 'REVIEW_ALERT', 'STOCK', 'OTHER'];
 const DIR = path.join(__dirname, '..', '..', '..', 'logs');
 const FILE = path.join(DIR, 'lpa.log');
 const events = () => col(C.activity, { writeConcern: { w: 1 } });
 
 function typeOf(message) {
   if (/^LOGIN FAILED/.test(message)) return 'LOGIN_FAILED';
+  if (/^LOGIN LOCKED/.test(message)) return 'LOGIN_LOCKED';
   const first = String(message).split(/\s/)[0];
   return TYPES.includes(first) ? first : 'OTHER';
 }
+// Log injection: a user name like "x\nLOGIN palvim" must not be able to fake a second log line.
+const oneLine = v => (v === null || v === undefined ? v : String(v).replace(/[\r\n\t\u0000-\u001f\u007f\u2028\u2029]+/g, ' '));
 const ipOf = req => (req && (req.ip || (req.socket && req.socket.remoteAddress))) || '';
 
 function toFile(line) {
@@ -32,8 +35,8 @@ function write(req, message, meta = {}) {
   const doc = {
     at: new Date(),
     type: meta.type || typeOf(message),
-    user: (req && req.user && req.user.username) || meta.user || null,
-    message: String(message).slice(0, 500),
+    user: oneLine((req && req.user && req.user.username) || meta.user || null),
+    message: oneLine(message).slice(0, 500),
     ipEnc,
     meta: Object.assign({}, meta, { type: undefined, user: undefined }),
   };
@@ -44,9 +47,10 @@ function write(req, message, meta = {}) {
 }
 
 // find with filters (each one uses an index: type_at, user_at or ttl_at), newest first.
-async function list({ type, user, from, to, limit = 50 } = {}) {
+async function list({ type, types, user, from, to, limit = 50 } = {}) {
   const filter = {};
   if (TYPES.includes(type)) filter.type = type;
+  else if (Array.isArray(types)) filter.type = { $in: types.filter(t => TYPES.includes(t)) };
   if (user) filter.user = String(user).toLowerCase();
   if (from || to) {
     filter.at = {};

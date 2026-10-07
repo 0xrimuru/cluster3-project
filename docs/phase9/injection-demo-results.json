@@ -1,0 +1,50 @@
+[
+  {
+    "id": "INJ-1",
+    "attack": "SQL injection - find user",
+    "input": "' OR '1'='1",
+    "before": "\"...WHERE lpa_user_username = '' OR '1'='1'\" -> 3 rows (aturner, mchang, palvim) - every account leaked",
+    "after": "placeholder: the whole text is one value -> 0 rows",
+    "result": "FIXED"
+  },
+  {
+    "id": "INJ-2",
+    "attack": "SQL injection - log in as administrator without a password",
+    "input": "user \"palvim' -- \", password \"anything\"",
+    "before": "\"-- \" comments out the password check -> row for U-001 returned = signed in as palvim",
+    "after": "real login page -> 302 /login?error=2&u=palvim'%20-- (refused)",
+    "result": "FIXED"
+  },
+  {
+    "id": "INJ-3",
+    "attack": "NoSQL injection - $ne operator instead of a value",
+    "input": "{\"clientId\": {\"$ne\": null}}",
+    "before": "{ 'author.clientId': {$ne: null} } matches 12 reviews (all of them)",
+    "after": "value forced to text -> 0 matches; the app refuses $-keys outright: POST /login with {\"username\":{\"$ne\":\"\"}} -> 400",
+    "result": "FIXED"
+  },
+  {
+    "id": "INJ-4",
+    "attack": "Cross-site scripting in a review title",
+    "input": "<img src=x onerror=\"alert(document.cookie)\">",
+    "before": "<h3><img src=x onerror=\"alert(document.cookie)\"></h3>",
+    "after": "<h3>&lt;img src=x onerror=&#34;alert(document.cookie)&#34;&gt;</h3>",
+    "result": "FIXED"
+  },
+  {
+    "id": "INJ-5",
+    "attack": "Log injection - fake a successful admin login line",
+    "input": "\"nobody\\\"\\n05/10/2026 09:00:00 | 127.0.0.1 | LOGIN palvim (administrator)\"",
+    "before": "written as 2 lines - line 2 looks like \"05/10/2026 09:00:00 | 127.0.0.1 | LOGIN palvim (administrator)\"\"",
+    "after": "stored as ONE line: \"LOGIN FAILED for user \"nobody\" 05/10/2026 09:00:00 | \"...\"",
+    "result": "FIXED"
+  },
+  {
+    "id": "INJ-6",
+    "attack": "Prototype pollution through JSON",
+    "input": "{\"__proto__\": {\"isAdmin\": true}}",
+    "before": "a naive merge makes EVERY object have isAdmin = true",
+    "after": "the app refuses the request -> 400; ({}).isAdmin = undefined",
+    "result": "FIXED"
+  }
+]

@@ -28,7 +28,7 @@
   </section>
   <% } %>
   <section class="quick-links">
-    <% if (role === 'administrator') { %>
+    <% if (can('sales.create')) { %>
     <a class="q-card" href="/sales/new"><strong>New invoice</strong><span>Client + items, stock updates automatically</span></a>
     <a class="q-card" href="/users"><strong>Users</strong><span>Accounts, groups &amp; status</span></a>
     <% } %>

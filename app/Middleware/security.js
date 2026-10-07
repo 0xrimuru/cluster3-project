@@ -28,6 +28,8 @@ function headers(req, res, next) {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'same-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  // HTTPS only: tell the browser to use HTTPS for this site for the next 180 days (HSTS)
+  if (req.secure) res.setHeader('Strict-Transport-Security', 'max-age=15552000');
   res.removeHeader('X-Powered-By');
   next();
 }

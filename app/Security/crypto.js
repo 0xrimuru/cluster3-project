@@ -33,7 +33,19 @@ function decrypt(token) {
   return Buffer.concat([decipher.update(Buffer.from(data, 'base64url')), decipher.final()]).toString('utf8');
 }
 
+// Blind index: a keyed hash (HMAC-SHA256) of a normalised value. Two equal values give the same
+// index, so an encrypted column can still be searched for an EXACT match - without decrypting
+// every row and without storing the value in the clear. The HMAC key is derived from DATA_KEY
+// with HKDF, so the encryption key and the index key are different keys.
+let indexKey = null;
+function blindIndex(value) {
+  if (value === null || value === undefined || value === '') return null;
+  if (!indexKey) indexKey = Buffer.from(crypto.hkdfSync('sha256', getKey(), Buffer.alloc(0), 'lpa-blind-index-v1', 32));
+  return crypto.createHmac('sha256', indexKey).update(String(value)).digest('hex');
+}
+const isEncrypted = v => typeof v === 'string' && /^v1\.[\w-]+\.[\w-]+\.[\w-]+$/.test(v);
+
 const hashToken = t => crypto.createHash('sha256').update(String(t)).digest('hex');
 const newKey = () => crypto.randomBytes(32).toString('base64');
 
-module.exports = { encrypt, decrypt, hashToken, newKey };
+module.exports = { encrypt, decrypt, hashToken, newKey, blindIndex, isEncrypted };

@@ -53,8 +53,10 @@ class SessionStore {
   }
 
   // deleteMany - sign a user out everywhere (deactivated, deleted, password changed).
-  static async destroyForUser(userId) {
-    const r = await (await sessions()).deleteMany({ userId });
+  // keepId: the session to keep (the one that just changed its own password).
+  static async destroyForUser(userId, keepId) {
+    const filter = keepId ? { userId, _id: { $ne: keepId } } : { userId };
+    const r = await (await sessions()).deleteMany(filter);
     return r.deletedCount;
   }
 }

@@ -1,0 +1,90 @@
+[
+  {
+    "id": "S-01",
+    "title": "Policy-based access control",
+    "steps": "16 page requests by customer / staff / admin + staff DELETE /products/LPA-001",
+    "expected": "Each user group reaches only the pages its permissions allow (403 otherwise); every refusal logged as ACCESS_DENIED",
+    "actual": "16/16 as expected; staff delete -> 403; 10 ACCESS_DENIED events",
+    "result": "PASS"
+  },
+  {
+    "id": "S-02",
+    "title": "Deny by default",
+    "steps": "Ask the policy engine for an unknown permission, for an inactive administrator, and with no user",
+    "expected": "All three refused; policy file says defaultDecision \"deny\"",
+    "actual": "unknown permission -> false; inactive admin -> false; no user -> false; 19 permissions x 3 groups, default deny",
+    "result": "PASS"
+  },
+  {
+    "id": "S-03",
+    "title": "Ownership: own orders and own reviews only",
+    "steps": "Customer opens another client's invoice (INV-1001) and edits another client's review",
+    "expected": "Both answered \"not found\" (404) - the data is not shown or changed",
+    "actual": "order -> 404; edit review -> 404; review unchanged = true",
+    "result": "PASS"
+  },
+  {
+    "id": "S-04",
+    "title": "Brute-force protection (lockout)",
+    "steps": "5 wrong passwords for mchang, then the RIGHT password; same for a user name that does not exist; then the 15-minute window passes",
+    "expected": "6th attempt refused even with the right password (\"Too many failed sign-ins\"); same answer for the unknown user; LOGIN_LOCKED logged; IP stored only as a hash; sign-in works after the window",
+    "actual": "5 wrong -> error=2; right password -> /login?error=3&m=15; unknown user 6th -> /login?error=3&m=15; logged = true; keys ip:12ca17b49, user:mchang, user:no-such; after window -> /",
+    "result": "PASS"
+  },
+  {
+    "id": "S-05",
+    "title": "Wrong user name takes as long as wrong password",
+    "steps": "Time 4 failed sign-ins for a real user and 4 for unknown user names",
+    "expected": "Similar times (the password is checked against a dummy hash for unknown users), so attackers cannot find valid user names",
+    "actual": "real user median 40 ms; unknown user median 40 ms",
+    "result": "PASS"
+  },
+  {
+    "id": "S-06",
+    "title": "Password rules and changing your password",
+    "steps": "Register with \"Password1\" and with the user name in the password; change password with a wrong current password, then correctly",
+    "expected": "Common / user-name passwords refused; wrong current password refused; after the change the OTHER session is signed out, this one stays; only the new password works",
+    "actual": "common -> 400 true; contains user name -> 400 true; wrong current -> 400; change -> 302; other session -> 302; this session -> 200; new password -> /shop; old password -> /login?error=2",
+    "result": "PASS"
+  },
+  {
+    "id": "S-07",
+    "title": "Client phone numbers encrypted in MySQL",
+    "steps": "Read lpa_clients.lpa_client_phone directly; open Clients; search by phone; encrypt the same number twice; change one character of a ciphertext",
+    "expected": "Database holds only AES-256-GCM ciphertext; the page shows the real number; exact phone search works (blind index); same number -> different ciphertext (random IV); changed ciphertext rejected",
+    "actual": "stored \"v1.fi_6RWkIu9l4zgkv.P5gSeI...\" (digits visible = false); page shows number = true; phone search finds CL-004 = true; two ciphertexts differ = true; index = HMAC (true); tampered -> rejected",
+    "result": "PASS"
+  },
+  {
+    "id": "S-08",
+    "title": "Injection protection",
+    "steps": "JSON login with {\"$ne\":\"\"}; JSON with __proto__; query ?q[$ne]=x; client search for ' OR '1'='1' --",
+    "expected": "$-operators and __proto__ refused (400, logged as SECURITY); nested query values are not parsed into objects; SQL text treated as a plain value (no clients found)",
+    "actual": "$ne -> 400; __proto__ -> 400; ?q[$ne] -> 200 (8 items, plain list); SQL -> 0 clients; SECURITY events 2",
+    "result": "PASS"
+  },
+  {
+    "id": "S-09",
+    "title": "Code-access security (npm run start:secure)",
+    "steps": "Start the app under the permission policy, sign in and use it; run a hostile script under the same policy",
+    "expected": "App works normally; Security page reports the policy enforced; reading system files, changing the code and running programs are denied",
+    "actual": "sign-in true; /products 200; sandbox enabled true, ok true; probe: read /etc/passwd: ERR_ACCESS_DENIED; change server.js: ERR_ACCESS_DENIED; run a program: ERR_ACCESS_DENIED; read .env: ALLOWED",
+    "result": "PASS"
+  },
+  {
+    "id": "S-10",
+    "title": "Encryption in transit (HTTPS)",
+    "steps": "Start the app with a certificate; sign in over HTTPS; try plain HTTP on the same port",
+    "expected": "TLS 1.2 or 1.3; HSTS header; session cookie marked Secure; plain HTTP not answered",
+    "actual": "TLSv1.3; HSTS \"max-age=15552000\"; cookie Secure = true; plain HTTP refused",
+    "result": "PASS"
+  },
+  {
+    "id": "S-11",
+    "title": "Second application secured: LPA Android app",
+    "steps": "Check the Android manifest, network security config, WebView code and release build settings",
+    "expected": "All 9 protections present (lint: 0 security issues)",
+    "actual": "9/9",
+    "result": "PASS"
+  }
+]

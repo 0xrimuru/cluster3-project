@@ -48,7 +48,7 @@ module.exports = [
       required: ['at', 'type', 'message'],
       properties: {
         at: { bsonType: 'date' },
-        type: { enum: ['LOGIN', 'LOGIN_FAILED', 'LOGOUT', 'REGISTER', 'ORDER', 'INVOICE', 'USER', 'REVIEW', 'REVIEW_ALERT', 'STOCK', 'OTHER'] },
+        type: { enum: ['LOGIN', 'LOGIN_FAILED', 'LOGIN_LOCKED', 'LOGOUT', 'REGISTER', 'PASSWORD', 'ACCESS_DENIED', 'SECURITY', 'ORDER', 'INVOICE', 'USER', 'REVIEW', 'REVIEW_ALERT', 'STOCK', 'OTHER'] },
         user: { bsonType: ['string', 'null'] },
         message: str(500),
         ipEnc: { bsonType: ['string', 'null'], description: 'AES-256-GCM encrypted IP address (personal information)' },
@@ -106,6 +106,25 @@ module.exports = [
       },
     } },
     indexes: [],
+  },
+  {
+    name: 'login_attempts',
+    partitionKey: '{ key: "hashed" }',
+    sortKey: 'at (newest first)',
+    writeConcern: { w: 1 },
+    ttl: 'at (expireAfterSeconds: 900) - failed sign-ins are forgotten after 15 minutes',
+    validator: { $jsonSchema: {
+      bsonType: 'object',
+      required: ['key', 'at'],
+      properties: {
+        key: str(70, { pattern: '^(user|ip):', description: 'user:<user name> or ip:<SHA-256 of the IP> (no plain IP stored)' }),
+        at: { bsonType: 'date' },
+      },
+    } },
+    indexes: [
+      { key: { at: 1 }, name: 'ttl_at', expireAfterSeconds: 900 },
+      { key: { key: 1, at: -1 }, name: 'key_at' },
+    ],
   },
   { name: 'system_state', validator: null, indexes: [], writeConcern: { w: 1 }, partitionKey: '_id', sortKey: 'none' },
 ];

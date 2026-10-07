@@ -17,7 +17,7 @@
         </p>
         <p class="desc"><%= product.description %></p>
         <div class="actions">
-          <% if (role === 'administrator') { %>
+          <% if (can('stock.manage')) { %>
           <a class="btn" href="/products/<%= product.id %>/edit">Edit</a>
           <form method="POST" action="/products/<%= product.id %>?_method=DELETE" data-confirm="Delete <%= product.title %>? It will be hidden from stock and the shop (history is kept)."><%- include('../partials/csrf') %>
             <button class="btn danger" type="submit">Delete</button>

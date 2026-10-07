@@ -1,4 +1,6 @@
-// routes/index.js - maps URLs to controller actions, with the user groups allowed for each.
+// routes/index.js - maps URLs to controller actions. Each protected route asks for a
+// PERMISSION (authorize('...')); which user groups hold it is decided by the access policy in
+// config/security-policy.json (deny by default). Summary of that policy:
 //   administrator : everything (incl. stock add/edit/delete, invoices add/delete, users)
 //   user (staff)  : dashboard, stock view + adjustment, sales + clients (view), shop (view)
 //   customer      : shop, cart, checkout, own orders
@@ -14,7 +16,8 @@ const ShopController = require('../app/Controllers/ShopController');
 const UserController = require('../app/Controllers/UserController');
 const ReviewController = require('../app/Controllers/ReviewController');
 const ActivityController = require('../app/Controllers/ActivityController');
-const { requireRole, STAFF } = require('../app/Middleware/auth');
+const SecurityController = require('../app/Controllers/SecurityController');
+const { authorize } = require('../app/Security/policy');
 
 // Controller actions are async (they wait for MySQL). Express 4 does not catch errors from
 // async functions by itself, so every handler is wrapped: a rejected promise goes to next(err)
@@ -25,9 +28,6 @@ const wrap = fn => (fn.length >= 4 ? fn : (req, res, next) => Promise.resolve(fn
   router[m] = (path, ...handlers) => original(path, ...handlers.map(wrap));
 });
 
-const admin = requireRole('administrator');
-const staff = requireRole(...STAFF);
-const customer = requireRole('customer');
 
 // Public
 router.get('/login', AuthController.loginForm);
@@ -42,59 +42,66 @@ router.get('/', HomeController.index);
 router.get('/help', HomeController.help);
 router.get('/more', HomeController.more);
 router.get('/settings', HomeController.settings);
-router.get('/shop', ShopController.index);
-router.get('/shop/:sku', ReviewController.show);
+router.get('/shop', authorize('shop.view'), ShopController.index);
+router.get('/shop/:sku', authorize('shop.view'), ReviewController.show);
 
 // Stock (staff view + adjust; administrators add / edit / delete)
-router.get('/stock/ledger', staff, ProductController.ledger);
-router.get('/products', staff, ProductController.index);
-router.get('/products/new', admin, ProductController.newForm);
-router.post('/products', admin, ProductController.create);
-router.get('/products/:id', staff, ProductController.show);
-router.get('/products/:id/edit', admin, ProductController.editForm);
-router.put('/products/:id', admin, ProductController.update);
-router.delete('/products/:id', admin, ProductController.destroy);
-router.post('/products/:id/adjust', staff, ProductController.adjust);
+router.get('/stock/ledger', authorize('stock.history'), ProductController.ledger);
+router.get('/products', authorize('stock.view'), ProductController.index);
+router.get('/products/new', authorize('stock.manage'), ProductController.newForm);
+router.post('/products', authorize('stock.manage'), ProductController.create);
+router.get('/products/:id', authorize('stock.view'), ProductController.show);
+router.get('/products/:id/edit', authorize('stock.manage'), ProductController.editForm);
+router.put('/products/:id', authorize('stock.manage'), ProductController.update);
+router.delete('/products/:id', authorize('stock.manage'), ProductController.destroy);
+router.post('/products/:id/adjust', authorize('stock.adjust'), ProductController.adjust);
 
 // Sales & invoicing (staff view; administrators create / delete invoices)
-router.get('/sales', staff, SalesController.invoices);
-router.get('/sales/new', admin, SalesController.newForm);
-router.post('/sales', admin, SalesController.create);
-router.get('/sales/:number', staff, SalesController.show);
-router.delete('/sales/:number', admin, SalesController.destroy);
-router.get('/clients', staff, SalesController.clients);
-router.get('/api/clients/:code', staff, SalesController.clientJson);
-router.get('/api/stock/:sku', staff, SalesController.stockJson);
+router.get('/sales', authorize('sales.view'), SalesController.invoices);
+router.get('/sales/new', authorize('sales.create'), SalesController.newForm);
+router.post('/sales', authorize('sales.create'), SalesController.create);
+router.get('/sales/:number', authorize('sales.view'), SalesController.show);
+router.delete('/sales/:number', authorize('sales.delete'), SalesController.destroy);
+router.get('/clients', authorize('clients.view'), SalesController.clients);
+router.get('/api/clients/:code', authorize('clients.view'), SalesController.clientJson);
+router.get('/api/stock/:sku', authorize('stock.view'), SalesController.stockJson);
 
 // Users management (administrators)
-router.get('/users', admin, UserController.index);
-router.get('/users/new', admin, UserController.newForm);
-router.post('/users', admin, UserController.create);
-router.get('/users/:id/edit', admin, UserController.editForm);
-router.put('/users/:id', admin, UserController.update);
-router.delete('/users/:id', admin, UserController.destroy);
+router.get('/users', authorize('users.manage'), UserController.index);
+router.get('/users/new', authorize('users.manage'), UserController.newForm);
+router.post('/users', authorize('users.manage'), UserController.create);
+router.get('/users/:id/edit', authorize('users.manage'), UserController.editForm);
+router.put('/users/:id', authorize('users.manage'), UserController.update);
+router.delete('/users/:id', authorize('users.manage'), UserController.destroy);
 
 // Web store (customers)
-router.post('/cart', customer, ShopController.add);
-router.get('/cart', customer, ShopController.cart);
-router.post('/cart/:sku', customer, ShopController.update);
-router.delete('/cart/:sku', customer, ShopController.remove);
-router.get('/checkout', customer, ShopController.checkoutForm);
-router.post('/checkout', customer, ShopController.checkout);
-router.get('/orders', customer, ShopController.orders);
-router.get('/orders/:number', customer, ShopController.order);
+router.post('/cart', authorize('shop.buy'), ShopController.add);
+router.get('/cart', authorize('shop.buy'), ShopController.cart);
+router.post('/cart/:sku', authorize('shop.buy'), ShopController.update);
+router.delete('/cart/:sku', authorize('shop.buy'), ShopController.remove);
+router.get('/checkout', authorize('shop.buy'), ShopController.checkoutForm);
+router.post('/checkout', authorize('shop.buy'), ShopController.checkout);
+router.get('/orders', authorize('orders.own'), ShopController.orders);
+router.get('/orders/:number', authorize('orders.own'), ShopController.order);
 
 // Product reviews (MongoDB): customers write / edit / delete their own; anyone signed in can vote;
 // staff moderate; administrators can delete any review
-router.post('/shop/:sku/reviews', customer, ReviewController.create);
-router.put('/reviews/:id', customer, ReviewController.update);
-router.delete('/reviews/:id', requireRole('customer', 'administrator'), ReviewController.destroy);
-router.post('/reviews/:id/helpful', ReviewController.vote);
-router.get('/reviews', staff, ReviewController.index);
-router.put('/reviews/:id/status', staff, ReviewController.setStatus);
+router.post('/shop/:sku/reviews', authorize('reviews.write'), ReviewController.create);
+router.put('/reviews/:id', authorize('reviews.write'), ReviewController.update);
+router.delete('/reviews/:id', ReviewController.destroy); // owner (reviews.write) or reviews.delete_any - checked in the controller
+router.post('/reviews/:id/helpful', authorize('reviews.vote'), ReviewController.vote);
+router.get('/reviews', authorize('reviews.moderate'), ReviewController.index);
+router.put('/reviews/:id/status', authorize('reviews.moderate'), ReviewController.setStatus);
+
+// Your account: change your own password
+router.get('/account/password', authorize('account.password'), SecurityController.passwordForm);
+router.put('/account/password', authorize('account.password'), SecurityController.changePassword);
+
+// Security status + access policy (administrators)
+router.get('/security', authorize('security.view'), SecurityController.index);
 
 // Activity log (MongoDB) - administrators
-router.get('/activity', admin, ActivityController.index);
+router.get('/activity', authorize('activity.view'), ActivityController.index);
 
 // Mashups (About / More)
 router.get('/mashups', MashupController.index);

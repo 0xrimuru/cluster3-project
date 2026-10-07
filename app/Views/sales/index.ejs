@@ -1,7 +1,7 @@
 <%- include('../partials/header') %>
   <div class="page-head">
     <h1>Sales &amp; <span class="subtle">invoicing</span></h1>
-    <% if (role === 'administrator') { %><a class="btn" href="/sales/new">+ Add</a><% } %>
+    <% if (can('sales.create')) { %><a class="btn" href="/sales/new">+ Add</a><% } %>
   </div>
   <% if (notice) { %><div class="flash ok"><%= notice %></div><% } %>
   <form class="search-row" method="GET" action="/sales" role="search">

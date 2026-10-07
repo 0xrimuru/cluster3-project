@@ -3,7 +3,7 @@
 //   CSRF token) is stored in MongoDB by SessionStore - only the token's hash is saved there.
 //   Nothing about the user is trusted from the cookie.
 // - requireLogin: every page except the public ones needs a signed-in, active user.
-// - requireRole: limits a route to certain user groups (administrator / user / customer).
+// - What each signed-in user may do is decided by the access policy (app/Security/policy.js).
 const User = require('../Models/User');
 const SessionStore = require('../Models/NoSql/SessionStore');
 
@@ -17,12 +17,13 @@ function readCookie(req, name) {
 
 async function startSession(req, res, user) {
   const token = await SessionStore.create(user, { ip: req.ip, agent: req.get('user-agent') });
-  res.setHeader('Set-Cookie', `${COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax`);
+  // Secure: over HTTPS the browser never sends the cookie on a plain-HTTP connection
+  res.setHeader('Set-Cookie', `${COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax${req.secure ? '; Secure' : ''}`);
   return token;
 }
 async function endSession(req, res) {
   await SessionStore.destroy(readCookie(req, COOKIE));
-  res.setHeader('Set-Cookie', `${COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`);
+  res.setHeader('Set-Cookie', `${COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax${req.secure ? '; Secure' : ''}`);
 }
 
 // Loads the session (MongoDB) and the user (MySQL) and exposes them to controllers and views.
@@ -55,14 +56,5 @@ function requireLogin(req, res, next) {
   return res.redirect('/login');
 }
 
-// requireRole('administrator') or requireRole('administrator', 'user')
-function requireRole(...groups) {
-  return (req, res, next) => {
-    if (req.user && groups.includes(req.user.group)) return next();
-    if ((req.get('accept') || '').includes('application/json') || req.path.startsWith('/api/')) return res.status(403).json({ error: 'Not allowed for your user group' });
-    return res.status(403).render('error', { title: 'Not allowed', message: 'Your account does not have access to this page.', nav: '' });
-  };
-}
-
 const STAFF = ['administrator', 'user'];
-module.exports = { loadUser, requireLogin, requireRole, startSession, endSession, STAFF };
+module.exports = { loadUser, requireLogin, startSession, endSession, STAFF };

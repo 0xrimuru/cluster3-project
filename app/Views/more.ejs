@@ -1,16 +1,24 @@
 <%- include('partials/header') %>
   <h1>More</h1>
   <nav class="menu-list" aria-label="More">
-    <% if (role === 'administrator') { %>
+    <% if (can('users.manage')) { %>
     <a href="/users"><strong>Users</strong><span>Search, add, edit and delete users</span></a>
-    <a href="/activity"><strong>Activity log</strong><span>Sign-ins, orders, invoices and changes (MongoDB)</span></a>
     <% } %>
-    <% if (role !== 'customer') { %>
+    <% if (can('activity.view')) { %>
+    <a href="/activity"><strong>Activity log</strong><span>Sign-ins, orders, invoices, changes and security events</span></a>
+    <% } %>
+    <% if (can('security.view')) { %>
+    <a href="/security"><strong>Security</strong><span>Access policy and protection status</span></a>
+    <% } %>
+    <% if (can('stock.view')) { %>
     <a href="/stock/ledger"><strong>Stock audit history</strong><span>Every stock adjustment: who, when, why</span></a>
     <a href="/reviews"><strong>Product reviews</strong><span>Search, hide or publish customer reviews</span></a>
     <a href="/shop"><strong>Web store</strong><span>The shop as customers see it</span></a>
     <% } %>
     <a href="/mashups"><strong>About LPA</strong><span>Our mission, store locator and international pricing</span></a>
+    <% if (can('account.password')) { %>
+    <a href="/account/password"><strong>Change password</strong><span>Update the password you sign in with</span></a>
+    <% } %>
     <a href="/settings"><strong>Preferences</strong><span>Theme and accent colour</span></a>
     <a href="/privacy"><strong>Privacy notice</strong><span>What personal information LPA keeps and why</span></a>
     <a href="/help"><strong>Help</strong><span>What each menu does for your user group</span></a>

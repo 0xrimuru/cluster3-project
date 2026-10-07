@@ -21,6 +21,7 @@ Node.js · Express · EJS on a Model–View–Controller structure · **MySQL / 
 3. Demo accounts (password `Lpa#2026`): `palvim` administrator · `mchang` staff · `aturner` customer.
 
 Other commands: `npm run db:export` (MySQL → `db/export.sql`) · `npm run nosql:export` (MongoDB → `db/nosql/export/*.json`) · running a setup again resets its data.
+Security: `npm run start:secure` (code-access security: the app may only read its own folder, write `logs/`, and cannot run other programs) · `npm run security:cert` (development certificate → the app serves HTTPS).
 
 ## Structure
 ```
@@ -30,15 +31,19 @@ app/
   Views/        EJS templates (V)
   Models/NoSql/ MongoDB models — SessionStore, ActivityLog, Review, RatingTrigger
   Middleware/   auth (sessions, roles), security (CSP, CSRF)
-  Security/     crypto.js (AES-256-GCM field encryption, token hashing)
+  Security/     policy.js (access policy engine), crypto.js (AES-256-GCM, blind index, hashing),
+                loginGuard.js (lockout), sandbox.js (code-access status), common-passwords.js
 config/
   database.js   the MySQL connection pool (settings from .env)
   nosql.js      the MongoDB client (settings from .env)
+  security-policy.json  permissions -> user groups (deny by default)
 db/
   schema.sql    tables, keys, constraints     seed.sql   starting data
   setup.js      npm run db:setup              export.js  npm run db:export -> export.sql
   nosql/        collections.js (data model: validators, indexes, TTL), seed-reviews.js, setup.js, export.js
-routes/         URL -> controller mapping (with the user groups allowed)
+routes/         URL -> controller mapping (each route asks for a permission)
+scripts/        secure-start.js (npm run start:secure), make-cert.js (npm run security:cert)
+mobile-app/     Android WebView app (Android Studio project)
 public/         css, js, images, media
 docs/           plans, minutes, requirements, test scripts and results per phase
 server.js       application entry point
@@ -53,4 +58,5 @@ server.js       application entry point
 - **Block 6 — ICTWEB514:** dynamic pages, security headers, CSRF, privacy (`docs/phase6`).
 - **Block 7 — ICTDBS507:** MySQL database integration (`config/`, `db/`, `docs/phase7`).
 - **Block 8 — ICTPRG554:** MongoDB — sessions, activity log, product reviews, change-stream trigger (`config/nosql.js`, `db/nosql`, `docs/phase8`).
-- Blocks 9–11 — application security, OOP desktop app, advanced programming — to come.
+- **Block 9 — ICTPRG537:** application security — access policy, code-access security, lockout, encryption, HTTPS, injection protection; Android app hardened (`app/Security`, `docs/phase9`, `mobile-app`).
+- Blocks 10–11 — OOP desktop app, advanced programming — to come.

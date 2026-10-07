@@ -2,11 +2,19 @@
 // Columns: ID (code), first name, last name, address, phone, status (a = active, d = disabled).
 // Business clients are kept by staff; web-store customers get a client record when they
 // register, so their orders become normal invoices.
+// The phone number is personal information: it is stored ENCRYPTED (AES-256-GCM) and found by
+// an exact-match blind index (HMAC-SHA256 of its digits) - see app/Security/crypto.js.
 const { query } = require('../../config/database');
+const { encrypt, decrypt, blindIndex, isEncrypted } = require('../Security/crypto');
 
 const COLUMNS = `lpa_client_ID AS code, lpa_client_firstname AS firstName, lpa_client_lastname AS lastName,
   lpa_client_address AS address, lpa_client_phone AS phone, lpa_client_status AS status`;
-const toClient = r => (r ? Object.assign(r, { id: r.code, status: r.status === 'a' ? 'active' : 'disabled' }) : null);
+const digits = p => String(p || '').replace(/\D/g, '');
+function openPhone(v) {
+  if (!isEncrypted(v)) return v; // (only before db:setup has encrypted old rows)
+  try { return decrypt(v); } catch (e) { return '(cannot decrypt)'; }
+}
+const toClient = r => (r ? Object.assign(r, { id: r.code, phone: openPhone(r.phone), status: r.status === 'a' ? 'active' : 'disabled' }) : null);
 const like = s => '%' + String(s).replace(/[\\%_]/g, c => '\\' + c) + '%';
 
 class Client {
@@ -19,12 +27,14 @@ class Client {
     return toClient(rows[0]);
   }
 
-  // Search by name, ID, address or phone.
+  // Search by name, ID or address (LIKE), or by the exact phone number (blind index).
   static async search(q) {
     if (!q || !q.trim()) return Client.all();
+    const d = digits(q);
     const rows = await query(`SELECT ${COLUMNS} FROM lpa_clients
-      WHERE CONCAT_WS(' ', lpa_client_firstname, lpa_client_lastname, lpa_client_ID, lpa_client_address, lpa_client_phone) LIKE ?
-      ORDER BY lpa_client_ID`, [like(q.trim())]);
+      WHERE CONCAT_WS(' ', lpa_client_firstname, lpa_client_lastname, lpa_client_ID, lpa_client_address) LIKE ?
+         OR (? IS NOT NULL AND lpa_client_phone_idx = ?)
+      ORDER BY lpa_client_ID`, [like(q.trim()), d.length >= 8 ? 1 : null, d.length >= 8 ? blindIndex(d) : null]);
     return rows.map(toClient);
   }
 
@@ -33,8 +43,9 @@ class Client {
   static async create({ firstName, lastName, address, phone }, conn) {
     const rows = await query("SELECT COALESCE(MAX(CAST(SUBSTRING(lpa_client_ID, 4) AS UNSIGNED)), 0) + 1 AS n FROM lpa_clients WHERE lpa_client_ID REGEXP '^CL-[0-9]+$' FOR UPDATE", [], conn);
     const code = 'CL-' + String(rows[0].n).padStart(3, '0');
-    await query(`INSERT INTO lpa_clients (lpa_client_ID, lpa_client_firstname, lpa_client_lastname, lpa_client_address, lpa_client_phone, lpa_client_status)
-      VALUES (?, ?, ?, ?, ?, 'a')`, [code, String(firstName || '').trim(), String(lastName || '').trim(), String(address || '').trim(), String(phone || '').trim()], conn);
+    const ph = String(phone || '').trim();
+    await query(`INSERT INTO lpa_clients (lpa_client_ID, lpa_client_firstname, lpa_client_lastname, lpa_client_address, lpa_client_phone, lpa_client_phone_idx, lpa_client_status)
+      VALUES (?, ?, ?, ?, ?, ?, 'a')`, [code, String(firstName || '').trim(), String(lastName || '').trim(), String(address || '').trim(), encrypt(ph), blindIndex(digits(ph))], conn);
     return Client.findByCode(code, conn);
   }
 
@@ -42,8 +53,10 @@ class Client {
   static async update(code, data, conn) {
     const address = String(data.address || '').trim();
     const phone = String(data.phone || '').trim();
-    await query(`UPDATE lpa_clients SET lpa_client_address = IF(? = '', lpa_client_address, ?),
-      lpa_client_phone = IF(? = '', lpa_client_phone, ?) WHERE lpa_client_ID = ?`, [address, address, phone, phone, code], conn);
+    const sets = []; const params = [];
+    if (address) { sets.push('lpa_client_address = ?'); params.push(address); }
+    if (phone) { sets.push('lpa_client_phone = ?', 'lpa_client_phone_idx = ?'); params.push(encrypt(phone), blindIndex(digits(phone))); }
+    if (sets.length) await query(`UPDATE lpa_clients SET ${sets.join(', ')} WHERE lpa_client_ID = ?`, params.concat(code), conn);
     return Client.findByCode(code, conn);
   }
 }

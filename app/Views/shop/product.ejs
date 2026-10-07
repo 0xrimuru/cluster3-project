@@ -27,7 +27,7 @@
 
   <section class="card pad" id="reviews" aria-labelledby="reviews-h">
     <div class="page-head"><h2 id="reviews-h">Customer reviews</h2>
-      <% if (role !== 'customer') { %><a class="btn ghost" href="/reviews?sku=<%= product.sku %>">Moderate</a><% } %></div>
+      <% if (can('reviews.moderate')) { %><a class="btn ghost" href="/reviews?sku=<%= product.sku %>">Moderate</a><% } %></div>
     <% if (notice) { %><div class="flash ok" role="status"><%= notice %></div><% } %>
     <% if (voteError) { %><div class="flash warn" role="alert"><%= voteError %></div><% } %>
     <% if (errors.length) { %><ul class="form-errors" role="alert"><% errors.forEach(function(e){ %><li><%= e %></li><% }); %></ul><% } %>
@@ -51,7 +51,7 @@
         <div class="form-actions"><button class="btn" type="submit">Publish review</button></div>
       </form>
     </details>
-    <% } else if (role === 'customer' && !mine) { %>
+    <% } else if (can('reviews.write') && !mine) { %>
     <p class="subtle">You can review this product after you have bought it.</p>
     <% } %>
 
@@ -77,7 +77,7 @@
           <% if (!r.mine && !r.votedByMe) { %>
           <form method="POST" action="/reviews/<%= r.id %>/helpful" class="inline"><%- include('../partials/csrf') %><button class="btn ghost sm" type="submit">Helpful</button></form>
           <% } else if (r.votedByMe) { %><span class="subtle">&#10003; You voted</span><% } %>
-          <% if (r.mine || role === 'administrator') { %>
+          <% if (r.mine || can('reviews.delete_any')) { %>
           <form method="POST" action="/reviews/<%= r.id %>?_method=DELETE" class="inline" data-confirm="Delete this review? This cannot be undone."><%- include('../partials/csrf') %><button class="btn ghost sm danger-text" type="submit">Delete</button></form>
           <% } %>
         </div>

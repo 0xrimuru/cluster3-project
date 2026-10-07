@@ -5,10 +5,11 @@ const Client = require('../Models/Client');
 const Invoice = require('../Models/Invoice');
 const Review = require('../Models/NoSql/Review');
 const Log = require('../Models/NoSql/ActivityLog');
+const policy = require('../Security/policy');
 
 const wantsJson = req => (req.get('accept') || '').includes('application/json');
-const isCustomer = req => req.user && req.user.group === 'customer';
-const isStaff = req => req.user && ['administrator', 'user'].includes(req.user.group);
+const isCustomer = req => policy.can(req.user, 'reviews.write');
+const isStaff = req => policy.can(req.user, 'stock.view');
 const back = (sku, q) => `/shop/${encodeURIComponent(sku)}${q ? '?' + q : ''}#reviews`;
 
 // Render the product page (also used to show validation errors).
@@ -62,7 +63,7 @@ exports.create = async (req, res) => {
 // PUT /reviews/:id (the author)
 exports.update = async (req, res) => {
   const current = await Review.get(req.params.id, req.user);
-  if (!current || !current.mine) return res.status(404).render('error', { title: 'Not found', message: 'Review not found.', nav: 'shop' });
+  if (!current || !policy.canEditReview(req.user, current)) return res.status(404).render('error', { title: 'Not found', message: 'Review not found.', nav: 'shop' });
   const { errors, clean } = Review.validate(req.body);
   if (errors.length) {
     if (wantsJson(req)) return res.status(400).json({ errors });
@@ -76,11 +77,15 @@ exports.update = async (req, res) => {
 // DELETE /reviews/:id (the author, or an administrator)
 exports.destroy = async (req, res) => {
   const current = await Review.get(req.params.id, req.user);
-  const ok = current && (current.mine || req.user.group === 'administrator') && await Review.remove(current.id, req.user);
+  if (current && !policy.canDeleteReview(req.user, current)) {
+    // someone else's review: log the attempt, answer "not found" (do not reveal it exists)
+    Log.write(req, `ACCESS_DENIED DELETE review ${current.id} (not the author)`, { type: 'ACCESS_DENIED', permission: 'reviews.delete_any' });
+  }
+  const ok = current && policy.canDeleteReview(req.user, current) && await Review.remove(current.id, req.user);
   if (!ok) return wantsJson(req) ? res.status(404).json({ error: 'Review not found' }) : res.status(404).render('error', { title: 'Not found', message: 'Review not found.', nav: 'shop' });
   Log.write(req, `REVIEW ${current.sku} review ${current.id} deleted by ${req.user.username}`, { sku: current.sku, reviewId: current.id });
   if (wantsJson(req)) return res.status(204).end();
-  res.redirect(req.user.group === 'customer' ? back(current.sku, 'done=deleted') : '/reviews?done=deleted');
+  res.redirect(policy.can(req.user, 'reviews.moderate') ? '/reviews?done=deleted' : back(current.sku, 'done=deleted'));
 };
 
 // POST /reviews/:id/helpful

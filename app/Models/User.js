@@ -27,13 +27,21 @@ const COLUMNS = `lpa_user_ID AS id, lpa_user_username AS username, lpa_user_firs
 const toUser = r => (r ? Object.assign(r, { status: STATUS_FROM_DB[r.status] || 'active' }) : null);
 const like = s => '%' + String(s).replace(/[\\%_]/g, c => '\\' + c) + '%';
 
+const COMMON = require('../Security/common-passwords');
 const USERNAME_RE = /^[a-z0-9._-]{3,30}$/;
-// Password rule: at least 8 characters with a letter and a number.
-function passwordProblem(p) {
+// Password rule: 8-128 characters with a letter and a number, not a common password and
+// not containing the user name.
+function passwordProblem(p, username) {
   if (!p || p.length < 8) return 'Password must be at least 8 characters.';
+  if (p.length > 128) return 'Password must be 128 characters or fewer.';
   if (!/[A-Za-z]/.test(p) || !/[0-9]/.test(p)) return 'Password must contain a letter and a number.';
+  if (COMMON.has(p.toLowerCase())) return 'That password is too common - choose another one.';
+  if (username && username.length >= 3 && p.toLowerCase().includes(String(username).toLowerCase())) return 'Password must not contain your user name.';
   return null;
 }
+// Checked against when the user name does not exist, so a wrong user name takes as long as a
+// wrong password (an attacker cannot find valid user names by timing the login).
+const DUMMY_HASH = hashPassword(require('crypto').randomBytes(16).toString('hex'));
 
 class User {
   static get GROUPS() { return GROUPS; }
@@ -64,7 +72,8 @@ class User {
     const rows = await query(`SELECT ${COLUMNS}, lpa_user_password AS passwordHash FROM lpa_users
       WHERE lpa_user_username = ? AND lpa_user_status = 'a'`, [String(username || '').trim().toLowerCase()]);
     const u = rows[0];
-    if (!u || !verifyPassword(password, u.passwordHash)) return null;
+    const ok = verifyPassword(password, u ? u.passwordHash : DUMMY_HASH);
+    if (!u || !ok) return null;
     delete u.passwordHash; // the hash never leaves the model
     return toUser(u);
   }
@@ -84,7 +93,7 @@ class User {
     if (String(data.firstName || '').trim().length > 50 || String(data.lastName || '').trim().length > 50) errors.push('First and last name must be 50 characters or fewer.');
     if (data.group !== undefined && !GROUPS.includes(data.group)) errors.push('Choose a valid user group.');
     if (isNew || data.password) {
-      const p = passwordProblem(data.password);
+      const p = passwordProblem(data.password, username);
       if (p) errors.push(p);
       if (data.confirmPassword !== undefined && data.password !== data.confirmPassword) errors.push('Password and confirm password must match.');
     }
@@ -118,6 +127,16 @@ class User {
     params.push(id);
     await query(`UPDATE lpa_users SET ${sets.join(', ')} WHERE lpa_user_ID = ? AND lpa_user_status <> 'x'`, params);
     return User.find(id);
+  }
+
+  // Is this the user's current password? (used before changing it)
+  static async checkPassword(id, password) {
+    const rows = await query("SELECT lpa_user_password AS h FROM lpa_users WHERE lpa_user_ID = ? AND lpa_user_status = 'a'", [id]);
+    return !!rows[0] && verifyPassword(password, rows[0].h);
+  }
+  static passwordProblem(p, username) { return passwordProblem(p, username); }
+  static async setPassword(id, password) {
+    await query('UPDATE lpa_users SET lpa_user_password = ? WHERE lpa_user_ID = ?', [hashPassword(password), id]);
   }
 
   // Soft delete: the record stays (the stock ledger refers to it) but can no longer sign in.

@@ -30,7 +30,7 @@
         <form method="POST" action="/reviews/<%= r.id %>/status?_method=PUT" class="inline"><%- include('../partials/csrf') %>
           <input type="hidden" name="status" value="<%= r.status==='hidden'?'published':'hidden' %>" /><input type="hidden" name="qs" value="<%= qs %>" />
           <button class="btn ghost sm" type="submit"><%= r.status==='hidden'?'Publish':'Hide' %></button></form>
-        <% if (role === 'administrator') { %>
+        <% if (can('reviews.delete_any')) { %>
         <form method="POST" action="/reviews/<%= r.id %>?_method=DELETE" class="inline" data-confirm="Delete this review permanently?"><%- include('../partials/csrf') %><button class="btn ghost sm danger-text" type="submit">Delete</button></form>
         <% } %>
       </div>

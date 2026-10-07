@@ -17,7 +17,7 @@
       <tfoot><tr><th colspan="3">Total (incl. GST)</th><th class="num">$<%= inv.amount.toFixed(2) %></th></tr></tfoot>
     </table>
     <div class="form-actions">
-      <% if (typeof staffView !== 'undefined' && staffView && role === 'administrator') { %>
+      <% if (typeof staffView !== 'undefined' && staffView && can('sales.delete')) { %>
       <form method="POST" action="/sales/<%= inv.number %>?_method=DELETE" data-confirm="Delete invoice <%= inv.number %>? Its items will be returned to stock."><%- include('../partials/csrf') %>
         <button class="btn danger" type="submit">Delete</button>
       </form>

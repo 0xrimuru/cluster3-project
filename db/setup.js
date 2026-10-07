@@ -16,8 +16,18 @@ if (/^DB_PASSWORD=(change-me)?\s*$/m.test(fs.readFileSync(ENV, 'utf8'))) {
   fs.writeFileSync(ENV, fs.readFileSync(ENV, 'utf8').replace(/^DB_PASSWORD=.*$/m, 'DB_PASSWORD=' + pw));
   console.log('Set a random password for lpa_app in .env (this file is not committed).');
 }
+if (!/^DATA_KEY="?[A-Za-z0-9+/=]{40,}/m.test(fs.readFileSync(ENV, 'utf8'))) {
+  // encryption key for personal data (shared with MongoDB - see app/Security/crypto.js)
+  const key = crypto.randomBytes(32).toString('base64');
+  let text = fs.readFileSync(ENV, 'utf8');
+  text = /^DATA_KEY=.*$/m.test(text) ? text.replace(/^DATA_KEY=.*$/m, `DATA_KEY="${key}"`) : text.replace(/\s*$/, '\n') + `DATA_KEY="${key}"\n`;
+  fs.writeFileSync(ENV, text);
+  console.log('Added DATA_KEY (AES-256 key) to .env');
+}
 require('dotenv').config({ path: ENV, quiet: true });
 const mysql = require('mysql2/promise');
+const { encrypt, blindIndex, isEncrypted } = require('../app/Security/crypto');
+const phoneDigits = p => String(p || '').replace(/\D/g, '');
 
 (async () => {
   const host = process.env.DB_HOST || '127.0.0.1';
@@ -39,6 +49,13 @@ const mysql = require('mysql2/promise');
     await admin.query(fs.readFileSync(path.join(__dirname, file), 'utf8'));
     console.log(`Ran db/${file}`);
   }
+
+  // 9.1 encrypt the client phone numbers loaded by seed.sql (plain text -> AES-256-GCM + blind index)
+  const [phones] = await admin.query('SELECT lpa_client_ID AS id, lpa_client_phone AS phone FROM lpa_clients');
+  for (const c of phones.filter(c => !isEncrypted(c.phone))) {
+    await admin.query('UPDATE lpa_clients SET lpa_client_phone = ?, lpa_client_phone_idx = ? WHERE lpa_client_ID = ?', [encrypt(c.phone), blindIndex(phoneDigits(c.phone)), c.id]);
+  }
+  console.log(`Encrypted ${phones.length} client phone numbers`);
 
   // Least privilege: the web app can read and change rows, but cannot drop or alter tables.
   for (const h of ['localhost', '127.0.0.1', '::1']) {

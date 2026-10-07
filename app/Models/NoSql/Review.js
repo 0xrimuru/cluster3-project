@@ -17,7 +17,7 @@ function toView(d, viewer) {
   const me = viewer && viewer.id;
   return {
     id: String(d._id), sku: d.sku, rating: d.rating, title: d.title, comment: d.comment, tags: d.tags || [],
-    author: d.author.name, clientId: d.author.clientId, verified: !!d.verified, status: d.status,
+    author: d.author.name, clientId: d.author.clientId, authorUserId: d.author.userId || null, verified: !!d.verified, status: d.status,
     helpful: d.helpful.count, votedByMe: !!me && d.helpful.voters.includes(me),
     mine: !!me && d.author.userId === me, createdAt: d.createdAt, updatedAt: d.updatedAt,
     edited: d.updatedAt - d.createdAt > 1000,
@@ -95,7 +95,8 @@ class Review {
   static async remove(id, user) {
     const _id = oid(id);
     if (!_id) return false;
-    const filter = user.group === 'administrator' ? { _id } : { _id, 'author.userId': user.id };
+    // the controller already checked the policy; the filter repeats the ownership rule as a safety net
+    const filter = require('../../Security/policy').can(user, 'reviews.delete_any') ? { _id } : { _id, 'author.userId': user.id };
     const r = await (await reviews()).findOneAndDelete(filter);
     if (r) await Trigger.afterWrite({ operationType: 'delete', fullDocumentBeforeChange: r });
     return !!r;

@@ -15,7 +15,8 @@ const { takeStock, RuleError } = require('./SalesController');
 const PAYMENT_OPTIONS = ['Visa', 'Mastercard', 'American Express', 'PayPal'];
 const round2 = n => Math.round(n * 100) / 100;
 const wantsJson = req => (req.get('accept') || '').includes('application/json');
-const isCustomer = req => req.user && req.user.group === 'customer';
+const policy = require('../Security/policy');
+const isCustomer = req => policy.can(req.user, 'shop.buy');
 
 // Build the cart lines from the session using current catalogue prices (one SQL query).
 // The cart itself is stored in the session document in MongoDB.
@@ -160,7 +161,7 @@ exports.orders = async (req, res) => {
 // GET /orders/:number - one of the customer's own orders (others are "not found")
 exports.order = async (req, res) => {
   const inv = await Invoice.find(req.params.number);
-  if (!inv || inv.clientId !== req.user.clientId) return res.status(404).render('error', { title: 'Not found', message: 'Order not found.', nav: 'orders' });
+  if (!inv || !policy.canViewOrder(req.user, inv)) return res.status(404).render('error', { title: 'Not found', message: 'Order not found.', nav: 'orders' });
   res.render('shop/order', { title: `Order ${inv.number}`, pageName: 'Orders', nav: 'orders', inv, placed: req.query.placed === '1', backHref: '/orders' });
 };
 
