@@ -1,0 +1,30 @@
+<html><body style="font-family:sans-serif;font-size:11pt">
+<h2 style="color:#0a6b49">LPA Administration System - Help</h2>
+<p>The desktop interface of LPA eComms. It uses the same database and the same user accounts as the web app.
+What you see depends on your user group (Administrator or Staff). Customers use the web store.</p>
+<h3>Menu</h3>
+<ul>
+<li><b>Home</b> - today's numbers: stock items, low / out of stock, invoices and total sales.</li>
+<li><b>Stock Management</b> - search stock by ID, name, brand or category. Staff can adjust stock (add, remove,
+reconcile) with a reason; every change is written to the audit history. Administrators can add, edit and delete items.</li>
+</ul>
+<h3>Sales and Invoicing</h3>
+<ul>
+<li><b>Invoices</b> - search by invoice number, client, address or date (YYYY-MM-DD) and open an invoice. Administrators can delete
+an invoice; its items go back to stock.</li>
+<li><b>New Invoice</b> (Administrators) - type a Client ID and press Search Client, type a Stock ID and press Search Item, choose the
+quantity and press Add Item. Save Invoice saves it and reduces the stock. Prices always come from the catalogue.</li>
+<li><b>Clients</b> - search by name, ID, address or the exact phone number. Administrators can add, edit and disable clients.</li>
+</ul>
+<h3>System Administration</h3>
+<ul>
+<li><b>My User Details</b> - your account and Change password.</li>
+<li><b>User Management</b> (Administrators) - add, edit, deactivate and delete users.</li>
+<li><b>Dark theme</b> - switch between light and dark.</li>
+</ul>
+<h3>Exit</h3>
+<ul><li><b>Logout</b> - back to the sign-in window. <b>Shutdown</b> - close the program.</li></ul>
+<h3>Security</h3>
+<p>After 5 wrong passwords the user name is locked for 15 minutes. Passwords are stored only as scrypt hashes and client
+phone numbers are stored encrypted.</p>
+</body></html>

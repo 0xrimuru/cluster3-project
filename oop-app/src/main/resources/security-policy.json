@@ -1,0 +1,33 @@
+{
+  "name": "LPA eComms access policy",
+  "version": 1,
+  "updated": "2026-10-07",
+  "defaultDecision": "deny",
+  "notes": "Every route asks for a permission. A user gets a permission only if their user group is listed. Anything not listed is denied (deny by default). Ownership rules (own review, own orders) are checked in code on top of these permissions.",
+  "roles": {
+    "administrator": "Administrator - runs the system, manages stock items, invoices and users",
+    "user": "Staff - daily stock and sales work",
+    "customer": "Customer - buys in the web store"
+  },
+  "permissions": {
+    "stock.view":          { "roles": ["administrator", "user"], "description": "See the stock list and item details" },
+    "stock.adjust":        { "roles": ["administrator", "user"], "description": "Add, remove or reconcile stock quantities" },
+    "stock.history":       { "roles": ["administrator", "user"], "description": "See the stock audit history" },
+    "stock.manage":        { "roles": ["administrator"],         "description": "Add, edit and delete stock items" },
+    "sales.view":          { "roles": ["administrator", "user"], "description": "Search invoices and open them" },
+    "sales.create":        { "roles": ["administrator"],         "description": "Create invoices" },
+    "sales.delete":        { "roles": ["administrator"],         "description": "Delete invoices (stock is returned)" },
+    "clients.view":        { "roles": ["administrator", "user"], "description": "See client records and look them up" },
+    "users.manage":        { "roles": ["administrator"],         "description": "Add, edit, deactivate and delete user accounts" },
+    "activity.view":       { "roles": ["administrator"],         "description": "Read the activity / security log" },
+    "security.view":       { "roles": ["administrator"],         "description": "See this policy and the security status page" },
+    "shop.view":           { "roles": ["administrator", "user", "customer"], "description": "Browse the web store and product pages" },
+    "shop.buy":            { "roles": ["customer"],              "description": "Use the cart and check out" },
+    "orders.own":          { "roles": ["customer"],              "description": "See your own orders (only your own)" },
+    "reviews.write":       { "roles": ["customer"],              "description": "Write, edit and delete your own reviews (bought products only)" },
+    "reviews.vote":        { "roles": ["administrator", "user", "customer"], "description": "Mark a review as helpful (not your own)" },
+    "reviews.moderate":    { "roles": ["administrator", "user"], "description": "Search reviews, hide and publish them" },
+    "reviews.delete_any":  { "roles": ["administrator"],         "description": "Delete any review" },
+    "account.password":    { "roles": ["administrator", "user", "customer"], "description": "Change your own password" }
+  }
+}

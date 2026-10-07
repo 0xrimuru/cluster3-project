@@ -1,0 +1,289 @@
+[
+  {
+    "id": "",
+    "test": "customersAndUnknown",
+    "class": "AuthLockoutTest",
+    "seconds": 0.168,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "lockout",
+    "class": "AuthLockoutTest",
+    "seconds": 0.322,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "signIn",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 1.047,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "stockCrud",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.074,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "adjust",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.072,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "clients",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.074,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "createInvoice",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.078,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "rollback",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.139,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "concurrency",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.31,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "deleteInvoice",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.149,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "injection",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.054,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "users",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.25,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "pooling",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.489,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "softDelete",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.065,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "loginFails",
+    "class": "GuiTest",
+    "seconds": 0.913,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "loginWorks",
+    "class": "GuiTest",
+    "seconds": 0.94,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "stock",
+    "class": "GuiTest",
+    "seconds": 0.801,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "newInvoice",
+    "class": "GuiTest",
+    "seconds": 2.147,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "clients",
+    "class": "GuiTest",
+    "seconds": 0.652,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "users",
+    "class": "GuiTest",
+    "seconds": 1.016,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "staffMenus",
+    "class": "GuiTest",
+    "seconds": 0.786,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "inheritance",
+    "class": "ModelTest",
+    "seconds": 0.007,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "invoiceMaths",
+    "class": "ModelTest",
+    "seconds": 0.003,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "invoiceRules",
+    "class": "ModelTest",
+    "seconds": 0.002,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "search",
+    "class": "ModelTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "polymorphism",
+    "class": "ModelTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "enums",
+    "class": "ModelTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "stockLevel",
+    "class": "ModelTest",
+    "seconds": 0,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "productRules",
+    "class": "ModelTest",
+    "seconds": 0.004,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "policy",
+    "class": "PolicyAndRulesTest",
+    "seconds": 0.017,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "passwordRules",
+    "class": "PolicyAndRulesTest",
+    "seconds": 0.011,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "envParsing",
+    "class": "PolicyAndRulesTest",
+    "seconds": 0.012,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "brokenPolicy",
+    "class": "PolicyAndRulesTest",
+    "seconds": 0.002,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "policyInSync",
+    "class": "PolicyAndRulesTest",
+    "seconds": 0.004,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "blindIndexMatchesNode",
+    "class": "SecurityCompatibilityTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "tamperDetected",
+    "class": "SecurityCompatibilityTest",
+    "seconds": 0.002,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "decryptsNodeCiphertext",
+    "class": "SecurityCompatibilityTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "roundTrip",
+    "class": "SecurityCompatibilityTest",
+    "seconds": 0.007,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "verifiesNodeHash",
+    "class": "SecurityCompatibilityTest",
+    "seconds": 0.081,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "nodeAcceptsJavaOutput",
+    "class": "SecurityCompatibilityTest",
+    "seconds": 0.211,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "hashRoundTrip",
+    "class": "SecurityCompatibilityTest",
+    "seconds": 0.451,
+    "result": "PASS"
+  }
+]

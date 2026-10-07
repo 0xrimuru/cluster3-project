@@ -44,6 +44,7 @@ db/
 routes/         URL -> controller mapping (each route asks for a permission)
 scripts/        secure-start.js (npm run start:secure), make-cert.js (npm run security:cert)
 mobile-app/     Android WebView app (Android Studio project)
+oop-app/        Java desktop app - LPA Administration System (Swing, same database) - see oop-app/README.md
 public/         css, js, images, media
 docs/           plans, minutes, requirements, test scripts and results per phase
 server.js       application entry point
@@ -59,4 +60,5 @@ server.js       application entry point
 - **Block 7 — ICTDBS507:** MySQL database integration (`config/`, `db/`, `docs/phase7`).
 - **Block 8 — ICTPRG554:** MongoDB — sessions, activity log, product reviews, change-stream trigger (`config/nosql.js`, `db/nosql`, `docs/phase8`).
 - **Block 9 — ICTPRG537:** application security — access policy, code-access security, lockout, encryption, HTTPS, injection protection; Android app hardened (`app/Security`, `docs/phase9`, `mobile-app`).
-- Blocks 10–11 — OOP desktop app, advanced programming — to come.
+- **Block 10 — ICTPRG549:** Java OOP desktop app (Swing GUI + MySQL), 41 tests incl. GUI (`oop-app`, `docs/phase10`).
+- Block 11 — advanced programming — to come.
