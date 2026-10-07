@@ -56,7 +56,7 @@ public class MainFrame extends JFrame {
         setLocationRelativeTo(null);
 
         for (BasePanel p : new BasePanel[]{new HomePanel(app, this), new StockPanel(app, this), new InvoicesPanel(app, this),
-                new NewInvoicePanel(app, this), new ClientPanel(app, this), new UserPanel(app, this), new MyDetailsPanel(app, this)}) {
+                new NewInvoicePanel(app, this), new ClientPanel(app, this), new UserPanel(app, this), new MyDetailsPanel(app, this), new ReportsPanel(app, this)}) {
             screens.put(p.key(), p);
             content.add(p, p.key());
         }
@@ -86,6 +86,12 @@ public class MainFrame extends JFrame {
         if (app.session.can("sales.create")) sales.add(item("New Invoice", 'N', e -> show("new-invoice")));
         if (app.session.can("clients.view")) sales.add(item("Clients", 'C', e -> show("clients")));
         if (sales.getItemCount() > 0) bar.add(sales);
+
+        if (app.session.can("reports.view")) {
+            JMenu reports = new JMenu("Reports");
+            reports.add(item("Reports and Planning", 'R', e -> show("reports")));
+            bar.add(reports);
+        }
 
         JMenu admin = new JMenu("System Administration");
         if (app.session.can("account.password")) admin.add(item("My User Details", (char) 0, e -> show("me")));
@@ -127,6 +133,9 @@ public class MainFrame extends JFrame {
     public void status(String text) { statusBar.setText(text); }
 
     public BasePanel screen(String key) { return screens.get(key); }
+
+    /** Tests: the screen objects. */
+    public java.util.Collection<BasePanel> screens() { return screens.values(); }
 
     private void logout() {
         app.auth.logout();

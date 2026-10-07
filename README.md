@@ -60,5 +60,5 @@ server.js       application entry point
 - **Block 7 — ICTDBS507:** MySQL database integration (`config/`, `db/`, `docs/phase7`).
 - **Block 8 — ICTPRG554:** MongoDB — sessions, activity log, product reviews, change-stream trigger (`config/nosql.js`, `db/nosql`, `docs/phase8`).
 - **Block 9 — ICTPRG537:** application security — access policy, code-access security, lockout, encryption, HTTPS, injection protection; Android app hardened (`app/Security`, `docs/phase9`, `mobile-app`).
-- **Block 10 — ICTPRG549:** Java OOP desktop app (Swing GUI + MySQL), 41 tests incl. GUI (`oop-app`, `docs/phase10`).
-- Block 11 — advanced programming — to come.
+- **Block 10 — ICTPRG549:** Java OOP desktop app (Swing GUI + MySQL) (`oop-app`, `docs/phase10`).
+- **Block 11 — ICTPRG547:** data structures and algorithms (trie, heap, LRU cache, sorts, binary search, graph + Dijkstra, 2-opt routes) and third-party libraries (JFreeChart, OpenPDF, Commons CSV) in the desktop app's Reports and Planning; 63 desktop tests (`docs/phase11`).

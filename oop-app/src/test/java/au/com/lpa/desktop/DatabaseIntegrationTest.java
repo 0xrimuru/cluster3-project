@@ -272,4 +272,47 @@ class DatabaseIntegrationTest {
         app.clients.disable(c.getId());
         assertEquals(RecordStatus.DISABLED, app.clients.search("Client " + RUN).get(0).getStatus());
     }
+
+    @Test @Order(13) @DisplayName("I-13 Reports on real data: reorder plan, sales per month, delivery route")
+    void reports() throws Exception {
+        as("mchang"); // staff may see reports
+        var plan = app.reports.reorderPlan(10);
+        assertEquals("LPA-008", plan.get(0).product().getId());          // 9 sold in 90 days, only 2 left
+        assertEquals("Only 20 days of stock left", plan.get(0).reason());
+        assertEquals(1, plan.get(0).suggestedQty());                      // 30 days x 0.1/day = 3, minus 2 on hand
+        assertEquals("LPA-003", plan.get(1).product().getId());          // out of stock (no recent sales)
+        assertEquals("LPA-004", plan.get(2).product().getId());          // low stock
+        var sales = app.reports.sales(LocalDate.parse("2026-07-01"), LocalDate.parse("2026-08-31"));
+        assertEquals(new BigDecimal("803.50"), sales.total());
+        assertEquals(new BigDecimal("546.50"), sales.months().get(0).total());
+        assertEquals(new BigDecimal("257.00"), sales.months().get(1).total());
+        var route = app.reports.deliveryRoute(app.reports.invoicesBetween(LocalDate.parse("2026-07-28"), LocalDate.parse("2026-08-04")));
+        var suburbs = route.stops().stream().map(au.com.lpa.desktop.report.DeliveryPlanner.Stop::suburb).toList();
+        assertEquals("Brisbane City", suburbs.get(0));
+        assertTrue(suburbs.containsAll(List.of("Indooroopilly", "Northgate", "South Brisbane")), suburbs.toString());
+        assertTrue(route.notOnMap().isEmpty(), route.notOnMap().toString());
+        System.out.printf("I-13: route %s = %.1f km (greedy %.1f km)%n", suburbs, route.km(), route.greedyKm());
+        app.auth.logout();
+        app.auth.login("palvim", "Lpa#2026");
+        User me = app.session.user();
+        assertNotNull(me);
+    }
+
+    @Test @Order(14) @DisplayName("I-14 LRU cache: repeat lookups come from memory; a sale clears the item so the new stock is shown")
+    void cache() throws Exception {
+        as("palvim");
+        app.cache.productCache().clear();
+        long misses = app.cache.productCache().misses(), hits = app.cache.productCache().hits();
+        int before = app.invoices.findProduct("LPA-007").orElseThrow().getOnHand();
+        app.invoices.findProduct("lpa-007");
+        assertEquals(misses + 1, app.cache.productCache().misses());
+        assertEquals(hits + 1, app.cache.productCache().hits());
+        Invoice d = new Invoice();
+        d.setClientId("CL-003");
+        d.addLine(new InvoiceLine("LPA-007", "Numpad", 1, BigDecimal.ONE));
+        app.invoices.create(d);
+        assertEquals(before - 1, app.invoices.findProduct("LPA-007").orElseThrow().getOnHand()); // not the stale cached value
+        assertEquals(List.of("LPA-001", "LPA-007"), app.invoices.suggestProducts("mechanical", 5).stream().map(Product::getId).toList()); // trie
+        assertEquals("CL-004", app.invoices.suggestClients("north", 5).get(0).getId());
+    }
 }

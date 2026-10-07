@@ -38,6 +38,7 @@ public class InvoicesPanel extends BasePanel {
     private final JLabel invTotal = new JLabel(" ");
     private final JButton newButton;
     private final JButton deleteButton;
+    private final JButton pdfButton;
     private Invoice open;
 
     public InvoicesPanel(Services app, MainFrame frame) {
@@ -54,6 +55,7 @@ public class InvoicesPanel extends BasePanel {
         table.setName("table");
         newButton = Ui.primary("New invoice", e -> frame.show("new-invoice"));
         deleteButton = Ui.danger("Delete invoice", e -> delete());
+        pdfButton = Ui.button("Save as PDF", e -> savePdf());
 
         JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         bar.add(new JLabel("Search:"));
@@ -77,6 +79,7 @@ public class InvoicesPanel extends BasePanel {
         JPanel foot = new JPanel(new BorderLayout());
         foot.add(invTotal, BorderLayout.WEST);
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        actions.add(pdfButton);
         actions.add(deleteButton);
         foot.add(actions, BorderLayout.EAST);
         detail.add(foot, BorderLayout.SOUTH);
@@ -117,6 +120,7 @@ public class InvoicesPanel extends BasePanel {
             lines.setRows(List.of());
             invTotal.setText(" ");
             deleteButton.setEnabled(false);
+            pdfButton.setEnabled(false);
             return;
         }
         header.setText("<html><b style='font-size:13pt'>" + inv.getId() + "</b> &nbsp; " + inv.getDate() + "<br>" + Ui.escape(inv.getClientName())
@@ -124,6 +128,20 @@ public class InvoicesPanel extends BasePanel {
         lines.setRows(inv.getLines());
         invTotal.setText("<html>Total (incl. GST " + Ui.money(inv.gst()) + "): <b>" + Ui.money(inv.total()) + "</b></html>");
         deleteButton.setEnabled(true);
+        pdfButton.setEnabled(true);
+    }
+
+    private void savePdf() {
+        if (open == null) return;
+        javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
+        fc.setSelectedFile(new java.io.File(open.getId() + ".pdf"));
+        if (fc.showSaveDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) savePdf(fc.getSelectedFile().toPath());
+    }
+
+    /** Saves the open invoice as a PDF (OpenPDF). Also used by tests (no file dialog). */
+    public void savePdf(java.nio.file.Path file) {
+        Invoice inv = open;
+        Async.run(this, () -> { au.com.lpa.desktop.export.InvoicePdf.write(inv, file); return file; }, f -> frame.status("Saved " + f));
     }
 
     private void delete() {

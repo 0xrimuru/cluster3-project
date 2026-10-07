@@ -30,6 +30,16 @@
       <groupId>com.formdev</groupId><artifactId>flatlaf</artifactId><version>3.5.4</version>
     </dependency>
 
+    <dependency> <!-- charts on the Reports screen (sales per month) -->
+      <groupId>org.jfree</groupId><artifactId>jfreechart</artifactId><version>1.5.5</version>
+    </dependency>
+    <dependency> <!-- invoice PDF ("Save as PDF") -->
+      <groupId>com.github.librepdf</groupId><artifactId>openpdf</artifactId><version>2.0.3</version>
+    </dependency>
+    <dependency> <!-- CSV export of reports (opens in Excel) -->
+      <groupId>org.apache.commons</groupId><artifactId>commons-csv</artifactId><version>1.12.0</version>
+    </dependency>
+
     <dependency>
       <groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><version>${junit.version}</version><scope>test</scope>
     </dependency>

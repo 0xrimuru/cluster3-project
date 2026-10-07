@@ -34,8 +34,10 @@ public class InvoiceService {
     private final ProductRepository products;
     private final LedgerRepository ledger;
     private final Session session;
+    private final LookupCache cache;
 
-    public InvoiceService(Db db, InvoiceRepository invoices, ClientRepository clients, ProductRepository products, LedgerRepository ledger, Session session) {
+    public InvoiceService(Db db, InvoiceRepository invoices, ClientRepository clients, ProductRepository products, LedgerRepository ledger, Session session, LookupCache cache) {
+        this.cache = cache;
         this.db = db;
         this.invoices = invoices;
         this.clients = clients;
@@ -60,15 +62,43 @@ public class InvoiceService {
         return invoices.findById(number);
     }
 
+    /** Client by ID - from the LRU cache when it was looked up recently. */
     public Optional<Client> findClient(String code) throws SQLException, ServiceException {
         session.require("clients.view");
-        return clients.findById(code);
+        String key = code == null ? "" : code.trim().toUpperCase();
+        Optional<Optional<Client>> hit = cache.clients.get(key);
+        if (hit.isPresent()) return hit.get();
+        Optional<Client> c = clients.findById(key);
+        cache.clients.put(key, c);
+        return c;
     }
 
+    /** Stock item by ID - from the LRU cache when it was looked up recently. */
     public Optional<Product> findProduct(String sku) throws SQLException, ServiceException {
         session.require("stock.view");
-        return products.findById(sku);
+        String key = sku == null ? "" : sku.trim().toUpperCase();
+        Optional<Optional<Product>> hit = cache.products.get(key);
+        if (hit.isPresent()) return hit.get();
+        Optional<Product> p = products.findById(key);
+        cache.products.put(key, p);
+        return p;
     }
+
+    /** Type-ahead: stock items whose ID, name, brand or category starts with the text (trie). */
+    public List<Product> suggestProducts(String prefix, int limit) throws SQLException, ServiceException {
+        session.require("stock.view");
+        if (cache.productIndex() == null) cache.productIndex(products.findAll());
+        return cache.productIndex().suggest(prefix, limit);
+    }
+
+    /** Type-ahead: clients whose ID or name starts with the text (trie). */
+    public List<Client> suggestClients(String prefix, int limit) throws SQLException, ServiceException {
+        session.require("clients.view");
+        if (cache.clientIndex() == null) cache.clientIndex(clients.findAll());
+        return cache.clientIndex().suggest(prefix, limit);
+    }
+
+    public LookupCache cache() { return cache; }
 
     public String nextNumberPreview() throws SQLException {
         return db.run(c -> {
@@ -115,6 +145,7 @@ public class InvoiceService {
                 }
                 return no;
             });
+            wanted.keySet().forEach(cache::productChanged); // stock on hand changed
             return invoices.findById(number).orElseThrow();
         } catch (Rollback r) {
             throw new ServiceException(r.messages);
@@ -136,5 +167,7 @@ public class InvoiceService {
             return true;
         });
         if (!done) throw new ServiceException("Invoice not found.");
+        cache.productChanged(null);
+        cache.products.clear();
     }
 }

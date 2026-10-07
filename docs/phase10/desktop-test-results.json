@@ -1,170 +1,289 @@
 [
   {
     "id": "",
+    "test": "stable",
+    "class": "AlgorithmsTest",
+    "seconds": 0.014,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "sortSpeed",
+    "class": "AlgorithmsTest",
+    "seconds": 0.578,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "binarySearch",
+    "class": "AlgorithmsTest",
+    "seconds": 0.003,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "lru",
+    "class": "AlgorithmsTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "heap",
+    "class": "AlgorithmsTest",
+    "seconds": 0.031,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "topK",
+    "class": "AlgorithmsTest",
+    "seconds": 0.011,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "trie",
+    "class": "AlgorithmsTest",
+    "seconds": 0.002,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "dijkstra",
+    "class": "AlgorithmsTest",
+    "seconds": 0.004,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "route",
+    "class": "AlgorithmsTest",
+    "seconds": 0.009,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "sorts",
+    "class": "AlgorithmsTest",
+    "seconds": 0.044,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "triePerformance",
+    "class": "AlgorithmsTest",
+    "seconds": 4.023,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "movingAverage",
+    "class": "AlgorithmsTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "",
     "test": "customersAndUnknown",
     "class": "AuthLockoutTest",
-    "seconds": 0.168,
+    "seconds": 0.223,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "lockout",
     "class": "AuthLockoutTest",
-    "seconds": 0.322,
+    "seconds": 0.309,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "signIn",
     "class": "DatabaseIntegrationTest",
-    "seconds": 1.047,
+    "seconds": 0.13,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "stockCrud",
     "class": "DatabaseIntegrationTest",
-    "seconds": 0.074,
+    "seconds": 0.058,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "adjust",
     "class": "DatabaseIntegrationTest",
-    "seconds": 0.072,
+    "seconds": 0.205,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "clients",
     "class": "DatabaseIntegrationTest",
-    "seconds": 0.074,
+    "seconds": 0.058,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "createInvoice",
     "class": "DatabaseIntegrationTest",
-    "seconds": 0.078,
+    "seconds": 0.061,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "rollback",
     "class": "DatabaseIntegrationTest",
-    "seconds": 0.139,
+    "seconds": 0.059,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "concurrency",
     "class": "DatabaseIntegrationTest",
-    "seconds": 0.31,
+    "seconds": 0.055,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "deleteInvoice",
     "class": "DatabaseIntegrationTest",
-    "seconds": 0.149,
+    "seconds": 0.377,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "injection",
     "class": "DatabaseIntegrationTest",
-    "seconds": 0.054,
+    "seconds": 0.202,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "users",
     "class": "DatabaseIntegrationTest",
-    "seconds": 0.25,
+    "seconds": 1.162,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "pooling",
     "class": "DatabaseIntegrationTest",
-    "seconds": 0.489,
+    "seconds": 0.562,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "softDelete",
     "class": "DatabaseIntegrationTest",
-    "seconds": 0.065,
+    "seconds": 0.171,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "reports",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.402,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "cache",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.275,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "loginFails",
     "class": "GuiTest",
-    "seconds": 0.913,
+    "seconds": 1.057,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "loginWorks",
     "class": "GuiTest",
-    "seconds": 0.94,
+    "seconds": 1.645,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "stock",
     "class": "GuiTest",
-    "seconds": 0.801,
+    "seconds": 0.974,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "newInvoice",
     "class": "GuiTest",
-    "seconds": 2.147,
+    "seconds": 2.221,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "clients",
     "class": "GuiTest",
-    "seconds": 0.652,
+    "seconds": 0.657,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "users",
     "class": "GuiTest",
-    "seconds": 1.016,
+    "seconds": 0.99,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "staffMenus",
     "class": "GuiTest",
-    "seconds": 0.786,
+    "seconds": 0.821,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "autocomplete",
+    "class": "GuiTest",
+    "seconds": 0.706,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "reports",
+    "class": "GuiTest",
+    "seconds": 2.495,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "pdf",
+    "class": "GuiTest",
+    "seconds": 1.153,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "inheritance",
     "class": "ModelTest",
-    "seconds": 0.007,
+    "seconds": 0,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "invoiceMaths",
     "class": "ModelTest",
-    "seconds": 0.003,
+    "seconds": 0.001,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "invoiceRules",
     "class": "ModelTest",
-    "seconds": 0.002,
+    "seconds": 0,
     "result": "PASS"
   },
   {
@@ -199,21 +318,21 @@
     "id": "",
     "test": "productRules",
     "class": "ModelTest",
-    "seconds": 0.004,
+    "seconds": 0.001,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "policy",
     "class": "PolicyAndRulesTest",
-    "seconds": 0.017,
+    "seconds": 0.001,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "passwordRules",
     "class": "PolicyAndRulesTest",
-    "seconds": 0.011,
+    "seconds": 0.007,
     "result": "PASS"
   },
   {
@@ -234,6 +353,41 @@
     "id": "",
     "test": "policyInSync",
     "class": "PolicyAndRulesTest",
+    "seconds": 0.007,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "csv",
+    "class": "ReportsTest",
+    "seconds": 0.011,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "pdf",
+    "class": "ReportsTest",
+    "seconds": 0.025,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "sales",
+    "class": "ReportsTest",
+    "seconds": 0.004,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "delivery",
+    "class": "ReportsTest",
+    "seconds": 0.002,
+    "result": "PASS"
+  },
+  {
+    "id": "",
+    "test": "reorder",
+    "class": "ReportsTest",
     "seconds": 0.004,
     "result": "PASS"
   },
@@ -248,7 +402,7 @@
     "id": "",
     "test": "tamperDetected",
     "class": "SecurityCompatibilityTest",
-    "seconds": 0.002,
+    "seconds": 0.013,
     "result": "PASS"
   },
   {
@@ -262,28 +416,28 @@
     "id": "",
     "test": "roundTrip",
     "class": "SecurityCompatibilityTest",
-    "seconds": 0.007,
+    "seconds": 0.002,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "verifiesNodeHash",
     "class": "SecurityCompatibilityTest",
-    "seconds": 0.081,
+    "seconds": 0.091,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "nodeAcceptsJavaOutput",
     "class": "SecurityCompatibilityTest",
-    "seconds": 0.211,
+    "seconds": 0.642,
     "result": "PASS"
   },
   {
     "id": "",
     "test": "hashRoundTrip",
     "class": "SecurityCompatibilityTest",
-    "seconds": 0.451,
+    "seconds": 0.22,
     "result": "PASS"
   }
 ]

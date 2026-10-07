@@ -4,7 +4,7 @@ The Java desktop app is in `oop-app/` (see its README for the class design).
 
 | File | What it is |
 |---|---|
-| `desktop-test-results.json` | 41 tests (JUnit 5): T-01..T-22 unit / compatibility, I-01..I-12 database, G-01..G-07 GUI — last run 41 / 41 PASS |
+| `desktop-test-results.json` | Phase 10 tests T-01..T-22, I-01..I-12, G-01..G-07 (41) - the file now holds the full 63-test run incl. Phase 11: 63 / 63 PASS |
 | `shots/` | Screenshots taken by the GUI test (login failure, home, stock, new invoice, invoice saved, invoices, clients phone search, users, my details, staff view) |
 
 Bugs found by the tests and fixed:

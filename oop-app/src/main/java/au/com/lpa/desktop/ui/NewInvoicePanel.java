@@ -53,6 +53,10 @@ public class NewInvoicePanel extends BasePanel {
     private Invoice draft = new Invoice();
     private Client client;
     private Product item;
+    private final Autocomplete<au.com.lpa.desktop.model.Client> clientSuggest;
+    private final Autocomplete<Product> itemSuggest;
+
+    public Autocomplete<Product> itemSuggest() { return itemSuggest; }
 
     public NewInvoicePanel(Services app, MainFrame frame) {
         super(app, frame, "New Invoice");
@@ -60,6 +64,11 @@ public class NewInvoicePanel extends BasePanel {
         clientId.addActionListener(e -> findClient());
         itemId.addActionListener(e -> findItem());
         addItem = Ui.button("Add Item", e -> addLine());
+        // type-ahead (trie): suggestions while typing a client or item name / ID
+        clientSuggest = Autocomplete.attach(clientId, prefix -> app.invoices.suggestClients(prefix, 8),
+                c -> c.getId() + "  " + c.fullName(), au.com.lpa.desktop.model.Client::getId, code -> findClient());
+        itemSuggest = Autocomplete.attach(itemId, prefix -> app.invoices.suggestProducts(prefix, 8),
+                p -> p.getId() + "  " + p.getName() + "  (" + p.getOnHand() + " on hand)", au.com.lpa.desktop.model.Product::getId, sku -> findItem());
         lines.setRowHeight(24);
 
         Ui.Form inv = new Ui.Form().add("Invoice No.:", number).add("Date (YYYY-MM-DD):", date);

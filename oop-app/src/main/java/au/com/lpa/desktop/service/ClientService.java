@@ -11,8 +11,10 @@ public class ClientService {
 
     private final ClientRepository clients;
     private final Session session;
+    private final LookupCache cache;
 
-    public ClientService(ClientRepository clients, Session session) {
+    public ClientService(ClientRepository clients, Session session, LookupCache cache) {
+        this.cache = cache;
         this.clients = clients;
         this.session = session;
     }
@@ -26,11 +28,14 @@ public class ClientService {
         session.require("sales.create"); // administrators keep the client list (they create invoices for them)
         List<String> errors = c.validate();
         if (!errors.isEmpty()) throw new ServiceException(errors);
-        return clients.save(c);
+        Client saved = clients.save(c);
+        cache.clientChanged(saved.getId());
+        return saved;
     }
 
     public void disable(String code) throws SQLException, ServiceException {
         session.require("sales.create");
         if (!clients.delete(code)) throw new ServiceException("Client not found or already disabled.");
+        cache.clientChanged(code);
     }
 }

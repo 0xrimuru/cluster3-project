@@ -30,6 +30,8 @@ public final class Services implements AutoCloseable {
     public final ClientService clients;
     public final UserService users;
     public final DashboardService dashboard;
+    public final au.com.lpa.desktop.report.ReportService reports;
+    public final au.com.lpa.desktop.service.LookupCache cache = new au.com.lpa.desktop.service.LookupCache();
 
     public Services(AppConfig config) {
         this.config = config;
@@ -43,9 +45,10 @@ public final class Services implements AutoCloseable {
         InvoiceRepository invoiceRepo = new InvoiceRepository(db);
         LedgerRepository ledgerRepo = new LedgerRepository(db);
         this.auth = new AuthService(userRepo, session);
-        this.stock = new StockService(db, productRepo, ledgerRepo, session);
-        this.invoices = new InvoiceService(db, invoiceRepo, clientRepo, productRepo, ledgerRepo, session);
-        this.clients = new ClientService(clientRepo, session);
+        this.stock = new StockService(db, productRepo, ledgerRepo, session, cache);
+        this.invoices = new InvoiceService(db, invoiceRepo, clientRepo, productRepo, ledgerRepo, session, cache);
+        this.clients = new ClientService(clientRepo, session, cache);
+        this.reports = new au.com.lpa.desktop.report.ReportService(new au.com.lpa.desktop.report.ReportRepository(db), productRepo, session);
         this.users = new UserService(userRepo, session);
         this.dashboard = new DashboardService(db);
     }

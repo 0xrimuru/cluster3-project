@@ -2,7 +2,8 @@
 
 The desktop interface of LPA eComms for LPA staff: stock management (with adjustments and audit history), invoices,
 new invoice, clients, user management and "my user details". It uses the **same MySQL database, accounts, access policy
-and encryption key** as the web app. ICTPRG549 (OOP + GUI + database); third-party libraries for ICTPRG547.
+and encryption key** as the web app. ICTPRG549 (OOP + GUI + database) and ICTPRG547 (data structures, algorithms,
+third-party libraries): Reports and Planning (reorder planner, sales chart, delivery route, algorithm lab), type-ahead, invoice PDF, CSV export.
 
 ## Run
 1. The web app must be set up first (`npm run db:setup` in the folder above) — the desktop app reads its `.env`.
@@ -13,7 +14,7 @@ and encryption key** as the web app. ICTPRG549 (OOP + GUI + database); third-par
 ```
 mvnw package          # Windows: mvnw.cmd package   (downloads Maven the first time)
 ```
-Runs 41 tests: unit tests (model, rules, policy, Java <-> Node.js hash/encryption compatibility), database tests against
+Runs 63 tests: unit tests (model, rules, policy, Java <-> Node.js hash/encryption compatibility), database tests against
 lpa_ecomms (CRUD, transactions, rollback, two users at once, SQL injection, connection pool) and GUI tests that drive the
 real windows and save screenshots to `target/screenshots` (they need a screen and the database; otherwise they are skipped).
 
@@ -29,4 +30,13 @@ real windows and save screenshots to `target/screenshots` (they need a screen an
   `InvoicesPanel`, `NewInvoicePanel`, `HomePanel`, `MyDetailsPanel`, `LoginDialog`; generic `BeanTableModel<T>`; `Async` (SwingWorker).
 - `util` — `Db` (small connection pool + transactions), `Clocks`. `Services` wires everything together.
 
-Third-party libraries: MySQL Connector/J, Gson, Bouncy Castle, FlatLaf, JUnit 5.
+- `algo` (ICTPRG547) — written by hand, generic, tested against Java's own versions: `Trie` (type-ahead), `MinHeap` (+ top-k),
+  `LruCache` (hash map + doubly linked list), `Sorts` (merge sort - stable, quick sort - 3-way random pivot, insertion sort),
+  `BinarySearch` (lower/upper bound, ranges), `Graph` (adjacency list + Dijkstra), `RoutePlanner` (nearest neighbour + 2-opt),
+  `MovingAverage` (sliding window with a deque).
+- `report` — `ReorderPlanner` (heap), `SalesReport` (binary search + moving average + merge sort), `DeliveryPlanner`
+  (suburb road graph in `delivery-map.json` + Dijkstra + 2-opt), `ReportService`, `ReportRepository`.
+- `export` — `InvoicePdf` (OpenPDF), `CsvExport` (Apache Commons CSV); the sales chart uses JFreeChart.
+- `service/LookupCache` — LRU caches + tries behind New Invoice lookups and type-ahead (cleared on every change).
+
+Third-party libraries: MySQL Connector/J, Gson, Bouncy Castle, FlatLaf, JFreeChart, OpenPDF, Apache Commons CSV, JUnit 5.

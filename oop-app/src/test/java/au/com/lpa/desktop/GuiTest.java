@@ -167,10 +167,8 @@ class GuiTest {
         JMenuBar bar = f.getJMenuBar();
         List<String> menus = new ArrayList<>();
         for (int i = 0; i < bar.getMenuCount(); i++) menus.add(bar.getMenu(i).getText());
-        assertEquals(List.of("Menu", "Sales and Invoicing", "System Administration", "Exit", "Help"), menus);
-        assertNotNull(find(bar.getMenu(2), javax.swing.JMenuItem.class, m -> "User Management".equals(m.getText())) == null
-                ? (Object) all(bar.getMenu(2).getPopupMenu()).stream().filter(c -> c instanceof javax.swing.JMenuItem m && "User Management".equals(m.getText())).findFirst().orElse(null)
-                : "ok");
+        assertEquals(List.of("Menu", "Sales and Invoicing", "Reports", "System Administration", "Exit", "Help"), menus);
+        assertTrue(java.util.Arrays.stream(bar.getMenu(3).getMenuComponents()).anyMatch(c -> c instanceof javax.swing.JMenuItem m && "User Management".equals(m.getText())));
         shot("02-home-administrator", f);
     }
 
@@ -257,5 +255,67 @@ class GuiTest {
         assertNotNull(button(staff.getContentPane(), "Submit adjustment"));
         shot("10-staff-stock", staff);
         edt(staff::dispose);
+    }
+
+    @Test @Order(8) @DisplayName("G-08 Type-ahead in New Invoice: typing 'webc' suggests the webcam (trie); picking it looks it up")
+    void autocomplete() throws Exception {
+        app.auth.logout();
+        app.auth.login("palvim", "Lpa#2026");
+        MainFrame f = frame.get();
+        edt(() -> f.show("new-invoice"));
+        Container c = f.getContentPane();
+        au.com.lpa.desktop.ui.NewInvoicePanel panel = (au.com.lpa.desktop.ui.NewInvoicePanel) f.screens().stream().filter(s -> s.key().equals("new-invoice")).findFirst().orElseThrow();
+        edt(() -> { JTextField item = named(c, JTextField.class, "itemId"); item.requestFocusInWindow(); item.setText("webc"); });
+        waitFor("suggestions", () -> !panel.itemSuggest().shown().isEmpty());
+        assertTrue(panel.itemSuggest().shown().get(0).startsWith("LPA-005  1080p HD Webcam CV-10"), panel.itemSuggest().shown().toString());
+        shot("11-type-ahead", f);
+        edt(() -> panel.itemSuggest().pick(0));
+        waitFor("item looked up", () -> text(named(c, JLabel.class, "itemName")).equals("1080p HD Webcam CV-10"));
+        assertEquals("LPA-005", named(c, JTextField.class, "itemId").getText());
+    }
+
+    @Test @Order(9) @DisplayName("G-09 Reports and Planning: reorder plan, sales chart (JFreeChart), delivery route, algorithm lab")
+    void reports() throws Exception {
+        MainFrame f = frame.get();
+        edt(() -> f.show("reports"));
+        au.com.lpa.desktop.ui.ReportsPanel rp = (au.com.lpa.desktop.ui.ReportsPanel) f.screens().stream().filter(s -> s.key().equals("reports")).findFirst().orElseThrow();
+        Container c = f.getContentPane();
+        waitFor("reorder rows", () -> named(c, JTable.class, "reorder") != null && named(c, JTable.class, "reorder").getRowCount() > 0);
+        assertEquals("LPA-008", named(c, JTable.class, "reorder").getValueAt(0, 0));
+        shot("12-reorder-planner", f);
+        edt(() -> rp.tabs().setSelectedIndex(1));
+        waitFor("chart data", () -> ((org.jfree.chart.plot.CategoryPlot) rp.chart().getPlot()).getDataset().getColumnCount() >= 5);
+        shot("13-sales-report", f);
+        java.io.File png = new java.io.File(SHOTS, "sales-chart.png");
+        org.jfree.chart.ChartUtils.saveChartAsPNG(png, rp.chart(), 900, 500);
+        assertTrue(png.length() > 5000);
+        edt(() -> rp.tabs().setSelectedIndex(2));
+        waitFor("route", () -> { javax.swing.JList<?> l = named(c, javax.swing.JList.class, "route"); return l != null && l.getModel().getSize() >= 3; });
+        shot("14-delivery-route", f);
+        edt(() -> rp.tabs().setSelectedIndex(3));
+        edt(() -> button(c, "Time the sorts").doClick());
+        waitFor("sort timings", () -> { javax.swing.JList<?> l = named(c, javax.swing.JList.class, "lab"); return l != null && l.getModel().getSize() >= 5; });
+        shot("15-algorithm-lab", f);
+        java.nio.file.Path csv = new java.io.File(SHOTS, "reorder-plan.csv").toPath();
+        edt(() -> rp.exportReorder(csv));
+        waitFor("csv written", () -> { try { return java.nio.file.Files.exists(csv) && java.nio.file.Files.readString(csv).contains("LPA-008"); } catch (java.io.IOException e) { return false; } });
+    }
+
+    @Test @Order(10) @DisplayName("G-10 Save an invoice as PDF (OpenPDF)")
+    void pdf() throws Exception {
+        MainFrame f = frame.get();
+        edt(() -> f.show("invoices"));
+        Container c = f.getContentPane();
+        waitFor("invoices", () -> named(c, JTable.class, "table") != null && named(c, JTable.class, "table").isShowing() && named(c, JTable.class, "table").getRowCount() >= 6);
+        Thread.sleep(800); // let the list finish reloading before choosing a row
+        edt(() -> named(c, JTable.class, "table").setRowSelectionInterval(0, 0));
+        waitFor("opened", () -> find(c, JLabel.class, l -> text(l).contains("INV-1001")) != null);
+        au.com.lpa.desktop.ui.InvoicesPanel ip = (au.com.lpa.desktop.ui.InvoicesPanel) f.screens().stream().filter(s -> s.key().equals("invoices")).findFirst().orElseThrow();
+        java.nio.file.Path pdf = new java.io.File(SHOTS, "INV-1001.pdf").toPath();
+        edt(() -> ip.savePdf(pdf));
+        waitFor("pdf", () -> pdf.toFile().length() > 1000);
+        com.lowagie.text.pdf.PdfReader r = new com.lowagie.text.pdf.PdfReader(pdf.toString());
+        assertTrue(new com.lowagie.text.pdf.parser.PdfTextExtractor(r).getTextFromPage(1).contains("Riverside College Library"));
+        r.close();
     }
 }

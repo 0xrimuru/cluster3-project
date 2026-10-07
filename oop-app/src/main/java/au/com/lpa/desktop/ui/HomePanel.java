@@ -54,6 +54,7 @@ public class HomePanel extends BasePanel {
         if (app.session.can("sales.create")) shortcuts.add(Ui.primary("New Invoice", e -> frame.show("new-invoice")));
         if (app.session.can("clients.view")) shortcuts.add(Ui.button("Clients", e -> frame.show("clients")));
         if (app.session.can("users.manage")) shortcuts.add(Ui.button("User Management", e -> frame.show("users")));
+        if (app.session.can("reports.view")) shortcuts.add(Ui.button("Reports and Planning", e -> frame.show("reports")));
         Async.run(this, () -> app.stock.search(""), list -> attention.setRows(list.stream()
                 .filter(p -> p.level() != au.com.lpa.desktop.model.Product.Level.IN)
                 .sorted(java.util.Comparator.comparingInt(au.com.lpa.desktop.model.Product::getOnHand)).toList()));

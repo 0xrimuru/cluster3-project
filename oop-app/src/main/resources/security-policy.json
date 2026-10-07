@@ -1,6 +1,6 @@
 {
   "name": "LPA eComms access policy",
-  "version": 1,
+  "version": 2,
   "updated": "2026-10-07",
   "defaultDecision": "deny",
   "notes": "Every route asks for a permission. A user gets a permission only if their user group is listed. Anything not listed is denied (deny by default). Ownership rules (own review, own orders) are checked in code on top of these permissions.",
@@ -28,6 +28,7 @@
     "reviews.vote":        { "roles": ["administrator", "user", "customer"], "description": "Mark a review as helpful (not your own)" },
     "reviews.moderate":    { "roles": ["administrator", "user"], "description": "Search reviews, hide and publish them" },
     "reviews.delete_any":  { "roles": ["administrator"],         "description": "Delete any review" },
+    "reports.view":        { "roles": ["administrator", "user"], "description": "Reports and planning: reorder planner, sales report, delivery route (desktop app)" },
     "account.password":    { "roles": ["administrator", "user", "customer"], "description": "Change your own password" }
   }
 }

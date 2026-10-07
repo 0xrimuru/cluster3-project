@@ -26,8 +26,10 @@ public class StockService {
     private final ProductRepository products;
     private final LedgerRepository ledger;
     private final Session session;
+    private final LookupCache cache;
 
-    public StockService(Db db, ProductRepository products, LedgerRepository ledger, Session session) {
+    public StockService(Db db, ProductRepository products, LedgerRepository ledger, Session session, LookupCache cache) {
+        this.cache = cache;
         this.db = db;
         this.products = products;
         this.ledger = ledger;
@@ -46,12 +48,15 @@ public class StockService {
         List<String> errors = new ArrayList<>(p.validate());
         if (isNew && p.getId() != null && products.idTaken(p.getId())) errors.add("Stock ID " + p.getId() + " already exists.");
         if (!errors.isEmpty()) throw new ServiceException(errors);
-        return products.save(p);
+        Product saved = products.save(p);
+        cache.productChanged(saved.getId());
+        return saved;
     }
 
     public void delete(String sku) throws SQLException, ServiceException {
         session.require("stock.manage");
         if (!products.delete(sku)) throw new ServiceException("Stock item not found.");
+        cache.productChanged(sku);
     }
 
     /** Add / remove / reconcile in ONE transaction with its ledger row. Never below zero. */
@@ -76,6 +81,7 @@ public class StockService {
             return p;
         });
         if (result == null) throw new ServiceException("Stock item not found.");
+        cache.productChanged(result.getId());
         return result;
     }
 
