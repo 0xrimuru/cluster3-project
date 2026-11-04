@@ -2,10 +2,9 @@
 // The client name / address are copied onto the invoice when it is created (they are what
 // was printed on the day), and each line keeps the price charged at the time of sale.
 // Line amounts and the invoice amount are always calculated here, never typed in.
-const { query, nowLocal } = require('../../config/database');
+const { query, nowLocal, like } = require('../../config/database');
 
 const round2 = n => Math.round(n * 100) / 100;
-const like = s => '%' + String(s).replace(/[\\%_]/g, c => '\\' + c) + '%';
 
 // List columns + the number of units on each invoice (sub-query on the items table).
 const LIST = `SELECT i.lpa_inv_no AS number, DATE_FORMAT(i.lpa_inv_date, '%Y-%m-%d') AS date,
@@ -38,7 +37,7 @@ class Invoice {
   }
 
   static async nextNumber(conn) {
-    const rows = await query("SELECT COALESCE(MAX(CAST(SUBSTRING(lpa_inv_no, 5) AS UNSIGNED)), 1000) + 1 AS n FROM lpa_invoices WHERE lpa_inv_no REGEXP '^INV-[0-9]+$'", [], conn);
+    const rows = await query("SELECT COALESCE(MAX(CAST(SUBSTRING(lpa_inv_no, 5) AS UNSIGNED)), 1000) + 1 AS n FROM lpa_invoices WHERE lpa_inv_no REGEXP '^INV-[0-9]+$' FOR UPDATE", [], conn); // lock: two checkouts at once never get the same number
     return 'INV-' + rows[0].n;
   }
 
@@ -56,6 +55,7 @@ class Invoice {
     return rows.length > 0;
   }
 
+  static round2(n) { return round2(n); }
   static total(list) { return round2((list || []).reduce((sum, i) => sum + i.amount, 0)); }
 
   // Total sales, worked out by the database (dashboard).

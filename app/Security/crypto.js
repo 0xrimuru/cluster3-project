@@ -46,6 +46,5 @@ function blindIndex(value) {
 const isEncrypted = v => typeof v === 'string' && /^v1\.[\w-]+\.[\w-]+\.[\w-]+$/.test(v);
 
 const hashToken = t => crypto.createHash('sha256').update(String(t)).digest('hex');
-const newKey = () => crypto.randomBytes(32).toString('base64');
 
-module.exports = { encrypt, decrypt, hashToken, newKey, blindIndex, isEncrypted };
+module.exports = { encrypt, decrypt, hashToken, blindIndex, isEncrypted };

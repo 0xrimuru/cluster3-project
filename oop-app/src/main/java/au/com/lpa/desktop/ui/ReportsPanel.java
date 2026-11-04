@@ -157,7 +157,7 @@ public class ReportsPanel extends BasePanel {
 
         tabs.setName("tabs");
         add(tabs, BorderLayout.CENTER);
-        LocalDate today = Clocks.nowBrisbane().toLocalDate();
+        LocalDate today = Clocks.today();
         from.setText(today.minusMonths(5).withDayOfMonth(1).toString());
         to.setText(today.toString());
         dFrom.setText(today.minusDays(90).toString());
@@ -270,7 +270,7 @@ public class ReportsPanel extends BasePanel {
         try {
             return LocalDate.parse(f.getText().trim());
         } catch (DateTimeParseException e) {
-            Ui.errors(this, "Please check", List.of("Dates must look like " + Clocks.nowBrisbane().toLocalDate() + "."));
+            Ui.errors(this, "Please check", List.of("Dates must look like " + Clocks.today() + "."));
             return null;
         }
     }

@@ -7,7 +7,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -137,15 +136,5 @@ public final class Ui {
         if (url == null) return null;
         Image img = new ImageIcon(url).getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
         return new ImageIcon(img);
-    }
-
-    public static JLabel badge(String text, Color colour) {
-        JLabel l = new JLabel(text, SwingConstants.CENTER);
-        l.setOpaque(true);
-        l.setBackground(new Color(colour.getRed(), colour.getGreen(), colour.getBlue(), 40));
-        l.setForeground(colour.darker());
-        l.setBorder(BorderFactory.createEmptyBorder(2, 8, 2, 8));
-        l.setFont(l.getFont().deriveFont(Font.BOLD, 11f));
-        return l;
     }
 }

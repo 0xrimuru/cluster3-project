@@ -8,7 +8,7 @@ const path = require('path');
 const selfsigned = require('selfsigned');
 const ROOT = path.join(__dirname, '..');
 const DIR = path.join(ROOT, 'certs');
-const ENV = path.join(ROOT, '.env');
+const { setEnv } = require('./env-file');
 
 const pems = selfsigned.generate([{ name: 'commonName', value: 'localhost' }, { name: 'organizationName', value: 'LPA eComms (development)' }], {
   keySize: 2048, days: 365, algorithm: 'sha256',
@@ -18,11 +18,8 @@ fs.mkdirSync(DIR, { recursive: true });
 fs.writeFileSync(path.join(DIR, 'lpa-dev.key'), pems.private, { mode: 0o600 });
 fs.writeFileSync(path.join(DIR, 'lpa-dev.crt'), pems.cert);
 
-let text = fs.existsSync(ENV) ? fs.readFileSync(ENV, 'utf8') : fs.readFileSync(path.join(ROOT, '.env.example'), 'utf8');
-for (const [k, v] of [['HTTPS_KEY', 'certs/lpa-dev.key'], ['HTTPS_CERT', 'certs/lpa-dev.crt']]) {
-  text = new RegExp(`^${k}=.*$`, 'm').test(text) ? text.replace(new RegExp(`^${k}=.*$`, 'm'), `${k}=${v}`) : text.replace(/\s*$/, '\n') + `${k}=${v}\n`;
-}
-fs.writeFileSync(ENV, text);
+setEnv('HTTPS_KEY', 'certs/lpa-dev.key');
+setEnv('HTTPS_CERT', 'certs/lpa-dev.crt');
 console.log('Created certs/lpa-dev.key and certs/lpa-dev.crt; HTTPS_KEY / HTTPS_CERT set in .env');
 console.log('Start the app (npm start) and open https://localhost:3000');
 console.log('To go back to HTTP: delete the HTTPS_KEY and HTTPS_CERT lines from .env');

@@ -14,7 +14,7 @@
     "steps": "Check .gitignore, config/database.js and .env.example",
     "sql": "n/a",
     "expected": ".env ignored; no password in the code; example file has a placeholder only",
-    "actual": ".env in .gitignore = true; git: .env not checked (no git here); password in config = false; example placeholder = true",
+    "actual": ".env in .gitignore = true; git: .env not tracked; password in config = false; example placeholder = true",
     "result": "PASS"
   },
   {
@@ -131,7 +131,7 @@
     "steps": "npm run db:export",
     "sql": "SHOW CREATE TABLE ?? + SELECT * FROM ??",
     "expected": "6 tables with their data; hashes only, no plain passwords",
-    "actual": "6 tables; 6 INSERT blocks; 11.7 KB; plain password = false",
+    "actual": "6 tables; 6 INSERT blocks; 12.5 KB; plain password = false",
     "result": "PASS"
   }
 ]

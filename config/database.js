@@ -65,4 +65,7 @@ function nowLocal() {
   return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`;
 }
 
-module.exports = { pool, query, transaction, check, isDown, nowLocal, settings: Object.assign({}, settings, { password: settings.password ? '********' : '(none)' }) };
+// LIKE '%text%' with the user's % _ \ escaped, so they are matched literally
+const like = s => '%' + String(s).replace(/[\\%_]/g, c => '\\' + c) + '%';
+
+module.exports = { like, pool, query, transaction, check, isDown, nowLocal, settings: Object.assign({}, settings, { password: settings.password ? '********' : '(none)' }) };

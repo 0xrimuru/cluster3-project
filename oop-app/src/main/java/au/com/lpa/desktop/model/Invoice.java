@@ -1,5 +1,7 @@
 package au.com.lpa.desktop.model;
 
+import au.com.lpa.desktop.util.Clocks;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,7 +11,7 @@ import java.util.List;
 /** A sales invoice (lpa_invoices) with its lines. The total is always worked out from the lines. */
 public class Invoice extends Entity<String> {
 
-    private LocalDate date = LocalDate.now();
+    private LocalDate date = Clocks.today();
     private String clientId = "";
     private String clientName = "";
     private String clientAddress = "";
@@ -63,7 +65,7 @@ public class Invoice extends Entity<String> {
         if (clientId == null || clientId.isBlank()) errors.add("Search and select a client first.");
         if (lines.isEmpty()) errors.add("Add at least one stock item.");
         if (date == null) errors.add("Date is required.");
-        else if (date.isAfter(LocalDate.now())) errors.add("The invoice date cannot be in the future.");
+        else if (date.isAfter(Clocks.today())) errors.add("The invoice date cannot be in the future.");
         return errors;
     }
 

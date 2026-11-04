@@ -93,7 +93,7 @@ public abstract class JdbcRepository<T extends Entity<String>> implements Reposi
     /** Next text ID such as LPA-009 / CL-007 / U-004 (largest number + 1). */
     protected String nextId(Connection c, String prefix, int width) throws SQLException {
         String sql = "SELECT COALESCE(MAX(CAST(SUBSTRING(" + idColumn() + ", ?) AS UNSIGNED)), 0) + 1 FROM " + table()
-                + " WHERE " + idColumn() + " REGEXP ?";
+                + " WHERE " + idColumn() + " REGEXP ? FOR UPDATE"; // lock: two saves at once never get the same ID
         try (PreparedStatement ps = prepare(c, sql, prefix.length() + 1, "^" + prefix + "[0-9]+$"); ResultSet rs = ps.executeQuery()) {
             rs.next();
             return prefix + String.format("%0" + width + "d", rs.getLong(1));

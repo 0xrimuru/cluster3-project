@@ -58,10 +58,13 @@ class GuiTest {
 
     @BeforeAll
     static void start() throws Exception {
+        // the seed invoices are from July/August 2026: report on them as if today were 7 Oct 2026
+        au.com.lpa.desktop.util.Clocks.useClock(java.time.Clock.fixed(java.time.Instant.parse("2026-10-07T00:00:00Z"), au.com.lpa.desktop.util.Clocks.LPA));
         assumeTrue(!GraphicsEnvironment.isHeadless(), "no display - GUI tests skipped");
         Path env = Path.of("..", ".env");
         assumeTrue(Files.exists(env), "no ../.env");
         System.setProperty("lpa.env", env.toString());
+        System.setProperty("lpa.test", "true"); // type-ahead shows even if the test display gives the field no keyboard focus
         try {
             app = new Services(AppConfig.load());
             app.db.run(c -> c.isValid(2));
@@ -312,8 +315,12 @@ class GuiTest {
         waitFor("opened", () -> find(c, JLabel.class, l -> text(l).contains("INV-1001")) != null);
         au.com.lpa.desktop.ui.InvoicesPanel ip = (au.com.lpa.desktop.ui.InvoicesPanel) f.screens().stream().filter(s -> s.key().equals("invoices")).findFirst().orElseThrow();
         java.nio.file.Path pdf = new java.io.File(SHOTS, "INV-1001.pdf").toPath();
+        java.nio.file.Files.deleteIfExists(pdf); // a file from an earlier run must not count as "saved"
         edt(() -> ip.savePdf(pdf));
-        waitFor("pdf", () -> pdf.toFile().length() > 1000);
+        waitFor("pdf", () -> { // written in the background: wait for the end-of-file marker, not just some bytes
+            try { String tail = new String(java.nio.file.Files.readAllBytes(pdf), java.nio.charset.StandardCharsets.ISO_8859_1); return tail.contains("%%EOF"); }
+            catch (java.io.IOException e) { return false; }
+        });
         com.lowagie.text.pdf.PdfReader r = new com.lowagie.text.pdf.PdfReader(pdf.toString());
         assertTrue(new com.lowagie.text.pdf.parser.PdfTextExtractor(r).getTextFromPage(1).contains("Riverside College Library"));
         r.close();

@@ -117,7 +117,7 @@ public class NewInvoicePanel extends BasePanel {
         draft = new Invoice();
         client = null;
         item = null;
-        date.setText(Clocks.nowBrisbane().toLocalDate().toString());
+        date.setText(Clocks.today().toString());
         for (JTextField f : new JTextField[]{clientId, itemId}) f.setText("");
         for (JLabel l : new JLabel[]{clientName, clientAddress, clientPhone, itemName, itemPrice, itemStock}) l.setText("-");
         qty.setValue(1);
@@ -193,7 +193,7 @@ public class NewInvoicePanel extends BasePanel {
         try {
             draft.setDate(LocalDate.parse(date.getText().trim()));
         } catch (DateTimeParseException e) {
-            Ui.errors(this, "Please check", List.of("Date must be a valid date, for example " + LocalDate.now() + "."));
+            Ui.errors(this, "Please check", List.of("Date must be a valid date, for example " + Clocks.today() + "."));
             return;
         }
         draft.setClientId(client == null ? "" : client.getId());

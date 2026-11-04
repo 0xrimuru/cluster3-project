@@ -30,7 +30,7 @@ function can(user, permission) {
   return !!(user && user.status === 'active' && rule && rule.roles.includes(user.group));
 }
 
-const wantsJson = req => (req.get('accept') || '').includes('application/json') || req.path.startsWith('/api/');
+const { wantsJson } = require('../Middleware/respond');
 
 function deny(req, res, permission) {
   require('../Models/NoSql/ActivityLog').write(req, `ACCESS_DENIED ${req.method} ${req.originalUrl.slice(0, 120)} needs ${permission}`, { type: 'ACCESS_DENIED', permission, group: req.user ? req.user.group : null });
@@ -68,4 +68,4 @@ function matrix() {
   return { groups, roles: POLICY.roles, rows: Object.entries(POLICY.permissions).map(([name, r]) => ({ name, description: r.description, allowed: groups.map(g => r.roles.includes(g)) })), version: POLICY.version, updated: POLICY.updated };
 }
 
-module.exports = { can, authorize, locals, matrix, canEditReview, canDeleteReview, canViewOrder, deny, POLICY };
+module.exports = { can, authorize, locals, matrix, canEditReview, canDeleteReview, canViewOrder, POLICY };

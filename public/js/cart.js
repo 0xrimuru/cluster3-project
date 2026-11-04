@@ -21,26 +21,26 @@
   function show(text) { msg.textContent = text; msg.hidden = !text; }
 
   async function save(tr, qty) {
-    const r = await fetch('/cart/' + encodeURIComponent(tr.dataset.sku), { method: 'POST',
-      headers: LPA.jsonHeaders(), body: JSON.stringify({ qty }) });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) { show(data.error || 'Could not update the cart.'); return false; }
-    show('');
+    const { ok, data } = await LPA.send('/cart/' + encodeURIComponent(tr.dataset.sku), 'POST', { qty });
+    if (!ok) { show(data.error || 'Could not update the cart.'); return false; }
+    if (!tr.capped) show(''); // keep an "Only N in stock" note visible
+    tr.capped = false;
     LPA.setCartCount(data.count);
+    // the server's figures are the truth (a price may have changed since the page loaded)
+    if (data.total !== undefined) { document.getElementById('cart-total').textContent = money(data.total); document.getElementById('cart-gst').textContent = money(data.gst); }
     if (qty === 0) tr.remove();
     if (!table.querySelector('tbody tr')) location.reload(); // show the empty-cart message
     return true;
   }
 
-  let timer;
   table.addEventListener('input', e => {
     if (!e.target.classList.contains('qty')) return;
     const input = e.target, tr = input.closest('tr');
     const max = parseInt(input.max, 10), qty = parseInt(input.value, 10);
-    if (Number.isInteger(qty) && qty > max) { show(`Only ${max} in stock.`); input.value = max; }
+    if (Number.isInteger(qty) && qty > max) { show(`Only ${max} in stock.`); input.value = max; tr.capped = true; }
     totals();
-    clearTimeout(timer);
-    timer = setTimeout(() => { const v = parseInt(input.value, 10); if (Number.isInteger(v) && v >= 0) save(tr, v); }, 400);
+    clearTimeout(tr.timer); // one timer per line: changing another line never cancels this save
+    tr.timer = setTimeout(() => { const v = parseInt(input.value, 10); if (Number.isInteger(v) && v >= 0) save(tr, v); }, 400);
   });
   table.addEventListener('submit', async e => {
     const form = e.target;

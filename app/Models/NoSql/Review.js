@@ -43,10 +43,9 @@ class Review {
   static get SORTS() { return Object.keys(SORTS); }
   static validate(body) { return validate(body); }
 
-  // find - published reviews of one product (staff also see hidden ones). Uses index sku_status_newest.
-  static async forProduct(sku, { viewer, sort = 'newest', includeHidden = false } = {}) {
-    const filter = { sku: String(sku).toUpperCase() };
-    if (!includeHidden) filter.status = 'published';
+  // find - published reviews of one product (staff moderate hidden ones on /reviews). Uses index sku_status_newest.
+  static async forProduct(sku, { viewer, sort = 'newest' } = {}) {
+    const filter = { sku: String(sku).toUpperCase(), status: 'published' };
     const rows = await (await reviews()).find(filter).sort(SORTS[sort] || SORTS.newest).limit(100).toArray();
     return rows.map(d => toView(d, viewer));
   }

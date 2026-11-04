@@ -8,6 +8,7 @@ const sandbox = require('../Security/sandbox');
 const LoginGuard = require('../Security/loginGuard');
 const db = require('../../config/database');
 const nosql = require('../../config/nosql');
+const { wantsJson } = require('../Middleware/respond');
 
 const base = { pageName: 'Security', nav: 'more' };
 
@@ -62,6 +63,6 @@ exports.index = async (req, res) => {
       { what: 'Browser to web app', how: req.app.locals.https ? 'HTTPS (TLS) + HSTS, Secure cookie' : 'HTTP (development) - run npm run security:cert for HTTPS' },
     ],
   };
-  if ((req.get('accept') || '').includes('application/json')) return res.json({ policy: policy.matrix(), status, events });
+  if (wantsJson(req)) return res.json({ policy: policy.matrix(), status, events });
   res.render('security/index', Object.assign({ title: 'Security', matrix: policy.matrix(), status, events }, base));
 };

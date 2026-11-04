@@ -7,11 +7,10 @@
 const { col, C, db } = require('../../../config/nosql');
 
 let mode = 'off';        // 'change-stream' | 'inline'
-let stream = null;
-let stopping = false;
-const listeners = [];    // tests / alerts subscribe here
 
-const round2 = n => Math.round(n * 100) / 100;
+// The summary document for one $group result { avg, count, ratings: [..] } (also used by nosql:setup).
+const toSummary = s => ({ avg: Math.round(s.avg * 100) / 100, count: s.count,
+  stars: Object.fromEntries([1, 2, 3, 4, 5].map(n => [String(n), s.ratings.filter(r => r === n).length])), updatedAt: new Date() });
 
 // Rebuild one product's summary with an aggregation pipeline (upsert, or delete when no reviews).
 async function recompute(sku) {
@@ -22,7 +21,7 @@ async function recompute(sku) {
   ]).toArray();
   const ratings = await col(C.ratings);
   if (!s) { await ratings.deleteOne({ _id: sku }); return null; }
-  const doc = { avg: round2(s.avg), count: s.count, stars: Object.fromEntries([1, 2, 3, 4, 5].map(n => [String(n), s.ratings.filter(r => r === n).length])), updatedAt: new Date() };
+  const doc = toSummary(s);
   await ratings.updateOne({ _id: sku }, { $set: doc }, { upsert: true });
   return Object.assign({ _id: sku }, doc);
 }
@@ -30,12 +29,11 @@ async function recompute(sku) {
 // What the trigger does for one change.
 async function handle(change) {
   const doc = change.fullDocument || change.fullDocumentBeforeChange || {};
-  const summary = await recompute(doc.sku);
+  await recompute(doc.sku);
   if (change.operationType === 'insert' && doc.rating <= 2) {
     // low rating -> alert for staff (activity log is required lazily to avoid a require loop)
     await require('./ActivityLog').write(null, `REVIEW_ALERT ${doc.rating}-star review of ${doc.sku} by ${doc.author && doc.author.name}: "${doc.title}"`, { type: 'REVIEW_ALERT', user: 'trigger', sku: doc.sku, reviewId: String(doc._id) });
   }
-  listeners.forEach(fn => { try { fn({ op: change.operationType, sku: doc.sku, summary }); } catch (e) { /* ignore */ } });
 }
 
 async function saveToken(token) {
@@ -47,7 +45,6 @@ async function openStream() {
   const opts = { fullDocument: 'updateLookup', fullDocumentBeforeChange: 'whenAvailable' };
   if (state && state.resumeToken) opts.startAfter = state.resumeToken;
   const s = (await col(C.reviews)).watch([{ $match: { operationType: { $in: ['insert', 'update', 'replace', 'delete'] } } }], opts);
-  stream = s;
   s.on('change', change => {
     handle(change).then(() => saveToken(change._id)).catch(err => console.error('Rating trigger:', err.message));
   });
@@ -58,7 +55,7 @@ async function openStream() {
   });
   // The stream also closes when the collection is dropped / re-created (npm run nosql:setup)
   // or the connection drops: open it again so the trigger keeps working.
-  s.on('close', () => { if (!stopping) reopen(1500); });
+  s.on('close', () => reopen(1500));
 }
 
 function reopen(delay) {
@@ -86,4 +83,4 @@ async function afterWrite(change) {
   await handle(change);
 }
 
-module.exports = { start, recompute, afterWrite, mode: () => mode, onChange: fn => listeners.push(fn), stop: () => { stopping = true; return stream && stream.close(); } };
+module.exports = { start, recompute, afterWrite, toSummary };

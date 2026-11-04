@@ -92,10 +92,8 @@
     const box = $('form-errors');
     if (errs.length) { box.innerHTML = errs.map(x => `<li>${esc(x)}</li>`).join(''); box.hidden = false; return; }
     $('inv-save').disabled = true;
-    const r = await fetch('/sales', { method: 'POST', headers: LPA.jsonHeaders(),
-      body: JSON.stringify({ clientId: client.code, date: $('inv-date').value, items: lines.map(l => ({ sku: l.sku, qty: l.qty })) }) });
-    const data = await r.json().catch(() => ({}));
-    if (r.ok) { location.href = data.url; return; }
+    const { ok, data } = await LPA.send('/sales', 'POST', { clientId: client.code, date: $('inv-date').value, items: lines.map(l => ({ sku: l.sku, qty: l.qty })) });
+    if (ok) { location.href = data.url; return; }
     box.innerHTML = (data.errors || [data.error || 'The invoice could not be saved.']).map(x => `<li>${esc(x)}</li>`).join('');
     box.hidden = false; $('inv-save').disabled = false;
   });

@@ -10,6 +10,7 @@ const sanitize = require('./app/Middleware/sanitize');
 const db = require('./config/database');
 const nosql = require('./config/nosql');
 const RatingTrigger = require('./app/Models/NoSql/RatingTrigger');
+const { wantsJson } = require('./app/Middleware/respond');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -49,7 +50,7 @@ app.use((err, req, res, next) => {
   const status = dbDown ? 503 : (err.status || err.statusCode || 500);
   const message = dbDown ? 'The LPA database is not available at the moment. Please try again in a few minutes.'
     : (status === 400 ? 'The request could not be read.' : 'Sorry, something went wrong. Please try again.');
-  if ((req.get('accept') || '').includes('application/json')) return res.status(status).json({ error: dbDown ? 'Database unavailable' : (status === 400 ? 'Bad request' : 'Something went wrong') });
+  if (wantsJson(req)) return res.status(status).json({ error: dbDown ? 'Database unavailable' : (status === 400 ? 'Bad request' : 'Something went wrong') });
   res.locals.can = res.locals.can || (() => false);
   Object.assign(res.locals, { user: res.locals.user || null, role: res.locals.role || '', roleLabel: res.locals.roleLabel || '', cartCount: res.locals.cartCount || 0, csrfToken: res.locals.csrfToken || '' });
   res.status(status).render('error', { title: dbDown ? 'Service unavailable' : 'Error', message, bare: dbDown, hideNav: dbDown });

@@ -7,7 +7,7 @@ const Review = require('../Models/NoSql/Review');
 const Log = require('../Models/NoSql/ActivityLog');
 const policy = require('../Security/policy');
 
-const wantsJson = req => (req.get('accept') || '').includes('application/json');
+const { wantsJson, notFound } = require('../Middleware/respond');
 const isCustomer = req => policy.can(req.user, 'reviews.write');
 const isStaff = req => policy.can(req.user, 'stock.view');
 const back = (sku, q) => `/shop/${encodeURIComponent(sku)}${q ? '?' + q : ''}#reviews`;
@@ -16,7 +16,7 @@ const back = (sku, q) => `/shop/${encodeURIComponent(sku)}${q ? '?' + q : ''}#re
 async function renderProduct(req, res, sku, extra = {}) {
   const product = await Product.findBySku(sku);
   if (!product || (product.status !== 'active' && !isStaff(req))) {
-    return res.status(404).render('error', { title: 'Not found', message: 'Product not found.', nav: 'shop' });
+    return notFound(req, res, 'Product not found.', 'shop');
   }
   const sort = Review.SORTS.includes(req.query.sort) ? req.query.sort : 'newest';
   const [reviews, summary] = await Promise.all([Review.forProduct(product.sku, { viewer: req.user, sort }), Review.summary(product.sku)]);
@@ -42,7 +42,7 @@ exports.show = (req, res) => renderProduct(req, res, req.params.sku);
 exports.create = async (req, res) => {
   const sku = String(req.params.sku).toUpperCase();
   const product = await Product.findBySku(sku);
-  if (!product) return res.status(404).render('error', { title: 'Not found', message: 'Product not found.', nav: 'shop' });
+  if (!product) return notFound(req, res, 'Product not found.', 'shop');
   const { errors, clean } = Review.validate(req.body);
   if (!(await Invoice.hasBought(req.user.clientId, sku))) errors.unshift('You can review a product after you have bought it.');
   let result = null;
@@ -63,7 +63,7 @@ exports.create = async (req, res) => {
 // PUT /reviews/:id (the author)
 exports.update = async (req, res) => {
   const current = await Review.get(req.params.id, req.user);
-  if (!current || !policy.canEditReview(req.user, current)) return res.status(404).render('error', { title: 'Not found', message: 'Review not found.', nav: 'shop' });
+  if (!current || !policy.canEditReview(req.user, current)) return notFound(req, res, 'Review not found.', 'shop');
   const { errors, clean } = Review.validate(req.body);
   if (errors.length) {
     if (wantsJson(req)) return res.status(400).json({ errors });
@@ -82,7 +82,7 @@ exports.destroy = async (req, res) => {
     Log.write(req, `ACCESS_DENIED DELETE review ${current.id} (not the author)`, { type: 'ACCESS_DENIED', permission: 'reviews.delete_any' });
   }
   const ok = current && policy.canDeleteReview(req.user, current) && await Review.remove(current.id, req.user);
-  if (!ok) return wantsJson(req) ? res.status(404).json({ error: 'Review not found' }) : res.status(404).render('error', { title: 'Not found', message: 'Review not found.', nav: 'shop' });
+  if (!ok) return notFound(req, res, 'Review not found.', 'shop');
   Log.write(req, `REVIEW ${current.sku} review ${current.id} deleted by ${req.user.username}`, { sku: current.sku, reviewId: current.id });
   if (wantsJson(req)) return res.status(204).end();
   res.redirect(policy.can(req.user, 'reviews.moderate') ? '/reviews?done=deleted' : back(current.sku, 'done=deleted'));
@@ -91,7 +91,7 @@ exports.destroy = async (req, res) => {
 // POST /reviews/:id/helpful
 exports.vote = async (req, res) => {
   const current = await Review.get(req.params.id, req.user);
-  if (!current) return wantsJson(req) ? res.status(404).json({ error: 'Review not found' }) : res.status(404).render('error', { title: 'Not found', message: 'Review not found.', nav: 'shop' });
+  if (!current) return notFound(req, res, 'Review not found.', 'shop');
   const r = await Review.vote(current.id, req.user);
   if (wantsJson(req)) {
     const after = await Review.get(current.id, req.user);
@@ -113,7 +113,7 @@ exports.index = async (req, res) => {
 exports.setStatus = async (req, res) => {
   const status = req.body.status === 'hidden' ? 'hidden' : 'published';
   const r = await Review.setStatus(req.params.id, status);
-  if (!r) return wantsJson(req) ? res.status(404).json({ error: 'Review not found' }) : res.status(404).render('error', { title: 'Not found', message: 'Review not found.', nav: 'more' });
+  if (!r) return notFound(req, res, 'Review not found.', 'more');
   Log.write(req, `REVIEW ${r.sku} review ${r.id} ${status} by ${req.user.username}`, { sku: r.sku, reviewId: r.id });
   if (wantsJson(req)) return res.json(r);
   res.redirect('/reviews?done=' + status + (req.body.qs ? '&' + String(req.body.qs).replace(/[^\w=&%+.-]/g, '') : ''));

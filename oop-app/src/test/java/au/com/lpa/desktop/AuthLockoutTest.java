@@ -66,6 +66,18 @@ class AuthLockoutTest {
         assertTrue(s.signedIn());
     }
 
+    @Test @DisplayName("T-23 Lockout message counts from the OLDEST failure (same rule as the web app)")
+    void lockoutWait() throws Exception {
+        TestClock clock = new TestClock();
+        AuthService auth = service(new Session(Policy.load(null)), clock);
+        for (int i = 0; i < 5; i++) { // one wrong password per minute: minutes 0..4
+            assertThrows(ServiceException.class, () -> auth.login("mchang", "wrong-pass1"));
+            clock.now = clock.now.plusSeconds(60);
+        }
+        // minute 5: the first failure (minute 0) expires at minute 15 -> 10 minutes left
+        assertEquals("Too many failed sign-ins. Try again in 10 minutes.", assertThrows(ServiceException.class, () -> auth.login("mchang", "Lpa#2026")).getMessage());
+    }
+
     @Test @DisplayName("T-21 Customers cannot use the desktop app; unknown user = same message as wrong password")
     void customersAndUnknown() throws Exception {
         Session s = new Session(Policy.load(null));

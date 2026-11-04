@@ -28,5 +28,4 @@ public class Session {
         if (!can(permission)) throw new ServiceException("Your account does not have permission for this (" + permission + ").");
     }
 
-    public Policy policy() { return policy; }
 }

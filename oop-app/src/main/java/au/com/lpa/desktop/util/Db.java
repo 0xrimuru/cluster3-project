@@ -77,8 +77,8 @@ public final class Db implements AutoCloseable {
             try { c.rollback(); } catch (SQLException ignored) { /* connection lost */ }
             throw e;
         } finally {
-            try { c.setAutoCommit(true); } catch (SQLException ignored) { /* closed */ }
-            giveBack(c);
+            giveBack(c); // rolls back anything not committed (even after an Error), then auto-commit on
+
         }
     }
 

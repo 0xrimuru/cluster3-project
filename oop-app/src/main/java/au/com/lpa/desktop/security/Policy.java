@@ -82,7 +82,4 @@ public final class Policy {
         return user != null && user.isActive() && r != null && r.groups().contains(user.getGroup().dbValue());
     }
 
-    public Map<String, Rule> rules() { return rules; }
-    public String source() { return source; }
-    public int version() { return version; }
 }

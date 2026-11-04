@@ -77,7 +77,7 @@ public class AuthService {
         Instant cutoff = clock.instant().minus(WINDOW);
         while (!list.isEmpty() && list.peekFirst().isBefore(cutoff)) list.pollFirst(); // forget old failures
         if (list.size() < MAX_FAILURES) return 0;
-        Instant freeAt = list.peekLast().plus(WINDOW);
+        Instant freeAt = list.peekFirst().plus(WINDOW); // unlocks when the oldest counted failure expires
         return Math.max(1, (Duration.between(clock.instant(), freeAt).toSeconds() + 59) / 60);
     }
 }

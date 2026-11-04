@@ -9,7 +9,7 @@ const StockLedger = require('../Models/StockLedger');
 const Log = require('../Models/NoSql/ActivityLog');
 const { transaction } = require('../../config/database');
 
-const wantsJson = req => (req.get('accept') || '').includes('application/json');
+const { wantsJson, notFound } = require('../Middleware/respond');
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Australia/Brisbane' });
 
 // Thrown inside a transaction when a business rule fails -> ROLLBACK + 400 to the user.
@@ -47,9 +47,20 @@ function readInvoice(body) {
     wanted[sku] = (wanted[sku] || 0) + qty; // the same item twice -> one line
   });
   const date = String(body.date || '');
-  if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(Date.parse(date)))) errors.push('Date must be a valid date.');
+  // Date.parse('2026-02-30') rolls over to 2 March, so also check the day survives the round trip
+  if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(Date.parse(date)) || new Date(date).toISOString().slice(0, 10) !== date)) errors.push('Date must be a valid date.');
   else if (date && date > today()) errors.push('The invoice date cannot be in the future.');
   return { errors, wanted, date };
+}
+
+const MAX_INVOICE = 999999.99; // lpa_inv_amount is DECIMAL(8,2)
+
+// The stock rules for selling qty of item p (null = OK). Used inside the transaction and by the read-only pre-check.
+function stockProblem(p, sku, qty) {
+  if (!p || p.status === 'deleted') return `Stock item ${sku} not found.`;
+  if (p.status !== 'active') return `${p.title} is disabled and cannot be sold.`;
+  if (qty > p.quantity) return `Only ${p.quantity} of ${p.title} on hand (asked for ${qty}).`;
+  return null;
 }
 
 // Inside the transaction: lock each stock row, check it, and build the lines (price from the catalogue).
@@ -58,11 +69,11 @@ async function takeStock(conn, wanted, userId, reasonFor) {
   const items = [];
   for (const sku of Object.keys(wanted).sort()) { // same lock order every time -> no deadlocks
     const p = await Product.lockForUpdate(sku, conn);
-    if (!p || p.status === 'deleted') { errors.push(`Stock item ${sku} not found.`); continue; }
-    if (p.status !== 'active') { errors.push(`${p.title} is disabled and cannot be sold.`); continue; }
-    if (wanted[sku] > p.quantity) { errors.push(`Only ${p.quantity} of ${p.title} on hand (asked for ${wanted[sku]}).`); continue; }
+    const problem = stockProblem(p, sku, wanted[sku]);
+    if (problem) { errors.push(problem); continue; }
     items.push({ sku: p.sku, name: p.title, qty: wanted[sku], price: p.price, before: p.quantity });
   }
+  if (items.reduce((sum, i) => sum + i.qty * i.price, 0) > MAX_INVOICE) errors.push(`One invoice can be at most $${MAX_INVOICE.toLocaleString('en-AU')} - split the order.`);
   if (errors.length) throw new RuleError(errors);
   return { items, finish: async number => {
     for (const i of items) {
@@ -83,12 +94,8 @@ exports.create = async (req, res) => {
   else if (client.status !== 'active') errors.unshift(`Client ${client.code} is disabled.`);
   if (errors.length) {
     // report every problem at once: also check the stock (read only - nothing is saved)
-    for (const sku of Object.keys(wanted)) {
-      const p = await Product.findBySku(sku);
-      if (!p) errors.push(`Stock item ${sku} not found.`);
-      else if (p.status !== 'active') errors.push(`${p.title} is disabled and cannot be sold.`);
-      else if (wanted[sku] > p.quantity) errors.push(`Only ${p.quantity} of ${p.title} on hand (asked for ${wanted[sku]}).`);
-    }
+    const bySku = Object.fromEntries((await Product.findMany(Object.keys(wanted))).map(p => [p.sku, p]));
+    for (const sku of Object.keys(wanted)) { const problem = stockProblem(bySku[sku], sku, wanted[sku]); if (problem) errors.push(problem); }
     return bad(errors);
   }
   let inv;
@@ -111,7 +118,7 @@ exports.create = async (req, res) => {
 // GET /sales/:number -> invoice detail
 exports.show = async (req, res) => {
   const inv = await Invoice.find(req.params.number);
-  if (!inv) return wantsJson(req) ? res.status(404).json({ error: 'Invoice not found' }) : res.status(404).render('error', { title: 'Not found', message: 'Invoice not found.', nav: 'sales' });
+  if (!inv) return notFound(req, res, 'Invoice not found.', 'sales');
   if (wantsJson(req)) return res.json(inv);
   res.render('shop/order', { title: `Invoice ${inv.number}`, pageName: 'Sales', nav: 'sales', inv, placed: false,
     created: req.query.created === '1', backHref: '/sales', staffView: true });
@@ -128,7 +135,7 @@ exports.destroy = async (req, res) => {
     }
     return removed;
   });
-  if (!inv) return wantsJson(req) ? res.status(404).json({ error: 'Invoice not found' }) : res.status(404).render('error', { title: 'Not found', message: 'Invoice not found.', nav: 'sales' });
+  if (!inv) return notFound(req, res, 'Invoice not found.', 'sales');
   Log.write(req, `INVOICE ${inv.number} deleted by ${req.user.username}`);
   if (wantsJson(req)) return res.status(204).end();
   res.redirect('/sales?deleted=' + inv.number);

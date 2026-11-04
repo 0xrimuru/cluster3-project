@@ -25,12 +25,14 @@ public class ReportRepository {
 
     public ReportRepository(Db db) { this.db = db; }
 
-    public Map<String, ItemSales> salesBySku(LocalDate since) throws SQLException {
+    /** Units and revenue per item on active invoices dated from .. to (both days included). */
+    public Map<String, ItemSales> salesBySku(LocalDate from, LocalDate to) throws SQLException {
         return db.run(c -> {
             try (PreparedStatement ps = c.prepareStatement("SELECT t.lpa_invitem_stock_ID, MAX(t.lpa_invitem_stock_name), SUM(t.lpa_invitem_qty), SUM(t.lpa_invitem_stock_amount) "
                     + "FROM lpa_invoice_items t JOIN lpa_invoices i ON i.lpa_inv_no = t.lpa_invitem_inv_no "
-                    + "WHERE i.lpa_inv_status = 'a' AND i.lpa_inv_date >= ? GROUP BY t.lpa_invitem_stock_ID")) {
-                ps.setTimestamp(1, Timestamp.valueOf(since.atStartOfDay()));
+                    + "WHERE i.lpa_inv_status = 'a' AND i.lpa_inv_date >= ? AND i.lpa_inv_date < ? GROUP BY t.lpa_invitem_stock_ID")) {
+                ps.setTimestamp(1, Timestamp.valueOf(from.atStartOfDay()));
+                ps.setTimestamp(2, Timestamp.valueOf(to.plusDays(1).atStartOfDay()));
                 try (ResultSet rs = ps.executeQuery()) {
                     Map<String, ItemSales> out = new HashMap<>();
                     while (rs.next()) out.put(rs.getString(1), new ItemSales(rs.getString(1), rs.getString(2), rs.getInt(3), rs.getBigDecimal(4)));

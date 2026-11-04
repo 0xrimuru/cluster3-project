@@ -132,7 +132,6 @@ public class MainFrame extends JFrame {
 
     public void status(String text) { statusBar.setText(text); }
 
-    public BasePanel screen(String key) { return screens.get(key); }
 
     /** Tests: the screen objects. */
     public java.util.Collection<BasePanel> screens() { return screens.values(); }

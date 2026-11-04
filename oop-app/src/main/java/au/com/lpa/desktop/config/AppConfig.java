@@ -95,8 +95,6 @@ public final class AppConfig {
         return file == null ? Optional.empty() : Optional.ofNullable(file.getParent());
     }
 
-    public Path file() { return file; }
-
     // ---- typed settings ----
     public String dbUrl() {
         return "jdbc:mysql://" + get("DB_HOST", "127.0.0.1") + ":" + get("DB_PORT", "3306") + "/" + get("DB_NAME", "lpa_ecomms")

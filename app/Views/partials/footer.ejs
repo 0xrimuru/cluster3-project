@@ -4,29 +4,25 @@
   <% var _nav = (typeof nav !== 'undefined') ? nav : ''; %>
   <% if (!(typeof hideNav !== 'undefined' && hideNav)) { %>
   <nav class="bottom-nav" aria-label="Primary">
-  <% if (role === 'customer') { %>
     <a href="/" class="<%= _nav==='home' ? 'active' : '' %>">
       <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9h5v-5h4v5h5v-9"/></svg><span>Home</span></a>
+  <% if (role === 'customer') { %>
     <a href="/shop" class="<%= _nav==='shop' ? 'active' : '' %>">
       <svg viewBox="0 0 24 24"><path d="M4 9h16l-1.5 11h-13z"/><path d="M8.5 9V7a3.5 3.5 0 0 1 7 0v2"/></svg><span>Shop</span></a>
     <a href="/cart" class="<%= _nav==='cart' ? 'active' : '' %>">
       <svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 12.5a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L21 8H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg><span>Cart</span><b class="cart-badge" id="cart-badge"<%= cartCount ? '' : ' hidden' %>><%= cartCount %></b></a>
     <a href="/orders" class="<%= _nav==='orders' ? 'active' : '' %>">
       <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span>Orders</span></a>
-    <a href="/more" class="<%= _nav==='more' ? 'active' : '' %>">
-      <svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg><span>More</span></a>
   <% } else { %>
-    <a href="/" class="<%= _nav==='home' ? 'active' : '' %>">
-      <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9h5v-5h4v5h5v-9"/></svg><span>Home</span></a>
     <a href="/products" class="<%= _nav==='stock' ? 'active' : '' %>">
       <svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg><span>Stock</span></a>
     <a href="/sales" class="<%= _nav==='sales' ? 'active' : '' %>">
       <svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 12h7M9 16h7"/></svg><span>Sales</span></a>
     <a href="/clients" class="<%= _nav==='clients' ? 'active' : '' %>">
       <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M16 5.2A3 3 0 0 1 16 11M21 20c0-2.6-1.5-4.5-3.5-5.2"/></svg><span>Clients</span></a>
+  <% } %>
     <a href="/more" class="<%= _nav==='more' ? 'active' : '' %>">
       <svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg><span>More</span></a>
-  <% } %>
   </nav>
   <% } %>
   <footer class="site-footer">LPA eComms &middot; Logic Peripherals Australia &middot; <a href="/privacy">Privacy</a> &middot; Pedro Alvim &middot; CTI20260187</footer>

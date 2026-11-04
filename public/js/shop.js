@@ -19,7 +19,7 @@
         const hit = !q || card.dataset.name.includes(q);
         card.hidden = !hit; if (hit) shown++;
       });
-      count.textContent = shown;
+      count.textContent = shown + ' product' + (shown === 1 ? '' : 's');
       empty.hidden = shown !== 0;
     });
   }
@@ -42,10 +42,8 @@
     const ok = await LPA.confirm('Add to cart?',
       `${qty} × ${form.dataset.title} at ${money(price)} each = ${money(qty * price)} (incl. GST).`, 'Add to cart');
     if (!ok) return;
-    const r = await fetch('/cart', { method: 'POST', headers: LPA.jsonHeaders(),
-      body: JSON.stringify({ sku: form.dataset.sku, qty }) });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) return flash(data.error || 'Could not add to cart.', false);
+    const { ok: saved, data } = await LPA.send('/cart', 'POST', { sku: form.dataset.sku, qty });
+    if (!saved) return flash(data.error || 'Could not add to cart.', false);
     LPA.setCartCount(data.count);
     const remaining = left - qty;
     form.dataset.left = remaining;

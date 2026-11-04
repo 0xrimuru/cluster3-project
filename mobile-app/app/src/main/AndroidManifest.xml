@@ -32,10 +32,12 @@
             </intent-filter>
         </activity>
 
-        <!-- MainActivity holds the WebView and opens after the splash delay (not exported). -->
+        <!-- MainActivity holds the WebView and opens after the splash delay (not exported).
+             configChanges: rotating the phone keeps the page (and unsaved form lines) instead of reloading. -->
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode" />
 
     </application>
 

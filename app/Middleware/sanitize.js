@@ -6,6 +6,7 @@
 // request whose body or query contains such keys, and logs it as a SECURITY event.
 // (SQL injection is prevented separately: every SQL statement uses ? placeholders.)
 const Log = require('../Models/NoSql/ActivityLog');
+const { wantsJson } = require('./respond');
 
 const BAD_KEY = k => k.startsWith('$') || ['__proto__', 'constructor', 'prototype'].includes(k);
 
@@ -27,8 +28,8 @@ function rejectOperators(req, res, next) {
   const bad = findBadKey(req.body) || findBadKey(req.query);
   if (!bad) return next();
   Log.write(req, `SECURITY blocked ${req.method} ${req.path.slice(0, 80)}: suspicious key "${String(bad).slice(0, 30)}" (possible injection)`, { type: 'SECURITY', key: String(bad).slice(0, 30) });
-  if ((req.get('accept') || '').includes('application/json') || req.is('application/json')) return res.status(400).json({ error: 'Bad request' });
+  if (wantsJson(req)) return res.status(400).json({ error: 'Bad request' });
   return res.status(400).render('error', { title: 'Bad request', message: 'The request contained data that is not allowed.' });
 }
 
-module.exports = { rejectOperators, findBadKey };
+module.exports = { rejectOperators };

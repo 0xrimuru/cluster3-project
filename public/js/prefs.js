@@ -27,6 +27,7 @@
       var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       prefs.theme = isDark ? 'light' : 'dark';
       write(prefs); apply(prefs);
+      document.querySelectorAll('input[name="pref-theme"]').forEach(function (r) { r.checked = r.value === prefs.theme; }); // Settings page
     });
 
     // Settings page controls
@@ -46,7 +47,7 @@
         if (a && a.brand === curBrand) s.classList.add('active');
         s.addEventListener('click', function () {
           var acc = ACCENTS[s.getAttribute('data-accent')];
-          prefs.brand = acc.brand; prefs.dark = acc.dark; prefs.soft = acc.soft;
+          prefs.brand = acc.brand; prefs.dark = acc.dark; // the soft tint follows --brand in the CSS
           write(prefs); apply(prefs);
           swatches.forEach(function (x) { x.classList.remove('active'); });
           s.classList.add('active');

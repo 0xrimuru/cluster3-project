@@ -10,24 +10,15 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const ROOT = path.join(__dirname, '..', '..');
-const ENV = path.join(ROOT, '.env');
+const { ENV, setEnv } = require('../../scripts/env-file');
 
-// ---- .env helpers ----
-function readEnv() { return fs.existsSync(ENV) ? fs.readFileSync(ENV, 'utf8') : fs.readFileSync(path.join(ROOT, '.env.example'), 'utf8'); }
-function setEnv(name, value) {
-  let text = readEnv();
-  const line = `${name}="${value}"`;
-  text = new RegExp(`^${name}=.*$`, 'm').test(text) ? text.replace(new RegExp(`^${name}=.*$`, 'm'), line) : text.replace(/\s*$/, '\n') + line + '\n';
-  fs.writeFileSync(ENV, text);
-  process.env[name] = value;
-}
 require('dotenv').config({ path: ENV, quiet: true });
 if (!process.env.DATA_KEY) { setEnv('DATA_KEY', crypto.randomBytes(32).toString('base64')); console.log('Added DATA_KEY (AES-256 key) to .env'); }
 
 const { MongoClient } = require('mongodb');
 const MODEL = require('./collections');
 const SEED = require('./seed-reviews');
+const { toSummary } = require('../../app/Models/NoSql/RatingTrigger');
 const DB = 'lpa_nosql';
 const APP_USER = 'lpa_nosql_app';
 const HOST = process.env.MONGO_HOST || '127.0.0.1:27017';
@@ -89,12 +80,9 @@ const ADMIN_URL = process.env.MONGO_ADMIN_URL || withOpts(`mongodb://${HOST}/?di
   console.log(`Inserted ${res.insertedCount} reviews`);
   const summary = await db.collection('product_reviews').aggregate([
     { $match: { status: 'published' } },
-    { $group: { _id: '$sku', avg: { $avg: '$rating' }, count: { $sum: 1 }, r: { $push: '$rating' } } },
+    { $group: { _id: '$sku', avg: { $avg: '$rating' }, count: { $sum: 1 }, ratings: { $push: '$rating' } } },
   ]).toArray();
-  await db.collection('product_ratings').insertMany(summary.map(s => ({
-    _id: s._id, avg: Math.round(s.avg * 100) / 100, count: s.count,
-    stars: Object.fromEntries([1, 2, 3, 4, 5].map(n => [String(n), s.r.filter(x => x === n).length])), updatedAt: new Date(),
-  })));
+  await db.collection('product_ratings').insertMany(summary.map(s => Object.assign({ _id: s._id }, toSummary(s))));
   console.log(`Built ${summary.length} rating summaries`);
 
   // ---- least-privilege role + app account ----

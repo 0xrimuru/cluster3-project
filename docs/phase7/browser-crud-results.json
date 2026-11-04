@@ -1,6 +1,6 @@
 [
   {
-    "browser": "Chromium 141.0.7390.37",
+    "browser": "Chromium 153.0.8010.12",
     "step": "Create",
     "page": "/products/LPA-031 shows \"Ergonomic Wrist Rest WR-1\"",
     "database": "row LPA-031: Ergonomic Wrist Rest WR-1, $24, 6, a",
@@ -8,7 +8,7 @@
     "shot": "chromium-1-create.png"
   },
   {
-    "browser": "Chromium 141.0.7390.37",
+    "browser": "Chromium 153.0.8010.12",
     "step": "Read",
     "page": "search \"wrist\" -> 1 card(s)",
     "database": "1 matching row(s)",
@@ -16,7 +16,7 @@
     "shot": "chromium-2-read.png"
   },
   {
-    "browser": "Chromium 141.0.7390.37",
+    "browser": "Chromium 153.0.8010.12",
     "step": "Update",
     "page": "detail shows $19.95 = true",
     "database": "price now 19.95",
@@ -24,7 +24,7 @@
     "shot": "chromium-3-update.png"
   },
   {
-    "browser": "Chromium 141.0.7390.37",
+    "browser": "Chromium 153.0.8010.12",
     "step": "Delete",
     "page": "back on Stock list; LPA-031 listed = false",
     "database": "status x (row kept for history)",
@@ -32,7 +32,7 @@
     "shot": "chromium-4-delete.png"
   },
   {
-    "browser": "Firefox 157.0",
+    "browser": "Firefox 153.6.0",
     "step": "Create",
     "page": "/products/LPA-032 shows \"Ergonomic Wrist Rest WR-1\"",
     "database": "row LPA-032: Ergonomic Wrist Rest WR-1, $24, 6, a",
@@ -40,7 +40,7 @@
     "shot": "firefox-1-create.png"
   },
   {
-    "browser": "Firefox 157.0",
+    "browser": "Firefox 153.6.0",
     "step": "Read",
     "page": "search \"wrist\" -> 1 card(s)",
     "database": "1 matching row(s)",
@@ -48,7 +48,7 @@
     "shot": "firefox-2-read.png"
   },
   {
-    "browser": "Firefox 157.0",
+    "browser": "Firefox 153.6.0",
     "step": "Update",
     "page": "detail shows $19.95 = true",
     "database": "price now 19.95",
@@ -56,7 +56,7 @@
     "shot": "firefox-3-update.png"
   },
   {
-    "browser": "Firefox 157.0",
+    "browser": "Firefox 153.6.0",
     "step": "Delete",
     "page": "back on Stock list; LPA-032 listed = false",
     "database": "status x (row kept for history)",

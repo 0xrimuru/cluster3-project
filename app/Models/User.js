@@ -3,7 +3,7 @@
 // salt (Node's built-in crypto) and only the hash goes into lpa_user_password.
 // Status: a = active, d = inactive, x = deleted (soft delete, kept for the audit trail).
 const crypto = require('crypto');
-const { query } = require('../../config/database');
+const { query, like } = require('../../config/database');
 
 const GROUPS = ['administrator', 'user', 'customer'];
 const LABEL = { administrator: 'Administrator', user: 'Staff', customer: 'Customer' };
@@ -25,7 +25,6 @@ function verifyPassword(plain, stored) {
 const COLUMNS = `lpa_user_ID AS id, lpa_user_username AS username, lpa_user_firstname AS firstName,
   lpa_user_lastname AS lastName, lpa_user_group AS \`group\`, lpa_user_client_ID AS clientId, lpa_user_status AS status`;
 const toUser = r => (r ? Object.assign(r, { status: STATUS_FROM_DB[r.status] || 'active' }) : null);
-const like = s => '%' + String(s).replace(/[\\%_]/g, c => '\\' + c) + '%';
 
 const COMMON = require('../Security/common-passwords');
 const USERNAME_RE = /^[a-z0-9._-]{3,30}$/;
@@ -46,7 +45,6 @@ const DUMMY_HASH = hashPassword(require('crypto').randomBytes(16).toString('hex'
 class User {
   static get GROUPS() { return GROUPS; }
   static label(group) { return LABEL[group] || group; }
-  static fullName(u) { return u ? `${u.firstName} ${u.lastName}` : ''; }
 
   static async all() { return (await query(`SELECT ${COLUMNS} FROM lpa_users WHERE lpa_user_status <> 'x' ORDER BY lpa_user_ID`)).map(toUser); }
 
@@ -146,5 +144,4 @@ class User {
   }
 }
 
-User.hashPassword = hashPassword;
 module.exports = User;

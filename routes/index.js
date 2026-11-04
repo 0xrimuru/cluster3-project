@@ -34,7 +34,7 @@ router.get('/login', AuthController.loginForm);
 router.post('/login', AuthController.login);
 router.get('/register', AuthController.registerForm);
 router.post('/register', AuthController.register);
-router.get('/logout', AuthController.logout);
+router.post('/logout', AuthController.logout); // POST + CSRF token: another site cannot sign you out with a link
 router.get('/privacy', (req, res) => res.render('privacy', { title: 'Privacy notice', bare: !req.user, hideNav: !req.user, nav: 'more' }));
 
 // Everyone signed in

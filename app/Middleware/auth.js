@@ -6,13 +6,14 @@
 // - What each signed-in user may do is decided by the access policy (app/Security/policy.js).
 const User = require('../Models/User');
 const SessionStore = require('../Models/NoSql/SessionStore');
+const { wantsJson } = require('./respond');
 
 const COOKIE = 'lpa_sid';
 const PUBLIC = ['/login', '/register', '/privacy'];
 
 function readCookie(req, name) {
   const part = (req.headers.cookie || '').split(';').map(c => c.trim()).find(c => c.startsWith(name + '='));
-  return part ? decodeURIComponent(part.slice(name.length + 1)) : '';
+  return part ? part.slice(name.length + 1) : ''; // tokens are hex: no decoding (a bad %-sequence would throw)
 }
 
 async function startSession(req, res, user) {
@@ -52,9 +53,8 @@ async function loadUser(req, res, next) {
 
 function requireLogin(req, res, next) {
   if (req.user || PUBLIC.includes(req.path)) return next();
-  if ((req.get('accept') || '').includes('application/json') || req.path.startsWith('/api/')) return res.status(401).json({ error: 'Sign in required' });
+  if (wantsJson(req)) return res.status(401).json({ error: 'Sign in required' });
   return res.redirect('/login');
 }
 
-const STAFF = ['administrator', 'user'];
-module.exports = { loadUser, requireLogin, startSession, endSession, STAFF };
+module.exports = { loadUser, requireLogin, startSession, endSession };

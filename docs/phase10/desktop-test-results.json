@@ -1,443 +1,471 @@
 [
   {
-    "id": "",
-    "test": "stable",
+    "id": "A-07",
+    "test": "Merge sort is stable (equal items keep their order)",
     "class": "AlgorithmsTest",
     "seconds": 0.014,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "sortSpeed",
+    "id": "A-12",
+    "test": "Speed: merge / quick sort O(n log n) vs insertion sort O(n^2)",
     "class": "AlgorithmsTest",
-    "seconds": 0.578,
+    "seconds": 0.561,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "binarySearch",
+    "id": "A-08",
+    "test": "Binary search: date range on a sorted list, empty and edge ranges",
     "class": "AlgorithmsTest",
     "seconds": 0.003,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "lru",
-    "class": "AlgorithmsTest",
-    "seconds": 0.001,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "heap",
-    "class": "AlgorithmsTest",
-    "seconds": 0.031,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "topK",
-    "class": "AlgorithmsTest",
-    "seconds": 0.011,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "trie",
+    "id": "A-05",
+    "test": "LRU cache: evicts the least recently used, counts hits / misses",
     "class": "AlgorithmsTest",
     "seconds": 0.002,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "dijkstra",
+    "id": "A-03",
+    "test": "MinHeap gives the same order as java.util.PriorityQueue (10,000 random values)",
     "class": "AlgorithmsTest",
-    "seconds": 0.004,
+    "seconds": 0.021,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "route",
+    "id": "A-04",
+    "test": "topK picks the k largest in order",
     "class": "AlgorithmsTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "A-01",
+    "test": "Trie: finds entries by any word prefix, alphabetical, limited, case-insensitive",
+    "class": "AlgorithmsTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "A-09",
+    "test": "Dijkstra finds the shortest path (not the fewest roads)",
+    "class": "AlgorithmsTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "A-10",
+    "test": "Route planner: visits every stop, returns to the depot, 2-opt never longer than greedy",
+    "class": "AlgorithmsTest",
+    "seconds": 0.002,
+    "result": "PASS"
+  },
+  {
+    "id": "A-06",
+    "test": "Merge sort and quick sort give the same result as Java's sort (random, sorted, reversed, duplicates)",
+    "class": "AlgorithmsTest",
+    "seconds": 0.034,
+    "result": "PASS"
+  },
+  {
+    "id": "A-02",
+    "test": "Trie is faster than scanning a list (100,000 entries)",
+    "class": "AlgorithmsTest",
+    "seconds": 4.003,
+    "result": "PASS"
+  },
+  {
+    "id": "A-11",
+    "test": "Moving average over a sliding window",
+    "class": "AlgorithmsTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "T-21",
+    "test": "Customers cannot use the desktop app; unknown user = same message as wrong password",
+    "class": "AuthLockoutTest",
+    "seconds": 0.32,
+    "result": "PASS"
+  },
+  {
+    "id": "T-20",
+    "test": "Lockout after 5 wrong passwords; the right password is refused until 15 minutes pass",
+    "class": "AuthLockoutTest",
+    "seconds": 0.431,
+    "result": "PASS"
+  },
+  {
+    "id": "T-23",
+    "test": "Lockout message counts from the OLDEST failure (same rule as the web app)",
+    "class": "AuthLockoutTest",
+    "seconds": 0.277,
+    "result": "PASS"
+  },
+  {
+    "id": "I-01",
+    "test": "Sign in with the web app's accounts; group decides the menus",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.216,
+    "result": "PASS"
+  },
+  {
+    "id": "I-02",
+    "test": "Stock: insert, read, update, soft delete (checked in the table)",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.071,
+    "result": "PASS"
+  },
+  {
+    "id": "I-03",
+    "test": "Stock adjustment + audit history in one transaction; never below zero",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.074,
+    "result": "PASS"
+  },
+  {
+    "id": "I-04",
+    "test": "Clients: phone stored encrypted; search by name and by exact phone",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.081,
+    "result": "PASS"
+  },
+  {
+    "id": "I-05",
+    "test": "New invoice: catalogue price used, stock reduced, history written",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.089,
+    "result": "PASS"
+  },
+  {
+    "id": "I-06",
+    "test": "Invoice with too many items is refused and NOTHING is saved (rollback)",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.086,
+    "result": "PASS"
+  },
+  {
+    "id": "I-07",
+    "test": "Two invoices at the same moment for the last item: only one succeeds",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.075,
+    "result": "PASS"
+  },
+  {
+    "id": "I-08",
+    "test": "Delete an invoice: stock comes back; staff may not delete",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.254,
+    "result": "PASS"
+  },
+  {
+    "id": "I-09",
+    "test": "SQL injection in every search box does nothing",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.084,
+    "result": "PASS"
+  },
+  {
+    "id": "I-10",
+    "test": "User management: add a user in the desktop app, sign in with it; rules enforced",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.405,
+    "result": "PASS"
+  },
+  {
+    "id": "I-11",
+    "test": "Optimisation: pooled connections are reused and much faster than a new connection per query",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.398,
+    "result": "PASS"
+  },
+  {
+    "id": "I-12",
+    "test": "Disabled records: deleted stock hidden; client 'delete' = disable",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.067,
+    "result": "PASS"
+  },
+  {
+    "id": "I-13",
+    "test": "Reports on real data: reorder plan, sales per month, delivery route",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.142,
+    "result": "PASS"
+  },
+  {
+    "id": "I-14",
+    "test": "LRU cache: repeat lookups come from memory; a sale clears the item so the new stock is shown",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.098,
+    "result": "PASS"
+  },
+  {
+    "id": "I-15",
+    "test": "Sales report best sellers stop at the 'to' date; the invoice number shown is the number saved",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.089,
+    "result": "PASS"
+  },
+  {
+    "id": "I-16",
+    "test": "Changing my password does not undo a group change made meanwhile (e.g. in the web app)",
+    "class": "DatabaseIntegrationTest",
+    "seconds": 0.249,
+    "result": "PASS"
+  },
+  {
+    "id": "G-01",
+    "test": "Wrong password: message shown, still on the login window",
+    "class": "GuiTest",
+    "seconds": 1.006,
+    "result": "PASS"
+  },
+  {
+    "id": "G-02",
+    "test": "Correct password opens the main window with the administrator's menus",
+    "class": "GuiTest",
+    "seconds": 1.064,
+    "result": "PASS"
+  },
+  {
+    "id": "G-03",
+    "test": "Stock Management lists the items from MySQL; selecting one fills the form",
+    "class": "GuiTest",
+    "seconds": 0.832,
+    "result": "PASS"
+  },
+  {
+    "id": "G-04",
+    "test": "New invoice: client + item lookups, live total, save updates stock",
+    "class": "GuiTest",
+    "seconds": 2.114,
+    "result": "PASS"
+  },
+  {
+    "id": "G-05",
+    "test": "Clients: phone search finds the client (encrypted column, blind index)",
+    "class": "GuiTest",
+    "seconds": 0.67,
+    "result": "PASS"
+  },
+  {
+    "id": "G-06",
+    "test": "User Management and My User Details screens",
+    "class": "GuiTest",
+    "seconds": 1.01,
+    "result": "PASS"
+  },
+  {
+    "id": "G-07",
+    "test": "Staff sees fewer menus (no New Invoice, no User Management)",
+    "class": "GuiTest",
+    "seconds": 0.772,
+    "result": "PASS"
+  },
+  {
+    "id": "G-08",
+    "test": "Type-ahead in New Invoice: typing 'webc' suggests the webcam (trie); picking it looks it up",
+    "class": "GuiTest",
+    "seconds": 0.909,
+    "result": "PASS"
+  },
+  {
+    "id": "G-09",
+    "test": "Reports and Planning: reorder plan, sales chart (JFreeChart), delivery route, algorithm lab",
+    "class": "GuiTest",
+    "seconds": 2.564,
+    "result": "PASS"
+  },
+  {
+    "id": "G-10",
+    "test": "Save an invoice as PDF (OpenPDF)",
+    "class": "GuiTest",
+    "seconds": 1.176,
+    "result": "PASS"
+  },
+  {
+    "id": "T-09",
+    "test": "Person rules are inherited by Client and User (+ their own rules)",
+    "class": "ModelTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "T-11",
+    "test": "Invoice lines: amounts in exact cents, same item merged, GST = total / 11",
+    "class": "ModelTest",
     "seconds": 0.009,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "sorts",
-    "class": "AlgorithmsTest",
-    "seconds": 0.044,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "triePerformance",
-    "class": "AlgorithmsTest",
-    "seconds": 4.023,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "movingAverage",
-    "class": "AlgorithmsTest",
-    "seconds": 0.001,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "customersAndUnknown",
-    "class": "AuthLockoutTest",
-    "seconds": 0.223,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "lockout",
-    "class": "AuthLockoutTest",
-    "seconds": 0.309,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "signIn",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.13,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "stockCrud",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.058,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "adjust",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.205,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "clients",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.058,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "createInvoice",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.061,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "rollback",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.059,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "concurrency",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.055,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "deleteInvoice",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.377,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "injection",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.202,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "users",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 1.162,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "pooling",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.562,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "softDelete",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.171,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "reports",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.402,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "cache",
-    "class": "DatabaseIntegrationTest",
-    "seconds": 0.275,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "loginFails",
-    "class": "GuiTest",
-    "seconds": 1.057,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "loginWorks",
-    "class": "GuiTest",
-    "seconds": 1.645,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "stock",
-    "class": "GuiTest",
-    "seconds": 0.974,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "newInvoice",
-    "class": "GuiTest",
-    "seconds": 2.221,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "clients",
-    "class": "GuiTest",
-    "seconds": 0.657,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "users",
-    "class": "GuiTest",
-    "seconds": 0.99,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "staffMenus",
-    "class": "GuiTest",
-    "seconds": 0.821,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "autocomplete",
-    "class": "GuiTest",
-    "seconds": 0.706,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "reports",
-    "class": "GuiTest",
-    "seconds": 2.495,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "pdf",
-    "class": "GuiTest",
-    "seconds": 1.153,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "inheritance",
+    "id": "T-12",
+    "test": "Invoice validation: client, at least one line, no future date",
     "class": "ModelTest",
-    "seconds": 0,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "invoiceMaths",
-    "class": "ModelTest",
-    "seconds": 0.001,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "invoiceRules",
-    "class": "ModelTest",
-    "seconds": 0,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "search",
-    "class": "ModelTest",
-    "seconds": 0.001,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "polymorphism",
-    "class": "ModelTest",
-    "seconds": 0.001,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "enums",
-    "class": "ModelTest",
-    "seconds": 0.001,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "stockLevel",
-    "class": "ModelTest",
-    "seconds": 0,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "productRules",
-    "class": "ModelTest",
-    "seconds": 0.001,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "policy",
-    "class": "PolicyAndRulesTest",
-    "seconds": 0.001,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "passwordRules",
-    "class": "PolicyAndRulesTest",
-    "seconds": 0.007,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "envParsing",
-    "class": "PolicyAndRulesTest",
-    "seconds": 0.012,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "brokenPolicy",
-    "class": "PolicyAndRulesTest",
     "seconds": 0.002,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "policyInSync",
-    "class": "PolicyAndRulesTest",
+    "id": "T-13",
+    "test": "Searchable: every word must match",
+    "class": "ModelTest",
     "seconds": 0.007,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "csv",
-    "class": "ReportsTest",
+    "id": "T-10",
+    "test": "Polymorphism: every Entity answers displayName() its own way",
+    "class": "ModelTest",
+    "seconds": 0.005,
+    "result": "PASS"
+  },
+  {
+    "id": "T-14",
+    "test": "Status codes and user groups map to the database values",
+    "class": "ModelTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "T-08",
+    "test": "Stock level badge: out (0), low (1-5), in (6+)",
+    "class": "ModelTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "T-07",
+    "test": "Product validation: name, brand, price range, Stock ID format",
+    "class": "ModelTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "T-15",
+    "test": "Policy: each group gets exactly its permissions; deny by default",
+    "class": "PolicyAndRulesTest",
     "seconds": 0.011,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "pdf",
-    "class": "ReportsTest",
-    "seconds": 0.025,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "sales",
-    "class": "ReportsTest",
-    "seconds": 0.004,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "delivery",
-    "class": "ReportsTest",
-    "seconds": 0.002,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "reorder",
-    "class": "ReportsTest",
-    "seconds": 0.004,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "blindIndexMatchesNode",
-    "class": "SecurityCompatibilityTest",
-    "seconds": 0.001,
-    "result": "PASS"
-  },
-  {
-    "id": "",
-    "test": "tamperDetected",
-    "class": "SecurityCompatibilityTest",
+    "id": "T-18",
+    "test": "Password rules match the web app (length, letter+number, common list, user name)",
+    "class": "PolicyAndRulesTest",
     "seconds": 0.013,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "decryptsNodeCiphertext",
+    "id": "T-19",
+    "test": "Settings file (.env) parsing: quotes, comments, # inside quotes",
+    "class": "PolicyAndRulesTest",
+    "seconds": 0.013,
+    "result": "PASS"
+  },
+  {
+    "id": "T-16",
+    "test": "A broken policy file is refused (allow-by-default, unknown role)",
+    "class": "PolicyAndRulesTest",
+    "seconds": 0.003,
+    "result": "PASS"
+  },
+  {
+    "id": "T-17",
+    "test": "The copy of the policy in the jar is identical to the web app's file",
+    "class": "PolicyAndRulesTest",
+    "seconds": 0.004,
+    "result": "PASS"
+  },
+  {
+    "id": "R-04",
+    "test": "CSV export (Commons CSV): commas and quotes are kept; Excel BOM; reads back the same",
+    "class": "ReportsTest",
+    "seconds": 0.017,
+    "result": "PASS"
+  },
+  {
+    "id": "R-05",
+    "test": "Invoice PDF (OpenPDF): readable text with the number, client, lines and total",
+    "class": "ReportsTest",
+    "seconds": 0.013,
+    "result": "PASS"
+  },
+  {
+    "id": "R-02",
+    "test": "Sales report: date range by binary search, months with zero, moving average, best sellers",
+    "class": "ReportsTest",
+    "seconds": 0.003,
+    "result": "PASS"
+  },
+  {
+    "id": "R-03",
+    "test": "Delivery planner: suburbs read from addresses, route starts/ends at the warehouse",
+    "class": "ReportsTest",
+    "seconds": 0.002,
+    "result": "PASS"
+  },
+  {
+    "id": "R-01",
+    "test": "Reorder planner: out of stock and selling, then under 30 days of cover, then out of stock, then the rest",
+    "class": "ReportsTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "R-06",
+    "test": "Reorder planner uses exact maths: 31 on hand, 93 sold in 90 days = exactly 30 days, nothing to order",
+    "class": "ReportsTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "T-06",
+    "test": "Blind index (HKDF + HMAC-SHA256) equals the web app's",
     "class": "SecurityCompatibilityTest",
     "seconds": 0.001,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "roundTrip",
+    "id": "T-05",
+    "test": "A changed ciphertext or a wrong key is rejected (GCM authentication)",
+    "class": "SecurityCompatibilityTest",
+    "seconds": 0.004,
+    "result": "PASS"
+  },
+  {
+    "id": "T-03",
+    "test": "Java decrypts a phone number encrypted by the web app",
+    "class": "SecurityCompatibilityTest",
+    "seconds": 0.001,
+    "result": "PASS"
+  },
+  {
+    "id": "T-04",
+    "test": "Encrypt/decrypt round trip; same text gives different ciphertext (random IV)",
     "class": "SecurityCompatibilityTest",
     "seconds": 0.002,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "verifiesNodeHash",
+    "id": "T-01",
+    "test": "Java verifies a password hash made by the web app",
     "class": "SecurityCompatibilityTest",
-    "seconds": 0.091,
+    "seconds": 0.155,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "nodeAcceptsJavaOutput",
+    "id": "T-22",
+    "test": "The web app (Node.js) accepts a hash and a ciphertext made by Java",
     "class": "SecurityCompatibilityTest",
-    "seconds": 0.642,
+    "seconds": 0.159,
     "result": "PASS"
   },
   {
-    "id": "",
-    "test": "hashRoundTrip",
+    "id": "T-02",
+    "test": "Java hashes are salted (different every time) and verify",
     "class": "SecurityCompatibilityTest",
-    "seconds": 0.22,
+    "seconds": 0.238,
     "result": "PASS"
   }
 ]

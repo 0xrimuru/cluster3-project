@@ -6,10 +6,9 @@
 // If MongoDB is down, the event is written to logs/lpa.log instead, so nothing is lost.
 const fs = require('fs');
 const path = require('path');
-const { col, C } = require('../../../config/nosql');
+const { col, C, ACTIVITY_TYPES: TYPES } = require('../../../config/nosql');
 const { encrypt, decrypt } = require('../../Security/crypto');
 
-const TYPES = ['LOGIN', 'LOGIN_FAILED', 'LOGIN_LOCKED', 'LOGOUT', 'REGISTER', 'PASSWORD', 'ACCESS_DENIED', 'SECURITY', 'ORDER', 'INVOICE', 'USER', 'REVIEW', 'REVIEW_ALERT', 'STOCK', 'OTHER'];
 const DIR = path.join(__dirname, '..', '..', '..', 'logs');
 const FILE = path.join(DIR, 'lpa.log');
 const events = () => col(C.activity, { writeConcern: { w: 1 } });
@@ -30,17 +29,17 @@ function toFile(line) {
 
 // insertOne. Returns a promise; callers do not have to wait for it.
 function write(req, message, meta = {}) {
+  const { type, user, ...rest } = meta;
   let ipEnc = null;
   try { ipEnc = encrypt(ipOf(req)); } catch (e) { /* no DATA_KEY yet - store no IP */ }
   const doc = {
     at: new Date(),
-    type: meta.type || typeOf(message),
-    user: oneLine((req && req.user && req.user.username) || meta.user || null),
+    type: type || typeOf(message),
+    user: oneLine((req && req.user && req.user.username) || user || null),
     message: oneLine(message).slice(0, 500),
     ipEnc,
-    meta: Object.assign({}, meta, { type: undefined, user: undefined }),
+    meta: rest,
   };
-  delete doc.meta.type; delete doc.meta.user;
   return events().then(c => c.insertOne(doc)).catch(err => {
     toFile(`${doc.at.toLocaleString('en-AU', { timeZone: 'Australia/Brisbane', hour12: false })} | ${ipOf(req) || '-'} | ${doc.message} | (MongoDB unavailable: ${err.name})`);
   });
@@ -73,4 +72,4 @@ async function countsByType(days = 7) {
   return rows.map(r => ({ type: r._id, n: r.n }));
 }
 
-module.exports = { write, list, countsByType, TYPES, FILE };
+module.exports = { write, list, countsByType, TYPES };

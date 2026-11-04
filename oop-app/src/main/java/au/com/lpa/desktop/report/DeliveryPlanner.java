@@ -67,6 +67,4 @@ public class DeliveryPlanner {
         return new Route(stops, plan.km(), plan.greedyKm(), notOnMap, depot);
     }
 
-    public Graph roads() { return roads; }
-    public String depot() { return depot; }
 }

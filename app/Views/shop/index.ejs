@@ -21,11 +21,11 @@
     </select>
     <button class="btn ghost" type="submit">Apply</button>
   </form>
-  <p class="result-count"><span id="shop-count"><%= products.length %></span> product<%= products.length===1?'':'s' %></p>
+  <p class="result-count" id="shop-count"><%= products.length %> product<%= products.length===1?'':'s' %></p>
 
   <ul class="product-grid" id="product-grid">
     <% products.forEach(function(p){ var lv = level(p); var have = inCart[p.sku] || 0; var left = Math.max(0, p.quantity - have); %>
-    <li class="product-card" data-name="<%= (p.title+' '+p.brand+' '+p.category).toLowerCase() %>">
+    <li class="product-card" data-name="<%= (p.title+' '+p.brand+' '+p.category+' '+(p.description||'')).toLowerCase() %>">
       <img src="<%= p.image %>" alt="<%= p.title %>" loading="lazy" />
       <div class="product-body">
         <div class="stock-top"><span class="cat"><%= p.category %></span><span class="badge badge-<%= lv %>"><%= lv==='out'?'Out of stock':(lv==='low'?'Only '+p.quantity+' left':'In stock') %></span></div>

@@ -77,7 +77,7 @@
     "steps": "Stock > Add item, fill the form, Save",
     "data": "LPA-009 Wireless Presenter WP-5, $29.90, qty 10",
     "expected": "Item saved and its detail page shown",
-    "actual": "302 -> /products/9; detail shows item = true",
+    "actual": "302 -> /products/LPA-009; detail shows item = true",
     "result": "PASS"
   },
   {
@@ -147,7 +147,7 @@
     "id": "UC-15",
     "title": "Delete a stock item (administrator)",
     "steps": "Open LPA-009 > Delete > confirm",
-    "data": "item id 9",
+    "data": "item id LPA-009",
     "expected": "Item hidden from stock (soft delete, history kept); opening it returns 404",
     "actual": "delete 302 -> /products; reopen = 404; still listed = false",
     "result": "PASS"
@@ -230,7 +230,7 @@
     "steps": "Request Home 5 times, average the time",
     "data": "5 requests",
     "expected": "Average under 500 ms",
-    "actual": "average 3 ms (max 4 ms)",
+    "actual": "average 7 ms (max 7 ms)",
     "result": "PASS"
   },
   {
@@ -398,8 +398,8 @@
   {
     "id": "UC-43",
     "title": "Passwords are stored as salted hashes",
-    "steps": "Inspect stored user records",
-    "data": "3 users",
+    "steps": "SELECT lpa_user_password FROM lpa_users",
+    "data": "4 users",
     "expected": "Every password is a scrypt hash with its own salt; no plain text",
     "actual": "0 plain/invalid; salts unique = true",
     "result": "PASS"
@@ -425,10 +425,37 @@
   {
     "id": "UC-46",
     "title": "Activity log records key events",
-    "steps": "Read logs/lpa.log after the test run",
+    "steps": "Read the activity log (MongoDB activity_log, /activity) after the test run",
     "data": "this run",
     "expected": "Failed login, logins, registration, order and invoice events written",
     "actual": "failed = true, login = true, register = true, order = true, invoice = true",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-47",
+    "title": "Forged requests refused (CSRF)",
+    "steps": "Send a POST without the page's CSRF token (as a forged cross-site request would)",
+    "data": "admin add item; customer add to cart",
+    "expected": "Both refused with 403; nothing changed",
+    "actual": "add item 403; add to cart 403",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-48",
+    "title": "Security headers on every page",
+    "steps": "Read the response headers of Home",
+    "data": "GET /",
+    "expected": "CSP (own scripts + nonce, no framing), nosniff, X-Frame-Options DENY, no X-Powered-By",
+    "actual": "CSP = yes; nosniff = nosniff; frame = DENY; powered-by = hidden",
+    "result": "PASS"
+  },
+  {
+    "id": "UC-49",
+    "title": "Typed HTML/script is shown as text (XSS)",
+    "steps": "Add a stock item whose name contains a <script> tag; open the stock list",
+    "data": "title = <script>alert(1)</script>Test",
+    "expected": "Shown as harmless text (escaped), never run",
+    "actual": "escaped in page = true",
     "result": "PASS"
   }
 ]

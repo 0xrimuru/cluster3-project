@@ -34,16 +34,16 @@ public class LookupCache {
     Trie<Product> productIndex() { return productIndex; }
     Trie<Client> clientIndex() { return clientIndex; }
 
-    void productIndex(List<Product> all) {
+    Trie<Product> productIndex(List<Product> all) {
         Trie<Product> t = new Trie<>();
         for (Product p : all) t.add(p.getId() + " " + p.getName() + " " + p.getBrand() + " " + p.getCategory(), p);
-        productIndex = t;
+        return productIndex = t;
     }
 
-    void clientIndex(List<Client> all) {
+    Trie<Client> clientIndex(List<Client> all) {
         Trie<Client> t = new Trie<>();
         for (Client c : all) t.add(c.getId() + " " + c.fullName(), c);
-        clientIndex = t;
+        return clientIndex = t;
     }
 
     public LruCache<String, Optional<Product>> productCache() { return products; }

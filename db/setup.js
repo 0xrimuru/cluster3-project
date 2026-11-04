@@ -7,21 +7,16 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const ROOT = path.join(__dirname, '..');
-const ENV = path.join(ROOT, '.env');
+const { ENV, readEnv, setEnv } = require('../scripts/env-file');
 
-if (!fs.existsSync(ENV)) fs.writeFileSync(ENV, fs.readFileSync(path.join(ROOT, '.env.example'), 'utf8'));
-if (/^DB_PASSWORD=(change-me)?\s*$/m.test(fs.readFileSync(ENV, 'utf8'))) {
-  const pw = crypto.randomBytes(18).toString('base64url');
-  fs.writeFileSync(ENV, fs.readFileSync(ENV, 'utf8').replace(/^DB_PASSWORD=.*$/m, 'DB_PASSWORD=' + pw));
+if (!fs.existsSync(ENV)) fs.writeFileSync(ENV, readEnv());
+if (/^DB_PASSWORD=(change-me)?\s*$/m.test(readEnv())) {
+  setEnv('DB_PASSWORD', crypto.randomBytes(18).toString('base64url'));
   console.log('Set a random password for lpa_app in .env (this file is not committed).');
 }
-if (!/^DATA_KEY="?[A-Za-z0-9+/=]{40,}/m.test(fs.readFileSync(ENV, 'utf8'))) {
+if (!/^DATA_KEY="?[A-Za-z0-9+/=]{40,}/m.test(readEnv())) {
   // encryption key for personal data (shared with MongoDB - see app/Security/crypto.js)
-  const key = crypto.randomBytes(32).toString('base64');
-  let text = fs.readFileSync(ENV, 'utf8');
-  text = /^DATA_KEY=.*$/m.test(text) ? text.replace(/^DATA_KEY=.*$/m, `DATA_KEY="${key}"`) : text.replace(/\s*$/, '\n') + `DATA_KEY="${key}"\n`;
-  fs.writeFileSync(ENV, text);
+  setEnv('DATA_KEY', crypto.randomBytes(32).toString('base64'));
   console.log('Added DATA_KEY (AES-256 key) to .env');
 }
 require('dotenv').config({ path: ENV, quiet: true });

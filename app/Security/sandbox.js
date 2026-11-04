@@ -23,4 +23,4 @@ function status() {
   return { enabled: true, checks, ok: checks.every(c => c.allowed === c.expect) };
 }
 
-module.exports = { status, ROOT, LOGS };
+module.exports = { status };

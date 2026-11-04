@@ -26,6 +26,7 @@ public class SplashActivity extends AppCompatActivity {
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (isFinishing() || isDestroyed()) return; // the user pressed Back during the splash
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
                 finish(); // remove the splash so the back button doesn't return to it
             }

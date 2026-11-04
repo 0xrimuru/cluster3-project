@@ -67,7 +67,9 @@ async function firefoxDriver(device) {
 }
 
 async function login(D, u) {
-  await D.goto('/logout'); await D.fill('#username', u); await D.fill('#password', 'Lpa#2026'); await D.clickNav('button[type=submit]');
+  await D.goto('/login'); // signed in already? -> press Log out first
+  if (await D.exists('header button[form="logout-form"]')) await D.clickNav('header button[form="logout-form"]');
+  await D.fill('#username', u); await D.fill('#password', 'Lpa#2026'); await D.clickNav('button[type=submit]');
 }
 function rec(browser, device, page, server, client, pass, shot) {
   results.push({ browser, device, page, server, client, result: pass ? 'PASS' : 'FAIL', shot });

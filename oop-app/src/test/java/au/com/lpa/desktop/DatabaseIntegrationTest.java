@@ -52,6 +52,8 @@ class DatabaseIntegrationTest {
 
     @BeforeAll
     static void connect() {
+        // the seed invoices are from July/August 2026: report on them as if today were 7 Oct 2026
+        au.com.lpa.desktop.util.Clocks.useClock(java.time.Clock.fixed(java.time.Instant.parse("2026-10-07T00:00:00Z"), au.com.lpa.desktop.util.Clocks.LPA));
         Path env = Path.of("..", ".env");
         assumeTrue(Files.exists(env), "no ../.env - database tests skipped");
         System.setProperty("lpa.env", env.toString());
@@ -142,7 +144,7 @@ class DatabaseIntegrationTest {
         as("palvim");
         Invoice draft = new Invoice();
         draft.setClientId("CL-004");
-        draft.setDate(LocalDate.now(au.com.lpa.desktop.util.Clocks.LPA));
+        draft.setDate(au.com.lpa.desktop.util.Clocks.today());
         draft.addLine(new InvoiceLine(SKU, "fake name", 2, new BigDecimal("0.01"))); // the screen's price is ignored
         Invoice saved = app.invoices.create(draft);
         assertTrue(saved.getId().matches("INV-\\d+"));
@@ -315,4 +317,40 @@ class DatabaseIntegrationTest {
         assertEquals(List.of("LPA-001", "LPA-007"), app.invoices.suggestProducts("mechanical", 5).stream().map(Product::getId).toList()); // trie
         assertEquals("CL-004", app.invoices.suggestClients("north", 5).get(0).getId());
     }
+
+    static int exec(String sql, String... params) throws Exception {
+        return app.db.run(c -> {
+            try (var ps = c.prepareStatement(sql)) {
+                for (int i = 0; i < params.length; i++) ps.setString(i + 1, params[i]);
+                return ps.executeUpdate();
+            }
+        });
+    }
+
+    @Test @Order(15) @DisplayName("I-15 Sales report best sellers stop at the 'to' date; the invoice number shown is the number saved")
+    void bestSellersAndNumbers() throws Exception {
+        as("palvim");
+        var day = app.reports.sales(LocalDate.parse("2026-07-28"), LocalDate.parse("2026-07-28")); // only INV-1001
+        assertEquals(List.of("LPA-001", "LPA-008"), day.topItems().stream().map(i -> i.sku()).sorted().toList());
+        assertEquals(6, day.topItems().stream().mapToInt(i -> i.units()).sum()); // 1 keyboard + 5 cables, nothing sold later
+        String preview = app.invoices.nextNumberPreview();
+        Invoice d = new Invoice();
+        d.setClientId("CL-003");
+        d.addLine(new InvoiceLine("LPA-007", "Numpad", 1, BigDecimal.ONE));
+        assertEquals(preview, app.invoices.create(d).getId());
+        assertTrue(preview.matches("INV-1\\d{3}"), preview); // same numbering as the web app
+    }
+
+    @Test @Order(16) @DisplayName("I-16 Changing my password does not undo a group change made meanwhile (e.g. in the web app)")
+    void passwordOnly() throws Exception {
+        as("mchang");
+        exec("UPDATE lpa_users SET lpa_user_group = 'administrator' WHERE lpa_user_username = ?", "mchang"); // another admin changes the group
+        try {
+            app.users.changeMyPassword("Lpa#2026", "Desk#Top2026x", "Desk#Top2026x");
+            assertEquals("administrator", raw("SELECT lpa_user_group FROM lpa_users WHERE lpa_user_username = ?", "mchang"));
+        } finally { // put mchang back: staff group, password Lpa#2026
+            exec("UPDATE lpa_users SET lpa_user_group = 'user', lpa_user_password = ? WHERE lpa_user_username = ?", SecurityCompatibilityTest.NODE_HASH, "mchang");
+        }
+    }
+
 }

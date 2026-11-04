@@ -1,0 +1,58 @@
+[
+  {
+    "id": "F-01",
+    "title": "Admin cannot make a customer login without a client record",
+    "expected": "400 with \"Register\" message; no user saved",
+    "actual": "400; message = true",
+    "result": "PASS"
+  },
+  {
+    "id": "F-02",
+    "title": "Re-using a deleted item's Stock ID gives a clear message",
+    "expected": "409 \"already exists\", not 500",
+    "actual": "409 {\"error\":\"That Stock ID already exists (deleted items keep their Stock ID).\"}",
+    "result": "PASS"
+  },
+  {
+    "id": "F-03",
+    "title": "Invoices saved at the same moment get different numbers",
+    "expected": "all 201, numbers all different",
+    "actual": "201/201/201; INV-1007, INV-1009, INV-1008",
+    "result": "PASS"
+  },
+  {
+    "id": "F-04",
+    "title": "Editing cannot save a product with no name",
+    "expected": "400",
+    "actual": "400",
+    "result": "PASS"
+  },
+  {
+    "id": "F-05",
+    "title": "Invalid date (30 Feb) and an over-limit total are refused with a message",
+    "expected": "both 400 (not 500)",
+    "actual": "30 Feb 400; $1.1m invoice 400 (item 201)",
+    "result": "PASS"
+  },
+  {
+    "id": "F-06",
+    "title": "A damaged session cookie still shows the sign-in page",
+    "expected": "200",
+    "actual": "200",
+    "result": "PASS"
+  },
+  {
+    "id": "F-07",
+    "title": "Pricing page copes with ?currency given twice",
+    "expected": "200 (not 500)",
+    "actual": "200",
+    "result": "PASS"
+  },
+  {
+    "id": "F-08",
+    "title": "Logout needs a POST with the CSRF token",
+    "expected": "GET does nothing; POST without token 403; with token -> signed out",
+    "actual": "GET 404 (orders still 200); no token 403; POST 302 -> /login; orders now 302 -> /login",
+    "result": "PASS"
+  }
+]

@@ -63,6 +63,11 @@ public class UserRepository extends JdbcRepository<User> {
     public User save(User u) { throw new UnsupportedOperationException("Use save(user, password)"); }
 
     /** INSERT (password required) or UPDATE (blank password keeps the current one). */
+    /** Change only the password (the rest of the row is left as it is in the database). */
+    public void setPassword(String id, String newPassword) throws SQLException {
+        update("UPDATE lpa_users SET lpa_user_password = ? WHERE lpa_user_ID = ?", PasswordHasher.hash(newPassword), id);
+    }
+
     public User save(User u, String newPassword) throws SQLException {
         return db.transaction(c -> {
             String status = u.getStatus() == RecordStatus.ACTIVE ? "a" : "d";

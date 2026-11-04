@@ -9,6 +9,7 @@
 //  - reviews:    flexible documents (tags list, optional fields, embedded author + votes)
 //  - ratings:    a pre-computed summary per product, rebuilt by a change-stream trigger
 
+const { ACTIVITY_TYPES } = require('../../config/nosql');
 const str = (max, extra = {}) => Object.assign({ bsonType: 'string', maxLength: max }, extra);
 
 module.exports = [
@@ -48,7 +49,7 @@ module.exports = [
       required: ['at', 'type', 'message'],
       properties: {
         at: { bsonType: 'date' },
-        type: { enum: ['LOGIN', 'LOGIN_FAILED', 'LOGIN_LOCKED', 'LOGOUT', 'REGISTER', 'PASSWORD', 'ACCESS_DENIED', 'SECURITY', 'ORDER', 'INVOICE', 'USER', 'REVIEW', 'REVIEW_ALERT', 'STOCK', 'OTHER'] },
+        type: { enum: ACTIVITY_TYPES },
         user: { bsonType: ['string', 'null'] },
         message: str(500),
         ipEnc: { bsonType: ['string', 'null'], description: 'AES-256-GCM encrypted IP address (personal information)' },

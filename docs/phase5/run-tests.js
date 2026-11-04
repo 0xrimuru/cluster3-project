@@ -309,7 +309,8 @@ const firstLedger = html => { const m = html.match(/<ul class="ledger big">([\s\
   rec('UC-22', 'Theme preference is remembered', 'Settings > choose Dark, then open Home', 'theme = dark', 'Home opens in dark theme', `data-theme = "${theme}"`, theme === 'dark');
   await page.evaluate(() => localStorage.clear());
 
-  await page.goto(BASE + '/logout');
+  await page.click('header button[form="logout-form"]');
+  await page.waitForURL(/\/login/);
   await page.goto(BASE + '/products');
   rec('UC-21', 'Logout ends the session', 'Press Logout, then try to open Stock', 'none', 'Sent back to the login page', `landed on ${new URL(page.url()).pathname}`, new URL(page.url()).pathname === '/login');
   await browser.close();

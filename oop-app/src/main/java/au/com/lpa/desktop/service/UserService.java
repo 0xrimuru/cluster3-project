@@ -59,6 +59,6 @@ public class UserService {
         if (next == null || !next.equals(confirm)) errors.add("New password and confirm password must match.");
         if (currentOk && next != null && next.equals(current)) errors.add("The new password must be different from the current one.");
         if (!errors.isEmpty()) throw new ServiceException(errors);
-        users.save(me, next);
+        users.setPassword(me.getId(), next); // only the password: never write back the sign-in copy of the user
     }
 }

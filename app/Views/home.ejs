@@ -5,10 +5,7 @@
   </section>
   <section class="card pad featured">
     <h2>Featured</h2>
-    <video class="promo" controls preload="none" poster="/media/promo-poster.jpg" playsinline>
-      <source src="/media/promo.mp4" type="video/mp4" />
-      Your browser does not support embedded video.
-    </video>
+    <%- include('partials/promo') %>
   </section>
   <section class="stat-grid">
     <div class="stat-tile"><span class="stat-num"><%= stats.items %></span><span class="stat-lbl">Stock items</span></div>
@@ -30,6 +27,8 @@
   <section class="quick-links">
     <% if (can('sales.create')) { %>
     <a class="q-card" href="/sales/new"><strong>New invoice</strong><span>Client + items, stock updates automatically</span></a>
+    <% } %>
+    <% if (can('users.manage')) { %>
     <a class="q-card" href="/users"><strong>Users</strong><span>Accounts, groups &amp; status</span></a>
     <% } %>
     <a class="q-card" href="/products"><strong>Stock management</strong><span>View &amp; adjust inventory</span></a>

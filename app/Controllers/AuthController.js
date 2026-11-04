@@ -46,9 +46,6 @@ exports.login = async (req, res) => {
   return res.redirect(user.group === 'customer' ? '/shop' : '/');
 };
 
-// The signed-in user's full name (used by the stock audit history).
-exports.currentUser = (req) => (req.user ? User.fullName(req.user) : 'Unknown user');
-
 exports.logout = async (req, res) => {
   if (req.user) Log.write(req, `LOGOUT ${req.user.username}`);
   await endSession(req, res);
@@ -73,9 +70,7 @@ exports.register = async (req, res) => {
     privacy: req.body.privacy === 'yes',
   };
   const errors = await User.validate(form, { isNew: true });
-  if (form.address.length > 250) errors.push('Address must be 250 characters or fewer.');
-  if (!form.address) errors.push('Address is required (it is used for delivery and invoices).');
-  if (!/^[0-9 ()+-]{8,20}$/.test(form.phone)) errors.push('Enter a valid phone number (8-20 digits, spaces, brackets, + or -).');
+  errors.push(...Client.contactErrors(form));
   if (!form.privacy) errors.push('Please confirm you have read the privacy notice.');
   if (errors.length) {
     delete form.password; delete form.confirmPassword;

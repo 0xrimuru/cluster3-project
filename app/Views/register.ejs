@@ -2,7 +2,7 @@
   <div class="login-backdrop">
     <div class="login-dialog wide" role="dialog" aria-modal="true" aria-labelledby="reg-title">
       <div class="login-titlebar"><span id="reg-title">New Customer Registration</span></div>
-      <form class="login-body" method="POST" action="/register" data-validate id="register-form">
+      <form class="login-body" method="POST" action="/register" id="register-form">
         <% if (errors.length) { %><ul class="form-errors" role="alert"><% errors.forEach(function(e){ %><li><%= e %></li><% }); %></ul><% } %>
         <div class="two-col">
           <label>First name<input name="firstName" value="<%= form.firstName || '' %>" required maxlength="50" autocomplete="given-name" /></label>

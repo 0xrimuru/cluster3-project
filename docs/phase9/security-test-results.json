@@ -12,7 +12,7 @@
     "title": "Deny by default",
     "steps": "Ask the policy engine for an unknown permission, for an inactive administrator, and with no user",
     "expected": "All three refused; policy file says defaultDecision \"deny\"",
-    "actual": "unknown permission -> false; inactive admin -> false; no user -> false; 19 permissions x 3 groups, default deny",
+    "actual": "unknown permission -> false; inactive admin -> false; no user -> false; 20 permissions x 3 groups, default deny",
     "result": "PASS"
   },
   {
@@ -36,7 +36,7 @@
     "title": "Wrong user name takes as long as wrong password",
     "steps": "Time 4 failed sign-ins for a real user and 4 for unknown user names",
     "expected": "Similar times (the password is checked against a dummy hash for unknown users), so attackers cannot find valid user names",
-    "actual": "real user median 40 ms; unknown user median 40 ms",
+    "actual": "real user median 60 ms; unknown user median 62 ms",
     "result": "PASS"
   },
   {
@@ -52,7 +52,7 @@
     "title": "Client phone numbers encrypted in MySQL",
     "steps": "Read lpa_clients.lpa_client_phone directly; open Clients; search by phone; encrypt the same number twice; change one character of a ciphertext",
     "expected": "Database holds only AES-256-GCM ciphertext; the page shows the real number; exact phone search works (blind index); same number -> different ciphertext (random IV); changed ciphertext rejected",
-    "actual": "stored \"v1.fi_6RWkIu9l4zgkv.P5gSeI...\" (digits visible = false); page shows number = true; phone search finds CL-004 = true; two ciphertexts differ = true; index = HMAC (true); tampered -> rejected",
+    "actual": "stored \"v1.MGDs-zU9A_lz4LpL.Dz4tIl...\" (digits visible = false); page shows number = true; phone search finds CL-004 = true; two ciphertexts differ = true; index = HMAC (true); tampered -> rejected",
     "result": "PASS"
   },
   {

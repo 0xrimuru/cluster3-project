@@ -7,6 +7,7 @@
 //     (_csrf) or in the X-CSRF-Token header (fetch). A forged request from another site
 //     cannot know the token, so it is refused.
 const crypto = require('crypto');
+const { wantsJson } = require('./respond');
 
 function headers(req, res, next) {
   const nonce = crypto.randomBytes(16).toString('base64');
@@ -41,7 +42,7 @@ function csrf(req, res, next) {
   const known = Buffer.from(req.session.csrf || '');
   const given = Buffer.from(sent);
   if (known.length && given.length === known.length && crypto.timingSafeEqual(known, given)) return next();
-  if ((req.get('accept') || '').includes('application/json') || req.is('application/json')) return res.status(403).json({ error: 'Security check failed (CSRF). Reload the page and try again.' });
+  if (wantsJson(req)) return res.status(403).json({ error: 'Security check failed (CSRF). Reload the page and try again.' });
   return res.status(403).render('error', { title: 'Security check failed', message: 'This form expired or did not come from LPA eComms. Go back, reload the page and try again.' });
 }
 

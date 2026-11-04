@@ -3,6 +3,7 @@
 //  - forms with data-confirm="message" ask before submitting (delete buttons, etc.)
 //  - greeting by time of day on the home pages
 //  - live "passwords match" feedback on the registration form
+//  - LPA.send(): fetch() with the CSRF token that reports a lost connection
 //  - LPA.setCartCount(): updates the cart badge without reloading the page
 window.LPA = window.LPA || {};
 
@@ -30,6 +31,16 @@ LPA.confirm = function (title, body, okLabel) {
 LPA.jsonHeaders = function () {
   const m = document.querySelector('meta[name="csrf-token"]');
   return { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-Token': m ? m.content : '' };
+};
+
+// fetch() that never throws: { ok, data }. A dropped connection gives a message instead of a stuck page.
+LPA.send = async function (url, method, body) {
+  try {
+    const r = await fetch(url, { method, headers: LPA.jsonHeaders(), body: body === undefined ? undefined : JSON.stringify(body) });
+    return { ok: r.ok, data: await r.json().catch(() => ({})) };
+  } catch (e) {
+    return { ok: false, data: { error: 'No connection to the LPA server - check the network and try again.' } };
+  }
 };
 
 LPA.setCartCount = function (n) {

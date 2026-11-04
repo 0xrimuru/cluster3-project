@@ -44,8 +44,9 @@ public class ReorderPlanner {
             if (!p.isActive()) continue;
             int sold = sales.containsKey(p.getId()) ? sales.get(p.getId()).units() : 0;
             double perDay = (double) sold / days;
-            double cover = perDay == 0 ? Double.POSITIVE_INFINITY : p.getOnHand() / perDay;
-            int target = (int) Math.ceil(perDay * targetDays);
+            // whole-number maths: 31 / (93 / 90.0) would give 29.999... days instead of exactly 30
+            double cover = sold == 0 ? Double.POSITIVE_INFINITY : (double) p.getOnHand() * days / sold;
+            int target = (sold * targetDays + days - 1) / days; // ceil(sold * targetDays / days)
             int qty = Math.max(0, target - p.getOnHand());
             if (qty == 0 && p.getOnHand() <= Product.LOW_STOCK && sold == 0) qty = Product.LOW_STOCK + 1 - p.getOnHand();
             String reason;
@@ -59,6 +60,4 @@ public class ReorderPlanner {
     }
 
     public LocalDate since(LocalDate today) { return today.minusDays(days); }
-    public int days() { return days; }
-    public int targetDays() { return targetDays; }
 }

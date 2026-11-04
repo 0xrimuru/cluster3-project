@@ -10,9 +10,13 @@
     <% if (can('security.view')) { %>
     <a href="/security"><strong>Security</strong><span>Access policy and protection status</span></a>
     <% } %>
-    <% if (can('stock.view')) { %>
+    <% if (can('stock.history')) { %>
     <a href="/stock/ledger"><strong>Stock audit history</strong><span>Every stock adjustment: who, when, why</span></a>
+    <% } %>
+    <% if (can('reviews.moderate')) { %>
     <a href="/reviews"><strong>Product reviews</strong><span>Search, hide or publish customer reviews</span></a>
+    <% } %>
+    <% if (can('stock.view')) { %>
     <a href="/shop"><strong>Web store</strong><span>The shop as customers see it</span></a>
     <% } %>
     <a href="/mashups"><strong>About LPA</strong><span>Our mission, store locator and international pricing</span></a>
@@ -22,6 +26,6 @@
     <a href="/settings"><strong>Preferences</strong><span>Theme and accent colour</span></a>
     <a href="/privacy"><strong>Privacy notice</strong><span>What personal information LPA keeps and why</span></a>
     <a href="/help"><strong>Help</strong><span>What each menu does for your user group</span></a>
-    <a href="/logout"><strong>Logout</strong><span>End your session</span></a>
+    <button type="submit" form="logout-form"><strong>Logout</strong><span>End your session</span></button>
   </nav>
 <%- include('partials/footer') %>

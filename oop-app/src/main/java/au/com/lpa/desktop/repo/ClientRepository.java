@@ -44,9 +44,7 @@ public class ClientRepository extends JdbcRepository<Client> {
         return c;
     }
 
-    /** Clients are disabled (d), not deleted - include them in lists. */
-    @Override
-    public List<Client> findAll() throws SQLException { return query(selectSql() + " ORDER BY lpa_client_ID"); }
+    // findAll / findById come from JdbcRepository: clients are only ever disabled (d), never 'x', so they all show.
 
     /** Name / ID / address (LIKE) or exact phone number (blind index). */
     @Override
@@ -55,12 +53,6 @@ public class ClientRepository extends JdbcRepository<Client> {
         String digits = FieldCrypto.digits(text);
         String index = digits.length() >= 8 ? crypto.blindIndex(digits) : "-";
         return query(selectSql() + " WHERE " + searchExpression() + " LIKE ? OR lpa_client_phone_idx = ? ORDER BY lpa_client_ID", like(text), index);
-    }
-
-    @Override
-    public java.util.Optional<Client> findById(String id) throws SQLException {
-        if (id == null || id.isBlank()) return java.util.Optional.empty();
-        return query(selectSql() + " WHERE lpa_client_ID = ?", id.trim().toUpperCase()).stream().findFirst();
     }
 
     @Override

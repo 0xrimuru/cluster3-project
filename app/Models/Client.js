@@ -4,7 +4,7 @@
 // register, so their orders become normal invoices.
 // The phone number is personal information: it is stored ENCRYPTED (AES-256-GCM) and found by
 // an exact-match blind index (HMAC-SHA256 of its digits) - see app/Security/crypto.js.
-const { query } = require('../../config/database');
+const { query, like } = require('../../config/database');
 const { encrypt, decrypt, blindIndex, isEncrypted } = require('../Security/crypto');
 
 const COLUMNS = `lpa_client_ID AS code, lpa_client_firstname AS firstName, lpa_client_lastname AS lastName,
@@ -15,9 +15,17 @@ function openPhone(v) {
   try { return decrypt(v); } catch (e) { return '(cannot decrypt)'; }
 }
 const toClient = r => (r ? Object.assign(r, { id: r.code, phone: openPhone(r.phone), status: r.status === 'a' ? 'active' : 'disabled' }) : null);
-const like = s => '%' + String(s).replace(/[\\%_]/g, c => '\\' + c) + '%';
 
 class Client {
+  // Delivery details rules - the same at registration and at checkout.
+  static contactErrors({ address, phone }) {
+    const errors = [];
+    if (!address) errors.push('Delivery address is required.');
+    else if (address.length > 250) errors.push('Delivery address must be 250 characters or fewer.');
+    if (!/^[0-9 ()+-]{8,20}$/.test(phone)) errors.push('Enter a valid phone number (8-20 digits, spaces, brackets, + or -).');
+    return errors;
+  }
+
   static fullName(c) { return c ? (c.firstName + ' ' + c.lastName) : ''; }
 
   static async all() { return (await query(`SELECT ${COLUMNS} FROM lpa_clients ORDER BY lpa_client_ID`)).map(toClient); }

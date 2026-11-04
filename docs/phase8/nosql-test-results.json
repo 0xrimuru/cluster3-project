@@ -23,7 +23,7 @@
     "steps": "Read the stored login event and session straight from MongoDB",
     "query": "activity_log.ipEnc (AES-256-GCM); sessions._id = SHA-256(token)",
     "expected": "IP stored only encrypted and decrypts with the key; a changed ciphertext is rejected; the cookie token is not stored",
-    "actual": "stored \"v1.y3N_CbpClDO52igX.ji...\" -> \"127.0.0.1\"; plain IP in doc = false; tampered -> Unsupported state or unable to authentic; session found by hash = true; raw token stored = false",
+    "actual": "stored \"v1.dJUIY5v8YQOGNZ9S.Qu...\" -> \"127.0.0.1\"; plain IP in doc = false; tampered -> Unsupported state or unable to authentic; session found by hash = true; raw token stored = false",
     "result": "PASS"
   },
   {
@@ -59,7 +59,7 @@
     "steps": "insertMany 1000 activity events (unordered), read them back by index, deleteMany",
     "query": "insertMany(docs, {ordered:false}); find({user}); deleteMany({user})",
     "expected": "1000 inserted, 1000 read, 1000 deleted",
-    "actual": "1000 inserted in 40 ms (25000 writes/s); 1000 read in 32 ms (31250 reads/s); 1000 deleted",
+    "actual": "1000 inserted in 57 ms (17544 writes/s); 1000 read in 36 ms (27778 reads/s); 1000 deleted",
     "result": "PASS"
   },
   {
@@ -95,7 +95,7 @@
     "steps": "Customer edits her review (3 -> 4 stars); staff clicks Helpful twice at the same moment, admin once; customer votes on her own review",
     "query": "findOneAndUpdate($set); updateOne({voters:{$ne:id}}, {$inc, $addToSet})",
     "expected": "Edit saved with a new updatedAt; helpful = 2 (one per person); own vote refused",
-    "actual": "302; rating 3 -> 4; updatedAt changed = true; votes 200/409/200; own 409; helpful = 2 (U-002, U-001)",
+    "actual": "302; rating 3 -> 4; updatedAt changed = true; votes 200/409/200; own 409; helpful = 2 (U-001, U-002)",
     "result": "PASS"
   },
   {
@@ -104,7 +104,7 @@
     "steps": "Insert a 1-star review straight into MongoDB (no app code involved)",
     "query": "collection.watch() on product_reviews (replica set rs0)",
     "expected": "Within seconds: product_ratings for LPA-008 rebuilt and a REVIEW_ALERT logged; resume token saved",
-    "actual": "rating 3.67 (3) -> 3 (4) in 112 ms; alert = \"REVIEW_ALERT 1-star review of LPA-008 by Logi...\"; resume token saved = true",
+    "actual": "rating 3.67 (3) -> 3 (4) in 108 ms; alert = \"REVIEW_ALERT 1-star review of LPA-008 by Logi...\"; resume token saved = true",
     "result": "PASS"
   },
   {
@@ -140,7 +140,7 @@
     "steps": "Store a session that expired a minute ago; use its cookie; wait for the TTL monitor",
     "query": "index { expiresAt: 1 } expireAfterSeconds: 0",
     "expected": "Expired cookie refused at once (redirect to login); MongoDB deletes the document by itself (TTL monitor runs every 60 s)",
-    "actual": "cookie -> 302 /login; document deleted after 58 s",
+    "actual": "cookie -> 302 /login; document deleted after 6 s",
     "result": "PASS"
   },
   {

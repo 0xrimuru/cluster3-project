@@ -2,7 +2,7 @@
 // Each item has a Stock ID (SKU, the primary key), name, brand, category, description,
 // image, on-hand quantity, price and status (a = active, d = disabled, x = deleted).
 // All SQL uses ? placeholders, so typed input can never change the query (no SQL injection).
-const { query } = require('../../config/database');
+const { query, like } = require('../../config/database');
 
 const PLACEHOLDER_IMAGE = '/images/products/placeholder.png';
 const STATUS_TO_DB = { active: 'a', disabled: 'd' };
@@ -23,7 +23,6 @@ const normSku = v => String(v || '').trim().toUpperCase();
 const normQty = v => { const n = parseInt(v, 10); return (isNaN(n) || n < 0) ? 0 : n; };
 const normStatus = v => STATUS_TO_DB[v] || 'a';
 const stockLevel = q => (q <= 0 ? 'out' : (q <= 5 ? 'low' : 'in'));
-const like = s => '%' + String(s).replace(/[\\%_]/g, c => '\\' + c) + '%'; // search text, wildcards escaped
 
 const SORTS = {
   featured: 'lpa_stock_ID',
@@ -70,7 +69,6 @@ class Product {
     const rows = await query(`SELECT ${COLUMNS} FROM lpa_stock WHERE lpa_stock_ID = ? AND lpa_stock_status <> 'x'`, [normSku(sku)], conn);
     return toProduct(rows[0]);
   }
-  static find(id, conn) { return Product.findBySku(id, conn); }
 
   // Several items in one query (used to rebuild the cart): WHERE lpa_stock_ID IN (?, ?, ...)
   static async findMany(skus) {

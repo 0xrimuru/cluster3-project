@@ -87,27 +87,21 @@ public class InvoiceService {
     /** Type-ahead: stock items whose ID, name, brand or category starts with the text (trie). */
     public List<Product> suggestProducts(String prefix, int limit) throws SQLException, ServiceException {
         session.require("stock.view");
-        if (cache.productIndex() == null) cache.productIndex(products.findAll());
-        return cache.productIndex().suggest(prefix, limit);
+        var index = cache.productIndex(); // read once: another screen may clear it at any moment
+        if (index == null) index = cache.productIndex(products.findAll());
+        return index.suggest(prefix, limit);
     }
 
     /** Type-ahead: clients whose ID or name starts with the text (trie). */
     public List<Client> suggestClients(String prefix, int limit) throws SQLException, ServiceException {
         session.require("clients.view");
-        if (cache.clientIndex() == null) cache.clientIndex(clients.findAll());
-        return cache.clientIndex().suggest(prefix, limit);
+        var index = cache.clientIndex();
+        if (index == null) index = cache.clientIndex(clients.findAll());
+        return index.suggest(prefix, limit);
     }
 
-    public LookupCache cache() { return cache; }
-
     public String nextNumberPreview() throws SQLException {
-        return db.run(c -> {
-            try (var ps = c.prepareStatement("SELECT COALESCE(MAX(CAST(SUBSTRING(lpa_inv_no, 5) AS UNSIGNED)), 1000) + 1 FROM lpa_invoices WHERE lpa_inv_no REGEXP '^INV-[0-9]+$'");
-                 var rs = ps.executeQuery()) {
-                rs.next();
-                return "INV-" + rs.getLong(1);
-            }
-        });
+        return db.run(invoices::nextNumber);
     }
 
     /** Creates the invoice; returns it with its number and the prices actually charged. */

@@ -1,5 +1,6 @@
 package au.com.lpa.desktop.report;
 
+import au.com.lpa.desktop.algo.BinarySearch;
 import au.com.lpa.desktop.repo.ProductRepository;
 import au.com.lpa.desktop.service.ServiceException;
 import au.com.lpa.desktop.service.Session;
@@ -7,6 +8,7 @@ import au.com.lpa.desktop.util.Clocks;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 /** Reports and planning for the desktop app (permission reports.view). */
@@ -26,19 +28,14 @@ public class ReportService {
 
     public List<ReorderPlanner.Suggestion> reorderPlan(int limit) throws SQLException, ServiceException {
         session.require("reports.view");
-        LocalDate today = Clocks.nowBrisbane().toLocalDate();
-        return reorder.plan(products.findAll(), reports.salesBySku(reorder.since(today)), limit);
+        LocalDate today = Clocks.today();
+        return reorder.plan(products.findAll(), reports.salesBySku(reorder.since(today), today), limit);
     }
 
     public SalesReport.Result sales(LocalDate from, LocalDate to) throws SQLException, ServiceException {
         session.require("reports.view");
         if (from.isAfter(to)) throw new ServiceException("The 'from' date must be on or before the 'to' date.");
-        return SalesReport.build(reports.invoicesByDate(), reports.salesBySku(from), from, to);
-    }
-
-    public DeliveryPlanner.Route deliveryRoute(LocalDate day) throws SQLException, ServiceException {
-        session.require("reports.view");
-        return delivery.plan(SalesReport.build(reports.invoicesByDate(), java.util.Map.of(), day, day).invoices());
+        return SalesReport.build(reports.invoicesByDate(), reports.salesBySku(from, to), from, to);
     }
 
     public DeliveryPlanner.Route deliveryRoute(List<ReportRepository.InvoiceRow> invoices) throws ServiceException {
@@ -48,9 +45,6 @@ public class ReportService {
 
     public List<ReportRepository.InvoiceRow> invoicesBetween(LocalDate from, LocalDate to) throws SQLException, ServiceException {
         session.require("reports.view");
-        return SalesReport.build(reports.invoicesByDate(), java.util.Map.of(), from, to).invoices();
+        return List.copyOf(BinarySearch.range(reports.invoicesByDate(), from, to, ReportRepository.InvoiceRow::date, Comparator.naturalOrder()));
     }
-
-    public ReorderPlanner planner() { return reorder; }
-    public DeliveryPlanner deliveryPlanner() { return delivery; }
 }

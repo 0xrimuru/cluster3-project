@@ -34,10 +34,6 @@ class Store {
   static all() {
     return stores;
   }
-
-  static find(id) {
-    return stores.find(s => s.id === Number(id));
-  }
 }
 
 module.exports = Store;

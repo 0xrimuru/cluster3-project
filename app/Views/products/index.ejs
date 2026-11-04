@@ -7,10 +7,10 @@
     <input id="stock-search" name="q" type="search" class="search" value="<%= typeof q !== 'undefined' ? q : '' %>" placeholder="Search by product, brand or SKU&hellip;" aria-label="Search stock" />
     <button class="btn ghost" type="submit">Search</button>
   </form>
-  <p class="row-right"><a class="link" href="/stock/ledger">Audit history &rarr;</a></p>
+  <% if (can('stock.history')) { %><p class="row-right"><a class="link" href="/stock/ledger">Audit history &rarr;</a></p><% } %>
   <ul class="stock-list" id="stock-list">
     <% products.forEach(function (p) { var lv = level(p); %>
-    <li class="stock-card <%= p.status==='disabled' ? 'is-disabled' : '' %>" data-name="<%= (p.title+' '+p.brand+' '+p.sku).toLowerCase() %>">
+    <li class="stock-card <%= p.status==='disabled' ? 'is-disabled' : '' %>" data-name="<%= (p.title+' '+p.brand+' '+p.sku+' '+p.category).toLowerCase() %>">
       <a class="stock-main" href="/products/<%= p.id %>">
         <img class="cover-thumb" src="<%= p.image || '/images/products/placeholder.png' %>" alt="<%= p.title %>" />
         <div class="stock-info">
@@ -23,6 +23,5 @@
     </li>
     <% }); %>
   </ul>
-  <p id="stock-empty" class="empty-msg" style="display:none;">No items match your search.</p>
-  <% if (products.length === 0) { %><p class="empty-msg">No stock items match.</p><% } %>
+  <p id="stock-empty" class="empty-msg" <%= products.length ? 'style=display:none;' : '' %>>No items match your search.</p>
 <%- include('../partials/footer') %>

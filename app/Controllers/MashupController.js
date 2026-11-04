@@ -32,36 +32,24 @@ async function getRates() {
   }
 
   const symbols = Object.keys(CURRENCIES).join(',');
-  let primary = null;
+  const get = async (name, url) => { // 5 s limit: a stalled provider must not hang the page
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      return res.ok ? await res.json() : null;
+    } catch (err) { console.error(`${name} unavailable:`, err.message); return null; }
+  };
+  // Source 1: Frankfurter (European Central Bank data). Source 2: open.er-api.com - a cross-check,
+  // and the fallback if the first provider is down (a mashup should cope with a source failing).
+  const [fr, er] = await Promise.all([
+    get('Frankfurter', `https://api.frankfurter.app/latest?from=AUD&to=${symbols}`),
+    get('ER-API', 'https://open.er-api.com/v6/latest/AUD'),
+  ]);
+  const primary = fr && fr.rates ? { provider: 'frankfurter.app (ECB)', date: fr.date, rates: fr.rates } : null;
   let crosscheck = null;
-
-  // Source 1: Frankfurter (European Central Bank data)
-  try {
-    const res = await fetch(`https://api.frankfurter.app/latest?from=AUD&to=${symbols}`);
-    if (res.ok) {
-      const json = await res.json();
-      primary = { provider: 'frankfurter.app (ECB)', date: json.date, rates: json.rates };
-    }
-  } catch (err) {
-    console.error('Frankfurter unavailable:', err.message);
-  }
-
-  // Source 2: open.er-api.com - used as a cross-check, and as a fallback
-  // if the first provider is down (a mashup should cope with a source failing).
-  try {
-    const res = await fetch('https://open.er-api.com/v6/latest/AUD');
-    if (res.ok) {
-      const json = await res.json();
-      if (json.result === 'success') {
-        const picked = {};
-        for (const code of Object.keys(CURRENCIES)) {
-          if (json.rates[code] !== undefined) picked[code] = json.rates[code];
-        }
-        crosscheck = { provider: 'open.er-api.com', date: json.time_last_update_utc, rates: picked };
-      }
-    }
-  } catch (err) {
-    console.error('ER-API unavailable:', err.message);
+  if (er && er.result === 'success') {
+    const picked = {};
+    for (const code of Object.keys(CURRENCIES)) if (er.rates[code] !== undefined) picked[code] = er.rates[code];
+    crosscheck = { provider: 'open.er-api.com', date: er.time_last_update_utc, rates: picked };
   }
 
   const data = {
@@ -102,7 +90,7 @@ exports.pricing = async (req, res) => {
     title: 'International pricing',
     products: await Product.forSale(),
     rates,
-    selected: (req.query.currency || 'USD').toUpperCase(),
+    selected: String(req.query.currency || 'USD').toUpperCase(),
   });
 };
 
@@ -121,7 +109,7 @@ exports.weatherJson = async (req, res) => {
     return res.status(400).json({ error: 'lat and lng query parameters are required' });
   }
   try {
-    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code`);
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code`, { signal: AbortSignal.timeout(5000) });
     if (!r.ok) throw new Error(`Open-Meteo answered ${r.status}`);
     const json = await r.json();
     res.json({ source: 'api.open-meteo.com', current: json.current, units: json.current_units });

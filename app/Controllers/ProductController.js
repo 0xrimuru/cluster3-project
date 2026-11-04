@@ -5,9 +5,7 @@ const Product = require('../Models/Product');
 const StockLedger = require('../Models/StockLedger');
 const { transaction } = require('../../config/database');
 
-function wantsJson(req) {
-  return req.is('application/json') || (req.get('accept') || '').includes('application/json');
-}
+const { wantsJson, notFound } = require('../Middleware/respond');
 const base = { pageName: 'Stock', nav: 'stock' };
 const LIMITS = { sku: 20, title: 250, brand: 100, category: 50, image: 250 }; // column sizes in lpa_stock
 const MAX_PRICE = 99999.99;   // DECIMAL(7,2)
@@ -15,6 +13,7 @@ const MAX_QTY = 1000000;
 
 // Server-side checks (the form also checks in the browser, but the server must not trust it).
 async function checkItem(body, selfSku) {
+  if (['title', 'brand'].some(f => (!selfSku || body[f] !== undefined) && !String(body[f] || '').trim())) return 'A stock item needs at least a product name and a brand.';
   for (const [field, max] of Object.entries(LIMITS)) {
     if (body[field] !== undefined && String(body[field]).trim().length > max) return `${field === 'title' ? 'Product name' : field[0].toUpperCase() + field.slice(1)} must be ${max} characters or fewer.`;
   }
@@ -33,6 +32,14 @@ async function checkItem(body, selfSku) {
     if (!Number.isInteger(q) || q < 0 || q > MAX_QTY) return 'On-hand quantity must be a whole number of 0 or more.';
   }
   return null;
+}
+
+// Database refusals we can explain (anything else is a real error -> 500 handler).
+function dbProblem(err) {
+  // The foreign keys stop a Stock ID change while invoices / the audit history refer to it.
+  if (/^ER_ROW_IS_REFERENCED/.test(err.code)) return 'This Stock ID is used on invoices or in the audit history, so it cannot be changed.';
+  if (err.code === 'ER_DUP_ENTRY') return 'That Stock ID already exists (deleted items keep their Stock ID).';
+  throw err;
 }
 
 function fail(req, res, status, message) {
@@ -55,17 +62,17 @@ exports.newForm = (req, res) =>
 
 // POST /products -> INSERT
 exports.create = async (req, res) => {
-  if (!String(req.body.title || '').trim() || !String(req.body.brand || '').trim()) return fail(req, res, 400, 'A stock item needs at least a product name and a brand.');
   const problem = await checkItem(req.body);
   if (problem) return fail(req, res, 400, problem);
-  const product = await Product.create(req.body);
+  let product;
+  try { product = await Product.create(req.body); } catch (err) { return fail(req, res, 409, dbProblem(err)); }
   if (wantsJson(req)) return res.status(201).json(product);
   res.redirect(`/products/${encodeURIComponent(product.sku)}`);
 };
 
 // GET /products/:id -> stock item detail + its audit history
 exports.show = async (req, res) => {
-  const product = await Product.find(req.params.id);
+  const product = await Product.findBySku(req.params.id);
   if (!product) return fail(req, res, 404, 'Stock item not found.');
   if (wantsJson(req)) return res.json(product);
   res.render('products/show', Object.assign({
@@ -77,7 +84,7 @@ exports.show = async (req, res) => {
 
 // GET /products/:id/edit
 exports.editForm = async (req, res) => {
-  const product = await Product.find(req.params.id);
+  const product = await Product.findBySku(req.params.id);
   if (!product) return fail(req, res, 404, 'Stock item not found.');
   res.render('products/edit', Object.assign({ title: `Edit ${product.title}`, product }, base));
 };
@@ -87,14 +94,7 @@ exports.update = async (req, res) => {
   const problem = await checkItem(req.body, req.params.id);
   if (problem) return fail(req, res, 400, problem);
   let product;
-  try {
-    product = await Product.update(req.params.id, req.body);
-  } catch (err) {
-    // The foreign keys stop a Stock ID change while invoices / the audit history refer to it.
-    if (/^ER_ROW_IS_REFERENCED/.test(err.code)) return fail(req, res, 409, 'This Stock ID is used on invoices or in the audit history, so it cannot be changed.');
-    if (err.code === 'ER_DUP_ENTRY') return fail(req, res, 409, 'That Stock ID already exists.');
-    throw err;
-  }
+  try { product = await Product.update(req.params.id, req.body); } catch (err) { return fail(req, res, 409, dbProblem(err)); }
   if (!product) return fail(req, res, 404, 'Stock item not found.');
   if (wantsJson(req)) return res.json(product);
   res.redirect(`/products/${encodeURIComponent(product.sku)}`);

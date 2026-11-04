@@ -71,7 +71,6 @@ public class Trie<V> {
         }
     }
 
-    public boolean containsPrefix(String prefix) { return !suggest(prefix, 1).isEmpty(); }
 
     /** Number of entries added. */
     public int size() { return size; }

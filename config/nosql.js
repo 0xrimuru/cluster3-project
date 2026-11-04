@@ -17,6 +17,8 @@ const C = {
   ratings: 'product_ratings',       // rating summary per product, kept up to date by a trigger
   state: 'system_state',            // small bookkeeping docs (e.g. trigger resume token)
 };
+// Activity log event types - used by ActivityLog and by the collection's $jsonSchema validator
+const ACTIVITY_TYPES = ['LOGIN', 'LOGIN_FAILED', 'LOGIN_LOCKED', 'LOGOUT', 'REGISTER', 'PASSWORD', 'ACCESS_DENIED', 'SECURITY', 'ORDER', 'INVOICE', 'USER', 'REVIEW', 'REVIEW_ALERT', 'STOCK', 'OTHER'];
 
 const client = new MongoClient(URL, {
   appName: 'lpa-ecomms',
@@ -55,4 +57,4 @@ const close = () => client.close();
 // Host part only, for messages (never print the password)
 const where = () => URL.replace(/\/\/[^@/]*@/, '//***@').replace(/\?.*$/, '');
 
-module.exports = { db, col, C, client, check, close, isDown, where, DB_NAME };
+module.exports = { db, col, C, ACTIVITY_TYPES, check, close, isDown, where };

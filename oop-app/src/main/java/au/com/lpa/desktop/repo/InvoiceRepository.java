@@ -62,9 +62,18 @@ public class InvoiceRepository extends JdbcRepository<Invoice> {
     @Override
     public Invoice save(Invoice i) { throw new UnsupportedOperationException("Invoices are created by InvoiceService"); }
 
+    /** Next invoice number - the same rule as the web app (INV-1001, INV-1002, ...), locked inside a transaction. */
+    public String nextNumber(Connection c) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement("SELECT COALESCE(MAX(CAST(SUBSTRING(lpa_inv_no, 5) AS UNSIGNED)), 1000) + 1 FROM lpa_invoices WHERE lpa_inv_no REGEXP '^INV-[0-9]+$' FOR UPDATE");
+             ResultSet rs = ps.executeQuery()) {
+            rs.next();
+            return "INV-" + rs.getLong(1);
+        }
+    }
+
     /** INSERT invoice + lines inside the caller's transaction. Returns the new invoice number. */
     public String insert(Connection c, Invoice inv, Client client, LocalDateTime when) throws SQLException {
-        String number = nextId(c, "INV-", 4);
+        String number = nextNumber(c);
         update(c, "INSERT INTO lpa_invoices (lpa_inv_no, lpa_inv_date, lpa_inv_client_ID, lpa_inv_client_name, lpa_inv_client_address, "
                 + "lpa_inv_amount, lpa_inv_payment, lpa_inv_status) VALUES (?, ?, ?, ?, ?, ?, ?, 'a')",
                 number, Timestamp.valueOf(when), client.getId(), client.fullName(), client.getAddress(), inv.total(), inv.getPayment());

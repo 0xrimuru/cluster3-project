@@ -12,7 +12,7 @@
         <h2><%= s.name %></h2>
         <p><%= s.address %></p>
         <p><%= s.phone %> &middot; <%= s.hours %></p>
-        <p class="weather" data-lat="<%= s.lat %>" data-lng="<%= s.lng %>">Loading weather&hellip;</p>
+        <p class="weather">Loading weather&hellip;</p>
       </div>
     <% }); %>
   </div>
@@ -60,6 +60,7 @@
             const el = document.querySelector('#store-' + s.id + ' .weather');
             if (el) el.textContent = 'Weather unavailable right now.';
           });
-      }));
+      }))
+      .catch(() => document.querySelectorAll('.store-card .weather').forEach(el => { el.textContent = 'Weather unavailable right now.'; }));
   </script>
 <%- include('../partials/footer') %>

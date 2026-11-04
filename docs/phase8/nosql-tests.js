@@ -261,7 +261,7 @@ const planIndex = plan => (JSON.stringify(plan.queryPlanner.winningPlan).match(/
   s1.child.kill();
   await login('cust2', 'aturner');
   const countBefore = await A.collection('sessions').countDocuments({ userId: 'U-003' });
-  await get('cust2', '/logout');
+  await post('cust2', '/logout');
   const afterLogout = await A.collection('sessions').countDocuments({ userId: 'U-003' });
   await post('admin', '/users/U-003?_method=PUT', { form: { username: 'aturner', firstName: 'Alex', lastName: 'Turner', group: 'customer', status: 'inactive' } });
   const afterDeactivate = await A.collection('sessions').countDocuments({ userId: 'U-003' });

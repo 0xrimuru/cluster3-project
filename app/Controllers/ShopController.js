@@ -13,8 +13,8 @@ const { transaction } = require('../../config/database');
 const { takeStock, RuleError } = require('./SalesController');
 
 const PAYMENT_OPTIONS = ['Visa', 'Mastercard', 'American Express', 'PayPal'];
-const round2 = n => Math.round(n * 100) / 100;
-const wantsJson = req => (req.get('accept') || '').includes('application/json');
+const { round2 } = Invoice; // money: the same rounding as the invoices
+const { wantsJson, notFound } = require('../Middleware/respond');
 const policy = require('../Security/policy');
 const isCustomer = req => policy.can(req.user, 'shop.buy');
 
@@ -120,9 +120,7 @@ exports.checkout = async (req, res) => {
   const form = { address: String(req.body.address || '').trim(), phone: String(req.body.phone || '').trim(), payment: String(req.body.payment || '') };
   const errors = [];
   if (!view.lines.length) errors.push('Your cart is empty.');
-  if (!form.address) errors.push('Delivery address is required.');
-  else if (form.address.length > 250) errors.push('Delivery address must be 250 characters or fewer.');
-  if (!/^[0-9 ()+-]{8,20}$/.test(form.phone)) errors.push('Enter a valid phone number.');
+  errors.push(...Client.contactErrors(form));
   if (!PAYMENT_OPTIONS.includes(form.payment)) errors.push('Choose a payment option.');
   view.lines.filter(l => l.short).forEach(l => errors.push(`Only ${l.onHand} of ${l.title} left in stock - please update your cart.`));
   if (req.body.expectedTotal && Number(req.body.expectedTotal) !== view.total) errors.push('Prices changed while you were checking out - please review the new total.');
@@ -161,9 +159,7 @@ exports.orders = async (req, res) => {
 // GET /orders/:number - one of the customer's own orders (others are "not found")
 exports.order = async (req, res) => {
   const inv = await Invoice.find(req.params.number);
-  if (!inv || !policy.canViewOrder(req.user, inv)) return res.status(404).render('error', { title: 'Not found', message: 'Order not found.', nav: 'orders' });
+  if (!inv || !policy.canViewOrder(req.user, inv)) return notFound(req, res, 'Order not found.', 'orders');
   res.render('shop/order', { title: `Order ${inv.number}`, pageName: 'Orders', nav: 'orders', inv, placed: req.query.placed === '1', backHref: '/orders' });
 };
 
-exports.PAYMENT_OPTIONS = PAYMENT_OPTIONS;
-exports.cartView = cartView;

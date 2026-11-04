@@ -2,13 +2,11 @@ package au.com.lpa.desktop.algo;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Weighted, undirected graph stored as an adjacency list (place -> neighbours with distances),
@@ -35,9 +33,7 @@ public class Graph {
         adjacency.get(b).add(new Edge(a, km));
     }
 
-    public Set<String> places() { return Collections.unmodifiableSet(adjacency.keySet()); }
     public boolean has(String place) { return adjacency.containsKey(place); }
-    public List<Edge> roads(String place) { return Collections.unmodifiableList(adjacency.getOrDefault(place, List.of())); }
 
     /** Shortest distances from one place to every reachable place. */
     public Map<String, Double> distancesFrom(String start) {

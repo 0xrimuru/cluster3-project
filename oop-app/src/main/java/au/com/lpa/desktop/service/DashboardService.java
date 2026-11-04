@@ -1,5 +1,6 @@
 package au.com.lpa.desktop.service;
 
+import au.com.lpa.desktop.model.Product;
 import au.com.lpa.desktop.util.Db;
 
 import java.math.BigDecimal;
@@ -17,7 +18,7 @@ public class DashboardService {
     public Stats stats() throws SQLException {
         return db.run(c -> {
             try (var ps = c.prepareStatement("SELECT (SELECT COUNT(*) FROM lpa_stock WHERE lpa_stock_status <> 'x'), "
-                    + "(SELECT COUNT(*) FROM lpa_stock WHERE lpa_stock_status <> 'x' AND lpa_stock_onhand BETWEEN 1 AND 5), "
+                    + "(SELECT COUNT(*) FROM lpa_stock WHERE lpa_stock_status <> 'x' AND lpa_stock_onhand BETWEEN 1 AND " + Product.LOW_STOCK + "), "
                     + "(SELECT COUNT(*) FROM lpa_stock WHERE lpa_stock_status <> 'x' AND lpa_stock_onhand = 0), "
                     + "(SELECT COUNT(*) FROM lpa_invoices WHERE lpa_inv_status = 'a'), "
                     + "(SELECT COALESCE(SUM(lpa_inv_amount), 0) FROM lpa_invoices WHERE lpa_inv_status = 'a')");

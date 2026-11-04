@@ -56,6 +56,14 @@ class ReportsTest {
         assertEquals(20, plan.get(1).daysOfCover(), 1e-9);
     }
 
+    @Test @DisplayName("R-06 Reorder planner uses exact maths: 31 on hand, 93 sold in 90 days = exactly 30 days, nothing to order")
+    void reorderExact() {
+        List<ReorderPlanner.Suggestion> plan = new ReorderPlanner(90, 30).plan(List.of(p("X", 31)), Map.of("X", new ItemSales("X", "X", 93, BigDecimal.ONE)), 1);
+        assertEquals(30.0, plan.get(0).daysOfCover());           // not 29.999999999999996
+        assertEquals("30 days of stock", plan.get(0).reason());  // not "Only 30 days of stock left"
+        assertEquals(0, plan.get(0).suggestedQty());              // target 31, 31 on hand
+    }
+
     static InvoiceRow row(String no, String date, String amount, String address) {
         return new InvoiceRow(no, LocalDate.parse(date), "CL-1", "Client " + no, address, new BigDecimal(amount));
     }
