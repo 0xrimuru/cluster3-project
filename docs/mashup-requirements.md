@@ -1,8 +1,8 @@
 # Mashup Interface Requirements — Block 3 (ICTPRG538)
 
-**Project:** OT Tech online bookstore (Cluster 3)
-**Prepared by:** Pedro Alvim · **Student ID:** CTI20260187 · **Date:** 30 July 2026
-**Submitted to:** Trainer/assessor (client role-play) for feedback and sign-off
+**Project:** LPA eComms — online store for Logic Peripherals Australia, built by OT Tech (Cluster 3)  
+**Prepared by:** Pedro Alvim · **Student ID:** CTI20260187 · **Date:** 30 July 2026 · **Version:** 1.1 (24 November 2026: LPA naming, 5-second time limit, sign-in for the JSON endpoints)  
+**Submitted to:** Dijo Sasidharan (client / project sponsor, role-play) for feedback and sign-off
 
 ## 1. Purpose
 
@@ -21,7 +21,7 @@ can be checked and signed off before and after the build.
 
 ## 3. Mashup 1 — Store locator (map + live weather)
 
-**What it does:** shows every OT Tech store on an interactive map, and shows the
+**What it does:** shows every LPA store (Brisbane, Sydney, Melbourne) on an interactive map, and shows the
 current weather at each store so customers can plan their visit.
 
 | Aspect | Requirement |
@@ -33,17 +33,20 @@ current weather at each store so customers can plan their visit.
 
 ## 4. Mashup 2 — Live international pricing (catalogue + exchange rates)
 
-**What it does:** shows the book catalogue priced in a chosen foreign currency using
+**What it does:** shows the product catalogue priced in a chosen foreign currency using
 live exchange rates, for LPA's overseas customers.
 
 | Aspect | Requirement |
 |--------|-------------|
-| Sources | Frankfurter API (European Central Bank rates) + open.er-api.com (second provider, used as a cross-check and fallback) + our own catalogue (`Book` model) |
-| Interface | `/mashups/pricing`: a currency picker (USD, EUR, GBP, JPY, NZD, BRL) and a table showing each book in AUD and the chosen currency, with the rate, its source, date, and the cross-check rate shown underneath |
+| Sources | Frankfurter API (European Central Bank rates) + open.er-api.com (second provider, used as a cross-check and fallback) + our own catalogue (`Product` model) |
+| Interface | `/mashups/pricing`: a currency picker (USD, EUR, GBP, JPY, NZD, BRL) and a table showing each product in AUD and the chosen currency, with the rate, its source, date, and the cross-check rate shown underneath |
 | Where it's combined | On the server: the controller fetches both providers, merges them, and renders the priced table; rates are cached for one hour so the free APIs aren't hammered |
-| Failure behaviour | If one provider is down the other takes over; if both are down the page still renders with AUD prices and an apology message |
+| Failure behaviour | Each provider gets at most 5 seconds; if one provider is down or slow the other takes over; if both are down the page still renders with AUD prices and an apology message |
 
 ## 5. JSON endpoints (for testing in Postman)
+
+The store is behind a sign-in, so Postman signs in first (see `postman/LPA Phases 2-3.postman_collection.json`).
+
 
 - `GET /mashups/api/stores` — store data used by the map
 - `GET /mashups/api/rates` — merged exchange rates (both providers, cache flag)
@@ -56,9 +59,20 @@ live exchange rates, for LPA's overseas customers.
 3. External failures degrade gracefully (no crashes, no blank pages).
 4. APIs tested in Postman with request/response evidence captured.
 
+```{=openxml}
+<w:p><w:r><w:br w:type="page"/></w:r></w:p>
+```
+
 ## 7. Feedback and sign-off
 
-| | Name | Feedback / comments | Signature | Date |
-|-|------|--------------------|-----------|------|
-| Trainer/assessor (client) | ____________ | ____________________ | __________ | ______ |
-| Student | Pedro Alvim | | __________ | ______ |
+**Client / project sponsor:** Dijo Sasidharan
+
+Feedback: ______________________________________________________________
+
+\_______________________________________________________________________ 
+
+Signature: ________________________  Date: ______________
+
+**Student / project manager:** Pedro Alvim
+
+Signature: ________________________  Date: ______________

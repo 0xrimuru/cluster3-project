@@ -1,0 +1,337 @@
+{
+  "info": {
+    "name": "LPA eComms – Phases 2-3 (MVC + mashups)",
+    "description": "Run 0a and 0b first, then the numbered requests. Start the app with npm start (http://localhost:3000).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0a Sign in (palvim)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/login",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "login"
+          ]
+        },
+        "description": "Signs in. Postman keeps the session cookie (lpa_sid) for the next requests.",
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "username",
+              "value": "palvim"
+            },
+            {
+              "key": "password",
+              "value": "Lpa#2026"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "0b Get the CSRF token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base}}/more",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "more"
+          ]
+        },
+        "description": "Reads the page's security token so POST/PUT/DELETE are accepted."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const m = pm.response.text().match(/name=\"csrf-token\" content=\"([0-9a-f]+)\"/);",
+              "pm.test('CSRF token found (signed in)', () => pm.expect(m).to.not.equal(null));",
+              "if (m) pm.collectionVariables.set('csrf', m[1]);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2.4 GET /products (list)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/products",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "products"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2.5 POST /products (create)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-CSRF-Token",
+            "value": "{{csrf}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/products",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "products"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Ergonomic Wrist Rest\",\n  \"brand\": \"LPA\",\n  \"category\": \"Accessories\",\n  \"price\": \"24.90\",\n  \"quantity\": \"10\",\n  \"status\": \"active\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('sku', pm.response.json().sku);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2.6 PUT /products/{{sku}} (update)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-CSRF-Token",
+            "value": "{{csrf}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/products/{{sku}}",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "products",
+            "{{sku}}"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"price\": \"22.50\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2.7 DELETE /products/{{sku}} (remove)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-CSRF-Token",
+            "value": "{{csrf}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/products/{{sku}}",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "products",
+            "{{sku}}"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3.2 GET /mashups/api/stores",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/mashups/api/stores",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "mashups",
+            "api",
+            "stores"
+          ]
+        },
+        "description": ""
+      }
+    },
+    {
+      "name": "3.3 GET /mashups/api/rates",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/mashups/api/rates",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "mashups",
+            "api",
+            "rates"
+          ]
+        },
+        "description": ""
+      }
+    },
+    {
+      "name": "3.4 GET /mashups/api/weather",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/mashups/api/weather?lat=-27.47&lng=153.02",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "mashups",
+            "api",
+            "weather"
+          ],
+          "query": [
+            {
+              "key": "lat",
+              "value": "-27.47"
+            },
+            {
+              "key": "lng",
+              "value": "153.02"
+            }
+          ]
+        },
+        "description": ""
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "csrf",
+      "value": ""
+    },
+    {
+      "key": "sku",
+      "value": ""
+    }
+  ]
+}
