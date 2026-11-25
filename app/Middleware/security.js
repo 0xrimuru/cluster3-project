@@ -27,7 +27,8 @@ function headers(req, res, next) {
   ].join('; '));
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('Referrer-Policy', 'same-origin');
+  // Other sites see only our origin (never the page path); OpenStreetMap tiles require a Referer
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   // HTTPS only: tell the browser to use HTTPS for this site for the next 180 days (HSTS)
   if (req.secure) res.setHeader('Strict-Transport-Security', 'max-age=15552000');
